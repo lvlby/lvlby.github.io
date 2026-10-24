@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LvLBY connection test</title>
+<style>body{margin:0;background:#0c111b;color:#e8edf6;font:16px/1.7 system-ui,-apple-system,Segoe UI,Tahoma,sans-serif;padding:20px}h1{font-size:20px;margin:0 0 6px}p{color:#9fb0c7;margin:4px 0 14px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #223048}.ok{color:#6ee7a8}.bad{color:#ff8b8b}.wait{color:#ffd98a}button{background:#a8e6c3;color:#0d1f16;border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:700;margin:10px 0}
+#sum{margin-top:16px;padding:14px;border-radius:12px;background:#151d2b;white-space:pre-wrap}code{direction:ltr;unicode-bidi:embed;font-size:13px}</style></head><body>
+<h1>تست اتصال LvLBY / LvLBY connection test</h1>
+<p>VPN را روشن کن، بعد دکمه را بزن. / Turn your VPN on, then tap the button.</p>
+<button id="go">شروع تست / Start test</button>
+<div id="rows"></div><div id="sum"></div>
+<script>
+var CFG={apiKey:"AIzaSyAWU5ZyMIEZa1r6I7R5E_t30KwWdPR2qT0",authDomain:"lvlby-cbf9b.firebaseapp.com",projectId:"lvlby-cbf9b"};
+var TESTS=[
+["Firebase script (gstatic)","https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"],
+["Google login page","https://accounts.google.com/"],
+["Login popup page (firebaseapp)","https://lvlby-cbf9b.firebaseapp.com/__/auth/handler"],
+["Google APIs script","https://apis.google.com/js/api.js"],
+["Firebase Auth API","https://identitytoolkit.googleapis.com/"],
+["Firebase token API","https://securetoken.googleapis.com/"],
+["Firestore API","https://firestore.googleapis.com/"]];
+var rows=document.getElementById('rows'),sum=document.getElementById('sum'),res={};
+function row(name){var d=document.createElement('div');d.className='row';d.innerHTML='<span></span><b class="wait">...</b>';d.firstChild.textContent=name;rows.appendChild(d);return d.lastChild}
+function setR(el,ok,t){el.className=ok?'ok':'bad';el.textContent=t}
+function timeout(ms){return new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},ms)})}
+function probe(url){return Promise.race([fetch(url,{mode:'no-cors',cache:'no-store'}),timeout(9000)])}
+function loadScript(src){return new Promise(function(ok,no){var s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=function(){no(new Error('load'))};document.head.appendChild(s);setTimeout(function(){no(new Error('timeout'))},12000)})}
+document.getElementById('go').onclick=function(){
+  rows.innerHTML='';sum.textContent='';res={};
+  var chain=Promise.resolve();
+  TESTS.forEach(function(t){chain=chain.then(function(){var el=row(t[0]);return probe(t[1]).then(function(){res[t[0]]=true;setR(el,true,'OK')},function(e){res[t[0]]=false;setR(el,false,'FAIL ('+e.message+')')})})});
+  chain=chain.then(function(){
+    var el=row('Firebase login check (uses your API key)');
+    return loadScript('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js').then(function(){return loadScript('https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js')}).then(function(){
+      var app=firebase.initializeApp(CFG);
+      return app.auth().signInWithEmailAndPassword('nobody-test@example.com','not-a-real-password-123').then(function(){return 'unexpected'},function(e){return e.code||e.message})
+    }).then(function(code){
+      var reachable=/user-not-found|invalid-credential|wrong-password|invalid-email|operation-not-allowed|too-many-requests|invalid-login/.test(code);
+      res.auth=reachable?'ok':code;setR(el,reachable,reachable?'OK ('+code+')':code);
+    },function(e){res.auth='script:'+e.message;setR(el,false,'FAIL ('+e.message+')')});
+  }).then(function(){
+    var bad=[],k;for(k in res){if(res[k]!==true&&res[k]!=='ok')bad.push(k)}
+    var m='';
+    m+='الان / host: '+location.host+'\nonline: '+navigator.onLine+'\n\n';
+    if(!bad.length){m+='همه‌چیز OK است. اگر باز ورود خطا می‌دهد، مشکل از دامنه یا تنظیمات Firebase است؛ نتیجه را برای من بفرست.\nAll OK. If sign-in still fails, the problem is the domain or Firebase settings; send me this result.'}
+    else{m+='این‌ها باز نشدند / These failed:\n- '+bad.join('\n- ')+'\n\n';
+      if(res.auth&&res.auth!=='ok'&&String(res.auth).indexOf('network-request-failed')>=0)m+='Firebase Auth API از این شبکه در دسترس نیست. VPN دیگری یا حالت «کل گوشی» را امتحان کن.\nThe Firebase login servers are not reachable from this network. Try another VPN or full-phone mode.\n';
+      if(res.auth&&/referer|blocked|api-key/.test(String(res.auth)))m+='کلید API محدودیت دامنه دارد. در Google Cloud، آدرس https://lvlby.github.io/* را به کلید اضافه کن.\nThe API key has a site restriction. Add https://lvlby.github.io/* in Google Cloud.\n';
+      m+='\nکد Firebase: '+res.auth}
+    sum.textContent=m});
+};
+</script></body></html>
