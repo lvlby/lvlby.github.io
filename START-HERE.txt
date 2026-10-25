@@ -1,0 +1,9 @@
+LvLBY v11 - one download
+
+1) GitHub: repository lvlby.github.io > Add file > Upload files. Upload everything INSIDE the folder UPLOAD-THESE
+   (index.html, privacy.html, sw.js, manifest.webmanifest and the icons folder). Commit.
+2) Firebase > Firestore Database > Rules: delete everything, paste PASTE-IN-FIREBASE-RULES.txt, Publish.
+   (Profile keys changed: energy, dayType, ov. Settings keys: pet, pname, owned, hat.)
+3) VPN on, open the site, close and reopen the app twice. Everyone (new and existing users) will see the questions once.
+
+extras/ holds the tests (node tests.js inside a folder that has index.html). Not needed for the site.
