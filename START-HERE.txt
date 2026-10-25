@@ -1,4 +1,4 @@
-LvLBY v11 - one download
+LvLBY v15 - one download
 
 1) GitHub: repository lvlby.github.io > Add file > Upload files. Upload everything INSIDE the folder UPLOAD-THESE
    (index.html, privacy.html, sw.js, manifest.webmanifest and the icons folder). Commit.

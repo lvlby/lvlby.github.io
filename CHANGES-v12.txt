@@ -1,0 +1,47 @@
+LvLBY v12 - what changed (from v11)
+
+1. "Client is offline" error
+   - Firestore now uses forced long-polling (works better on filtered networks).
+   - If the cloud cannot be reached, the app no longer shows an error. It keeps your data on the device, shows a calm message, and retries automatically (6s, 12s, ... up to 60s) and again when the phone comes back online.
+   - Fixed a second hidden bug: Firebase setup could register twice.
+   NOT guaranteed: if firestore.googleapis.com is fully blocked on the user's network, cloud sync cannot work. The app still works locally.
+
+2. Questions popup
+   - Cause found: the only line that opened the questions was accidentally inside the notifications button, so it never opened on first visit.
+   - Now: a welcome popup with a big "Start the questions / شروع سؤال‌ها" button opens on first visit (and for users who have not finished the questions). A big card with the same button also sits on top of the main screen until the questions are done. "Later / بعداً" closes the popup.
+
+3. Persian (checked by running the page in a real headless browser at phone size)
+   - Brand "LvLBY." showed the dot on the wrong side: fixed.
+   - Native date box showed English "10/25/2026": in Persian it now shows the Persian date (the date picker itself still opens when tapped; the picker window is the browser's own).
+   - Tab bar labels wrapped on 3 lines: shortened (روتین‌ها، هفته، گزارش).
+   - Language button now says "English" / "فارسی". Privacy link is Persian in Persian mode.
+   - "XP" text order was reversed: fixed. Google button no longer breaks into 3 lines.
+   - Date commas are Persian (،).
+   - Automatic scan of every tab found no leftover English words except "XP".
+   - I did NOT read every Persian sentence for style/grammar. I checked: missing translations (none), Arabic letters/digits (none), spacing of "می‌" prefixes (none wrong). A native-speaker read-through is still recommended.
+
+4. Not done
+   - "Profile picture when installed as an app": waiting for your answer (see chat).
+   - Not tested on a real phone or real Iranian network.
+
+
+v12b additions
+- Persian questions reviewed and reworded (age question, wake/sleep time labels with صبح/شب, 'choose several' hints, challenge and experience options). References to the renamed tab fixed.
+- Home-screen icon: added separate maskable icons (logo inside the safe zone) so Android no longer crops the corners; kept normal icons too. If the old icon still shows, remove the installed app and install again.
+
+v13 - Smart Add repeats
+Smart Add now understands (English and Persian):
+  every 2 days / every three days / every other day      هر ۲ روز / هر سه روز / یک روز در میان
+  every 2 weeks (optionally on a weekday)                هر دو هفته دوشنبه
+  every day for one week / till one week / for 3 weeks   هر روز به مدت یک هفته / برای ۲ هفته
+  "for/till N days, weeks, months" alone = every day until that period ends (max 1 year)
+The preview line shows the repeat and the end date before you confirm. Repeats are saved in "My routines".
+Limits: "for 2 hours" is NOT treated as a repeat. In the Habits tab, such items are not yet shown with their interval (they still appear on the right days).
+
+v14 - tour
+- New tour step "Repeats in Smart Add" (English + Persian) right after the Smart Add step.
+- The tour now starts immediately after the questions are finished (after the "Your routine is ready" screen), every time the questions are completed, not only the first time. Editing your profile later does not replay it.
+- The "Connect Google / use without account" screen now appears AFTER the tour, so a blocked Google sign-in can no longer stop the tour from showing.
+
+v15 - "Building your routine" screen
+After the last question, a short loading screen (spinner, changing messages, progress bar) shows for a random 1.8 to 2.8 seconds, then the "Your routine is ready" screen appears. The routine itself is computed instantly and saved first; the wait is only for the feel of the moment.

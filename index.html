@@ -212,6 +212,10 @@ input,select,textarea{background:#101a2b;border:1px solid #435573;color:var(--te
 .badge.on{border-color:var(--yellow);box-shadow:0 0 0 1px #ffd97a33}.calday.today{outline-color:var(--violet)}
 .toast{box-shadow:0 10px 30px #0006}
 ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#3a4a63;border-radius:8px}
+.datewrap{position:relative}.datelbl{display:none}.datewrap.faDate .datelbl{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--line,#2a3750);border-radius:12px;padding:0 12px;font-weight:600}.datewrap.faDate #selectedDate{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+#xpText{direction:ltr;unicode-bidi:isolate;white-space:nowrap}.tabs .tab{white-space:nowrap}.langbtn{white-space:nowrap}
+.brandname{unicode-bidi:isolate;direction:ltr;display:inline-block}#googleSignIn{white-space:nowrap;font-size:13px}#startCard{margin-bottom:14px;border-color:var(--accent)}#startCard h3{margin:0 0 6px}
+.obspin{width:44px;height:44px;border-radius:50%;border:4px solid #2a3750;border-top-color:var(--accent);animation:obspin .9s linear infinite;margin:14px auto 10px}@keyframes obspin{to{transform:rotate(360deg)}}.obbar{height:6px;border-radius:6px;background:#26324a;overflow:hidden;margin:14px 0 6px}.obbar i{display:block;height:100%;width:0;background:var(--accent);transition-property:width;transition-timing-function:linear}body.reduce .obspin{animation-duration:2.4s}
 </style>
 <meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks.">
 <meta property="og:title" content="LvLBY">
@@ -448,9 +452,10 @@ function setupFirebase(){
   if(!firebaseConfigured()||typeof firebase==='undefined'){showStatus();return}
   try{
     if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
-    cloudAuth=firebase.auth();cloudDb=firebase.firestore();try{cloudDb.settings({experimentalAutoDetectLongPolling:true,merge:true})}catch(e){}
+    cloudAuth=firebase.auth();cloudDb=firebase.firestore();try{cloudDb.settings({experimentalForceLongPolling:true,merge:true})}catch(e){}
   }catch(err){console.error('Firebase initialization failed:',err);cloudAuth=null;showStatus();return}
-  cloudAuth.onAuthStateChanged(async user=>{
+  if(window.__fbDone)return;window.__fbDone=true;
+  const authChanged=async user=>{
     if(unsub){unsub();unsub=null}
     if(demo&&user)exitDemo();
     cloudUser=user||null;cloudReady=false;
@@ -473,7 +478,7 @@ function setupFirebase(){
         pushAfter=true;
       }
       localStorage.setItem(LS.owner,user.uid);
-      cloudReady=true;
+      cloudReady=true;window.__cl=0;
       if(!data.days[selected])buildDay(selected);
       renderAll();afterSignIn();
       if(pushAfter){cloudState='syncing';showStatus();await pushCloud()}else{cloudState='synced';showStatus()}
@@ -484,8 +489,11 @@ function setupFirebase(){
         if(localStorage.getItem(LS.dirty)==='1')return;
         adoptCloud(c);if(!data.days[selected])buildDay(selected);renderAll();showStatus();
       },e=>console.error('Live sync error:',e));
-    }catch(err){console.error('Cloud load failed:',err);cloudState='loaderr';showStatus(sx('as')+(user.displayName||user.email||'Google')+' · '+sx('loaderr')+' ['+(err.code||err.message||'unknown')+']')}
-  });
+    }catch(err){console.error('Cloud load failed:',err);
+      if(err&&(err.code==='unavailable'||/offline|network|timeout/i.test(String(err.message||'')))){cloudState='pending';window.__cl=(window.__cl||0)+1;showStatus(sx('as')+(user.displayName||user.email||'Google')+' · '+({en:'cloud is unreachable, your data is safe on this device, retrying automatically',fa:'اتصال ابری برقرار نیست؛ اطلاعاتت روی این دستگاه امن است و خودکار دوباره تلاش می‌کنم'}[lang]||''));clearTimeout(window.__clT);window.__clT=setTimeout(()=>{if(cloudUser&&cloudUser.uid===user.uid)authChanged(cloudUser)},Math.min(60000,6000*window.__cl));return}
+      cloudState='loaderr';showStatus(sx('as')+(user.displayName||user.email||'Google')+' · '+sx('loaderr')+' ['+(err.code||err.message||'unknown')+']')}
+  };
+  cloudAuth.onAuthStateChanged(authChanged);window.__retryCloud=()=>{if(cloudUser&&!cloudReady)authChanged(cloudUser)};
   btn.onclick=async()=>{
     try{
       if(cloudUser){await doSignOut();return}
@@ -496,7 +504,7 @@ function setupFirebase(){
   };
   showStatus();
 }
-window.addEventListener('online',()=>{if(cloudUser&&cloudReady&&localStorage.getItem(LS.dirty)==='1'){cloudState='syncing';pushCloud()}showStatus()});
+window.addEventListener('online',()=>{if(window.__retryCloud)window.__retryCloud();if(cloudUser&&cloudReady&&localStorage.getItem(LS.dirty)==='1'){cloudState='syncing';pushCloud()}showStatus()});
 window.addEventListener('offline',()=>{if(cloudUser)cloudState='pending';showStatus()});
 function paintProgress(){const tasks=ensureDay(selected).tasks,done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0;$('progressBar').style.width=pct+'%';$('progressText').textContent=`${fa(done)} / ${fa(tasks.length)} ${tr('tasks')} ${tr('completeCount')}`;{const el=$('progressPct'),nv=fa(pct)+'%';if(el.textContent!==nv){el.textContent=nv;bump(el)}}$('doneStat').textContent=fa(done);$('totalStat').textContent=fa(tasks.length)}
 
@@ -560,16 +568,16 @@ const QS=[
 {k:'student',i:'🎓',t:'bool',req:1,q:['Are you a student?','آیا دانش‌آموز یا دانشجو هستی؟']},
 {k:'goal',i:'🎯',t:'one',q:['Why do you want LvLBY?','چرا LvLBY را می‌خواهی؟'],o:[['Study and school','Work and career','Health and fitness','Build better habits','Just stay organized'],['درس و مدرسه','کار و شغل','سلامت و ورزش','ساختن عادت‌های بهتر','فقط منظم بودن']]},
 {k:'work',i:'💼',t:'text',q:['What is your occupation? (optional)','شغلت چیست؟ (اختیاری)'],ph:['','']},
-{k:'age',i:'🎂',t:'one',q:['How old are you? (optional)','چند سالته؟ (اختیاری)'],o:[['13–17','18–24','25–34','35–44','45+','Prefer not to say'],['۱۳ تا ۱۷','۱۸ تا ۲۴','۲۵ تا ۳۴','۳۵ تا ۴۴','۴۵ به بالا','ترجیح می‌دهم نگویم']]},
-{k:'wake',i:'🌅',t:'one',q:['When do you usually wake up?','معمولاً کی بیدار می‌شوی؟'],o:[['Before 6 AM','6 to 7 AM','7 to 8 AM','8 to 9 AM','After 9 AM'],['قبل از ۶ صبح','۶ تا ۷','۷ تا ۸','۸ تا ۹','بعد از ۹']]},
-{k:'sleep',i:'🌙',t:'one',q:['When do you usually go to sleep?','معمولاً کی می‌خوابی؟'],o:[['Before 9 PM','9 to 10 PM','10 to 11 PM','11 PM to midnight','After midnight'],['قبل از ۹ شب','۹ تا ۱۰','۱۰ تا ۱۱','۱۱ تا ۱۲','بعد از نیمه‌شب']]},
-{k:'challenge',i:'🧩',t:'many',q:['What makes planning hard for you? (pick any)','برنامه‌ریزی برایت کجا سخت است؟ (چندتا را می‌توانی انتخاب کنی)'],o:[['Putting things off','Forgetting things','Staying focused','Staying consistent','Too many tasks','Managing my time'],['عقب انداختن کارها','فراموش کردن','تمرکز','ثبات و پیوستگی','زیاد بودن کارها','مدیریت زمان']]},
-{k:'interests',i:'💡',t:'many',q:['What do you want to organize? (pick any)','می‌خواهی چه چیزهایی را منظم کنی؟ (چندتا)'],o:[['School and study','Work','Fitness','Health and sleep','Family and friends','Hobbies','Reading','Money'],['درس و مطالعه','کار','ورزش','سلامت و خواب','خانواده و دوستان','سرگرمی‌ها','مطالعهٔ آزاد','پول و مالی']]},
+{k:'age',i:'🎂',t:'one',q:['How old are you? (optional)','چند سال داری؟ (اختیاری)'],o:[['13–17','18–24','25–34','35–44','45+','Prefer not to say'],['۱۳ تا ۱۷','۱۸ تا ۲۴','۲۵ تا ۳۴','۳۵ تا ۴۴','۴۵ به بالا','ترجیح می‌دهم نگویم']]},
+{k:'wake',i:'🌅',t:'one',q:['When do you usually wake up?','معمولاً کی بیدار می‌شوی؟'],o:[['Before 6 AM','6 to 7 AM','7 to 8 AM','8 to 9 AM','After 9 AM'],['قبل از ۶ صبح','۶ تا ۷ صبح','۷ تا ۸ صبح','۸ تا ۹ صبح','بعد از ۹ صبح']]},
+{k:'sleep',i:'🌙',t:'one',q:['When do you usually go to sleep?','معمولاً کی می‌خوابی؟'],o:[['Before 9 PM','9 to 10 PM','10 to 11 PM','11 PM to midnight','After midnight'],['قبل از ۹ شب','۹ تا ۱۰ شب','۱۰ تا ۱۱ شب','۱۱ شب تا نیمه‌شب','بعد از نیمه‌شب']]},
+{k:'challenge',i:'🧩',t:'many',q:['What makes planning hard for you? (pick any)','برنامه‌ریزی برایت کجا سخت است؟ (می‌توانی چند مورد انتخاب کنی)'],o:[['Putting things off','Forgetting things','Staying focused','Staying consistent','Too many tasks','Managing my time'],['به تعویق انداختن کارها','فراموش کردن کارها','تمرکز داشتن','ادامه دادن و پایداری','زیاد بودن کارها','مدیریت زمان']]},
+{k:'interests',i:'💡',t:'many',q:['What do you want to organize? (pick any)','می‌خواهی چه چیزهایی را منظم کنی؟ (می‌توانی چند مورد انتخاب کنی)'],o:[['School and study','Work','Fitness','Health and sleep','Family and friends','Hobbies','Reading','Money'],['درس و مطالعه','کار','ورزش','سلامت و خواب','خانواده و دوستان','سرگرمی‌ها','مطالعهٔ آزاد','پول و مالی']]},
 {k:'energy',i:'⚡',t:'one',q:['When do you have the most energy?','کی بیشترین انرژی را داری؟'],o:[['Morning','Afternoon','Evening','Late night'],['صبح','بعدازظهر','عصر','آخر شب']]},
 {k:'dayType',i:'🗓️',t:'one',q:['What does your day mostly look like?','روزهایت بیشتر شبیه چیست؟'],o:[['School or university','Office or work outside home','Working from home','Home and family','Freelance or self-employed','Something else'],['مدرسه یا دانشگاه','کار بیرون از خانه','کار از خانه','خانه و خانواده','فریلنس یا کار آزاد','چیز دیگر']]},
 {k:'daily',i:'⏱️',t:'one',q:['How much time can you give to tasks each day?','هر روز چقدر وقت برای کارها داری؟'],o:[['Under 1 hour','1 to 2 hours','2 to 4 hours','More than 4 hours'],['کمتر از ۱ ساعت','۱ تا ۲ ساعت','۲ تا ۴ ساعت','بیش از ۴ ساعت']]},
 {k:'remind',i:'🔔',t:'one',q:['When would you like reminders?','کی یادآوری می‌خواهی؟'],o:[['Morning','Afternoon','Evening','No reminders'],['صبح','بعدازظهر','عصر','بدون یادآوری']]},
-{k:'exp',i:'📱',t:'one',q:['Have you used planner apps before?','قبلاً از اپ‌های برنامه‌ریزی استفاده کرده‌ای؟'],o:[['This is my first one','I used some before','I use one now'],['این اولین‌شان است','قبلاً استفاده کرده‌ام','الان هم استفاده می‌کنم']]},
+{k:'exp',i:'📱',t:'one',q:['Have you used planner apps before?','قبلاً از اپ‌های برنامه‌ریزی استفاده کرده‌ای؟'],o:[['This is my first one','I used some before','I use one now'],['این اولین بارم است','قبلاً استفاده کرده‌ام','الان هم از یکی استفاده می‌کنم']]},
 {k:'src',i:'🔎',t:'one',q:['How did you hear about LvLBY?','از کجا با LvLBY آشنا شدی؟'],o:[['A friend','Social media','Search','School or teacher','Other'],['دوست','شبکه‌های اجتماعی','جست‌وجو','مدرسه یا معلم','جای دیگر']]},
 {k:'cal',i:'📅',t:'one',last:1,q:['Which calendar do you prefer?','کدام تقویم را ترجیح می‌دهی؟'],o:[['Automatic','Shamsi (شمسی)','Gregorian'],['خودکار','شمسی','میلادی']]}];
 const OB={en:{goals:QS[2].o[0],hi:'Hi, ',friend:'friend',none:'Not set',welcome:'Welcome, ',back:'Back',skip:'Skip',next:'Next',done:'Finish',haveAcc:'Already have an account? Sign in',updated:'Profile updated.'},
@@ -588,8 +596,10 @@ function obStart(edit,update){
   ob={step:0,stage:'q',edit:!!edit,update:!!update,tmp:t};renderOb();$('onboard').classList.add('open')}
 function obQ(q){return q.k==='work'&&ob.tmp.student===true?['What do you study? (optional)','چه چیزی می‌خوانی؟ (اختیاری)']:q.q}
 function obOk(q){const v=ob.tmp[q.k];if(!q.req)return true;if(q.t==='text')return !!(v&&String(v).trim());if(q.t==='bool')return typeof v==='boolean';return v!==undefined&&v!==''}
+function renderWelcome(box){const upd=profileOk();box.append(obEl('div','',''));const e=obEl('div','','👋');e.style.cssText='font-size:46px;text-align:center';const h=obEl('h2','',upd?L('Quick update for you','یک به‌روزرسانی کوتاه برای تو'):L('Welcome to LvLBY','به LvLBY خوش آمدی'));h.style.textAlign='center';const p=obEl('p','muted',upd?L('We added new questions so your plan fits you better. It takes about a minute.','چند سؤال تازه اضافه کردیم تا برنامه بهتر با تو جور شود. حدود یک دقیقه طول می‌کشد.'):L('Answer a few quick questions and I will set up your day for you. It takes about a minute.','به چند سؤال کوتاه جواب بده تا برنامهٔ روزت را برایت بچینم. حدود یک دقیقه طول می‌کشد.'));p.style.textAlign='center';const b=obEl('button','btn primary',L('Start the questions','شروع سؤال‌ها'));b.type='button';b.style.cssText='width:100%;font-size:18px;padding:16px;margin-top:14px';b.onclick=()=>obStart(false,upd);const l=obEl('button','btn',L('Later','بعداً'));l.type='button';l.style.cssText='width:100%;margin-top:8px';l.onclick=()=>$('onboard').classList.remove('open');box.append(e,h,p,b,l)}
+function welcomeGate(){try{if(demo||$('onboard').classList.contains('open'))return;if(profileOk()&&P.ov===ONB_VER)return;ob={step:0,stage:'welcome',tmp:{}};renderOb();$('onboard').classList.add('open')}catch(e){console.error(e)}}
 function renderOb(){
-  const box=$('obBox');box.innerHTML='';nxBtn=null;if(ob.stage==='ready')return renderReady(box);if(ob.stage==='connect')return renderConnect(box);
+  const box=$('obBox');box.innerHTML='';nxBtn=null;if(ob.stage==='welcome')return renderWelcome(box);if(ob.stage==='building')return renderBuilding(box);if(ob.stage==='ready')return renderReady(box);if(ob.stage==='connect')return renderConnect(box);
   const o=OB[lang]||OB.en,st=ob.step,q=QS[st],last=st===QS.length-1;
   const bar=obEl('div','xptrack'),fl=obEl('div','xpfill');fl.style.width=Math.round((st+1)/(QS.length+1)*100)+'%';bar.append(fl);box.append(bar);if(q.i){const ic=obEl('div','obico',q.i);box.append(ic)}
   const ey=obEl('div','eyebrow',fa(st+1)+' / '+fa(QS.length));ey.style.marginTop='10px';box.append(ey);
@@ -617,21 +627,31 @@ function obCommit(){
 function obAfterQuestions(){
   obCommit();let plan=[];
   if(!demo){try{plan=pzBuild();backupDevice();pzApply(plan)}catch(e){console.error('Personal setup failed',e)}}
-  ob.plan=plan;ob.stage='ready';renderOb()}
+  ob.plan=plan;ob.stage='building';ob.dur=3000+Math.round(Math.random()*2500);renderOb();
+  clearTimeout(window.__obT);window.__obT=setTimeout(()=>{if(ob.stage==='building'){ob.stage='ready';renderOb()}},ob.dur)}
+function renderBuilding(box){
+  const steps=[L('Reading your answers…','در حال خواندن پاسخ‌هایت…'),L('Fitting your wake-up and sleep times…','هماهنگ کردن ساعت بیداری و خواب…'),L('Arranging your habits…','چیدن عادت‌ها و روتین‌ها…'),L('Almost ready…','تقریباً آماده است…')];
+  const sp=obEl('div','obspin');sp.setAttribute('aria-hidden','true');box.append(sp);
+  const h=obEl('div','hero-title',L('Building your routine','در حال ساختن روتین تو'));h.style.textAlign='center';box.append(h);
+  const m=obEl('p','muted smalltext',steps[0]);m.style.textAlign='center';m.setAttribute('role','status');box.append(m);
+  const bar=obEl('div','obbar'),fill=obEl('i','');bar.append(fill);box.append(bar);
+  const d=ob.dur||2200;requestAnimationFrame(()=>requestAnimationFrame(()=>{fill.style.transitionDuration=d+'ms';fill.style.width='100%'}));
+  steps.forEach((t,i)=>{if(i)setTimeout(()=>{if(ob.stage==='building')m.textContent=t},Math.round(d*i/steps.length))})}
 function renderReady(box){
   const o=OB[lang]||OB.en;box.append(obEl('div','obico','✨'));box.append(obEl('div','eyebrow',L('YOUR ROUTINE','روتین تو')));
   box.append(obEl('div','hero-title',L('Your routine is ready','روتینت آماده شد')));
   box.append(obEl('p','muted smalltext',notStudent()?L('Built from your answers. School shifts are switched off for you, so your day is one simple plan.','از روی پاسخ‌هایت ساخته شد. شیفت مدرسه برای تو خاموش است و روزت یک برنامهٔ ساده است.'):L('Built from your answers, with your school shift on.','از روی پاسخ‌هایت ساخته شد و شیفت مدرسه روشن است.')));
   const list=obEl('div','');list.style.margin='8px 0';
   (ob.plan||[]).forEach(a=>{const r=obEl('div','set-row');r.style.padding='8px 0';const l=obEl('span','');l.append(obEl('span','',a.ic+' '+a.t));const d=obEl('small','',a.d);l.append(d);r.append(l);list.append(r)});
-  if(!(ob.plan||[]).length)list.append(obEl('p','muted smalltext',L('Your default routine stays as it is. You can edit it in Habits.','روتین پیش‌فرضت همان می‌ماند. در بخش عادت‌ها می‌توانی ویرایشش کنی.')));
-  box.append(list);box.append(obEl('p','muted smalltext',L('You can change everything later in Habits & routines.','هر چیزی را بعداً در بخش عادت‌ها و روتین‌ها می‌توانی عوض کنی.')));
+  if(!(ob.plan||[]).length)list.append(obEl('p','muted smalltext',L('Your default routine stays as it is. You can edit it in Habits.','روتین پیش‌فرضت همان می‌ماند. در بخش روتین‌ها می‌توانی ویرایشش کنی.')));
+  box.append(list);box.append(obEl('p','muted smalltext',L('You can change everything later in Habits & routines.','هر چیزی را بعداً در بخش روتین‌ها می‌توانی عوض کنی.')));
   const b=obEl('button','btn primary',L('Continue','ادامه'));b.style.cssText='width:100%;margin-top:12px';
-  b.onclick=()=>{if(!ob.edit&&!cloudUser){ob.stage='connect';renderOb()}else obFinish()};box.append(b)}
+  b.onclick=()=>obFinish();box.append(b)}
 function obFinish(){
   const o=OB[lang]||OB.en;
   $('onboard').classList.remove('open');
   if(ob.edit){toast(o.updated);return}
+  try{localStorage.removeItem('lvlby-tour')}catch(e){}window.__connectAfterTour=!cloudUser&&!demo;
   toast(o.welcome+P.name+' 🎉');maybeTour()}
 /* ---- Personal setup: turns the welcome answers into real changes ---- */
 const pzFmt=t=>lang==='fa'?String(t).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]):String(t);
@@ -688,7 +708,10 @@ const CT=[['Start with just 5 minutes on the smallest task. Starting is the hard
 ['Choose your Top 3 for today and let the rest wait. Tap a task and mark it as Top 3.','سه کار برتر امروز را انتخاب کن و بقیه صبر کنند. روی یک کار بزن و آن را «۳ کار برتر» کن.'],
 ['Give each task a time, so your day takes shape by itself.','برای هر کار ساعتی بگذار تا روزت خودبه‌خود شکل بگیرد.']];
 const CEX=[['Tomorrow at 5 PM, study Science','فردا ساعت ۵ عصر درس علوم'],['Friday at 9 AM, send the weekly report','جمعه ساعت ۹ صبح گزارش هفتگی را بفرستم'],['Every day at 6 PM, exercise 20 minutes','هر روز ساعت ۶ عصر ۲۰ دقیقه ورزش'],['Every day at 9 PM, read 15 minutes','هر روز ساعت ۹ شب ۱۵ دقیقه مطالعه'],['Tonight, plan my week','امشب برنامهٔ هفته‌ام را بنویسم']];
+function renderStartCard(){let c=$('startCard');if(!c){c=document.createElement('div');c.id='startCard';c.className='card';const co=$('coach'),hr=co.closest('.hero-main')||co;hr.parentNode.insertBefore(c,hr)}const need=!demo&&(!profileOk()||P.ov!==ONB_VER);c.hidden=!need;c.textContent='';if(!need)return;const h=obEl('h3','',L('Set up your day in one minute','برنامهٔ روزت را در یک دقیقه بچین'));const p=obEl('p','muted',L('Answer a few quick questions and LvLBY builds your routines for you.','به چند سؤال کوتاه جواب بده تا LvLBY روتین‌هایت را بسازد.'));const b=obEl('button','btn primary',L('Start the questions','شروع سؤال‌ها'));b.type='button';b.style.cssText='width:100%;font-size:18px;padding:16px';b.onclick=()=>obStart(false,profileOk());c.append(h,p,b)}
 function renderCoach(){
+  try{renderStartCard()}catch(e){console.error(e)}
+  try{fixFaBits()}catch(e){console.error(e)}
   try{renderWeekly()}catch(e){console.error(e)}
   document.body.classList.toggle('nostudent',notStudent());const st=document.querySelector('.tab[data-view="schedule"]');if(st)st.textContent=notStudent()?L('My daily plan','برنامهٔ روزانه'):tr('tabSchedule');
   const el=$('coach');if(!el)return;
@@ -726,7 +749,7 @@ function installText(){if(isStandalone())return '';const ios=/iphone|ipad|ipod/i
 function doInstall(){if(deferredInstall){const d=deferredInstall;deferredInstall=null;d.prompt()}else toast(installText()||L('Already installed.','قبلاً نصب شده.'))}
 function renderConnect(box){
   box.append(obEl('div','eyebrow','LvLBY'));box.append(obEl('div','hero-title',L('Save your progress','پیشرفتت را ذخیره کن')));
-  box.append(obEl('p','muted smalltext',L('Connect your Google account to keep your tasks safe and use LvLBY on all your devices. After that I will show you how everything works.','حساب گوگلت را وصل کن تا کارهایت امن بمانند و در همهٔ دستگاه‌هایت باشند. بعد از آن نشانت می‌دهم هر بخش چطور کار می‌کند.')));
+  box.append(obEl('p','muted smalltext',L('Connect your Google account to keep your tasks safe and use LvLBY on all your devices. You can also skip this and use LvLBY without an account.','حساب گوگلت را وصل کن تا کارهایت امن بمانند و در همهٔ دستگاه‌هایت باشند. اگر نمی‌خواهی، می‌توانی بدون حساب هم استفاده کنی.')));
   const btn=(label,cls,fn)=>{const b=obEl('button','btn '+cls,label);b.style.cssText='width:100%;margin-top:10px';b.onclick=fn;box.append(b)};
   btn(L('Continue with Google','ادامه با گوگل'),'primary',()=>$('googleSignIn').click());
   btn(L('Not now: try the demo','فعلاً نه: نسخهٔ دمو را امتحان کن'),'',()=>{$('onboard').classList.remove('open');startDemo()});
@@ -749,6 +772,7 @@ $('demoConnect').onclick=()=>{exitDemo();$('googleSignIn').click()};$('demoExit'
 const TOUR=[
 {tab:'today',e:'✅',t:['Today','امروز'],d:['Your day in one list. Tap the box to finish a task. Tap the task itself for notes, steps, a focus timer, or to mark it one of your Top 3.','روز تو در یک فهرست. روی کادر بزن تا کار انجام شود. روی خود کار بزن برای یادداشت، مراحل، تایمر تمرکز یا انتخاب به‌عنوان یکی از ۳ کار برتر.']},
 {tab:'today',e:'✨',t:['Smart Add','افزودن هوشمند'],d:['Write one sentence like "Tomorrow at 5 PM, study Science" or «هر روز ساعت ۷ زبان بخونم». LvLBY finds the day, time, deadline and repeats, and asks you if something is unclear.','یک جمله بنویس، مثلاً «فردا ساعت ۵ عصر تکلیف علوم» یا "Study English every day at 7 PM". روز، ساعت، مهلت و تکرار پیدا می‌شود و اگر چیزی مبهم باشد می‌پرسد.']},
+{tab:'today',e:'🔂',t:['Repeats in Smart Add','تکرار در افزودن هوشمند'],d:['Add a repeat to your sentence: "every 2 days at 5 PM, study", "every 2 weeks on Monday, gym" or "every day for one week, stretch". Before you confirm, the preview shows when it repeats and when it ends.','به جمله‌ات تکرار اضافه کن: «هر ۲ روز ساعت ۵ عصر مطالعه»، «هر دو هفته دوشنبه باشگاه» یا «هر روز به مدت یک هفته کشش». پیش از تأیید می‌بینی چه زمانی تکرار می‌شود و کی تمام می‌شود.']},
 {tab:'habits',e:'🔁',t:['Routines','روتین‌ها'],d:['Your daily habits, like brushing teeth or drinking water. Edit, add or remove them. They appear every day by themselves.','عادت‌های روزانه‌ات، مثل مسواک یا آب خوردن. ویرایش، اضافه یا حذف کن. هر روز خودشان می‌آیند.']},
 {tab:'schedule',e:'🗓️',t:['Weekly schedule','برنامهٔ هفتگی'],d:['Set your school shift, morning or afternoon. It can swap automatically every Saturday at 00:00 (you can turn that off in Settings).','شیفت مدرسه‌ات را بگذار، صبح یا عصر. می‌تواند هر شنبه ساعت ۰۰:۰۰ خودکار عوض شود (در تنظیمات خاموشش می‌کنی).']},
 {tab:'calendar',e:'📅',t:['Calendar','تقویم'],d:['Your month at a glance: darker days mean more finished tasks. Tap a day to open it. Students can add exam and homework deadlines here, and everyone can save templates.','ماهت یک‌جا: روزهای تیره‌تر یعنی کار بیشتر انجام شده. روی یک روز بزن تا باز شود. دانش‌آموزها اینجا موعد امتحان و تکلیف می‌گذارند و همه می‌توانند قالب بسازند.']},
@@ -759,7 +783,7 @@ const TOUR=[
 let tourI=0;
 function maybeTour(){if(!localStorage.getItem('lvlby-tour')&&profileOk()&&!$('onboard').classList.contains('open'))setTimeout(startTour,500)}
 function startTour(){tourI=0;renderTour();$('tourModal').classList.add('open')}
-function endTour(){$('tourModal').classList.remove('open');try{localStorage.setItem('lvlby-tour','1')}catch(e){}const b=document.querySelector('.tab[data-view="today"]');if(b)b.click()}
+function endTour(){$('tourModal').classList.remove('open');try{localStorage.setItem('lvlby-tour','1')}catch(e){}const b=document.querySelector('.tab[data-view="today"]');if(b)b.click();if(window.__connectAfterTour){window.__connectAfterTour=false;if(!cloudUser&&!demo)setTimeout(()=>{ob={step:0,stage:'connect',tmp:{}};renderOb();$('onboard').classList.add('open')},400)}}
 function renderTour(){
   const TS=TOUR.filter(x=>!(notStudent()&&x.tab==='schedule')),s=TS[tourI],box=$('tourBox'),last=tourI===TS.length-1;box.innerHTML='';
   const b=document.querySelector('.tab[data-view="'+s.tab+'"]');if(b)b.click();
@@ -854,7 +878,7 @@ const iso3=a=>a[0]+'-'+p2(a[1])+'-'+p2(a[2]);
 function g2j(gy,gm,gd){const gdm=[0,31,59,90,120,151,181,212,243,273,304,334];let jy=gy<=1600?0:979;gy-=gy<=1600?621:1600;const gy2=gm>2?gy+1:gy;let days=365*gy+Math.floor((gy2+3)/4)-Math.floor((gy2+99)/100)+Math.floor((gy2+399)/400)-80+gd+gdm[gm-1];jy+=33*Math.floor(days/12053);days%=12053;jy+=4*Math.floor(days/1461);days%=1461;if(days>365){jy+=Math.floor((days-1)/365);days=(days-1)%365}return[jy,days<186?1+Math.floor(days/31):7+Math.floor((days-186)/30),1+(days<186?days%31:(days-186)%30)]}
 function j2g(jy,jm,jd){jy+=1595;let days=-355668+365*jy+Math.floor(jy/33)*8+Math.floor(((jy%33)+3)/4)+jd+(jm<7?(jm-1)*31:((jm-7)*30)+186);let gy=400*Math.floor(days/146097);days%=146097;if(days>36524){gy+=100*Math.floor(--days/36524);days%=36524;if(days>=365)days++}gy+=4*Math.floor(days/1461);days%=1461;if(days>365){gy+=Math.floor((days-1)/365);days=(days-1)%365}let gd=days+1;const sal=[0,31,((gy%4==0&&gy%100!=0)||gy%400==0)?29:28,31,30,31,30,31,31,30,31,30,31];let gm;for(gm=0;gm<13&&gd>sal[gm];gm++)gd-=sal[gm];return[gy,gm,gd]}
 const calMode=()=>(S.cal==='shamsi'||S.cal==='gregorian')?S.cal:(lang==='fa'?'shamsi':'gregorian');
-function dayLabel(date,o){const loc=(lang==='fa'?'fa-IR':'en-US')+(calMode()==='shamsi'?'-u-ca-persian':'-u-ca-gregory');try{return new Date(date+'T12:00:00').toLocaleDateString(loc,o)}catch(e){return date}}
+function dayLabel(date,o){const loc=(lang==='fa'?'fa-IR':'en-US')+(calMode()==='shamsi'?'-u-ca-persian':'-u-ca-gregory');try{const r=new Date(date+'T12:00:00').toLocaleDateString(loc,o);return lang==='fa'?r.replace(/,/g,'،'):r}catch(e){return date}}
 function calLoc(mode){return (lang==='fa'?'fa-IR':'en-US')+(mode==='shamsi'?'-u-ca-persian':'-u-ca-gregory')}
 function calSample(mode){try{return new Date(today()+'T12:00:00').toLocaleDateString(calLoc(mode),{day:'numeric',month:'short'})}catch(e){return ''}}
 function monthTitle(iso){try{const p=new Intl.DateTimeFormat(calLoc(calMode()),{month:'long',year:'numeric'}).formatToParts(new Date(iso+'T12:00:00')),g=t=>(p.find(x=>x.type===t)||{}).value||'';return g('month')+' '+g('year')}catch(e){return iso}}
@@ -1014,8 +1038,24 @@ SA.resolve=(ti,hint,fix)=>{
   if(mer==='am'){if(h===12)h=0}else if(mer==='pm'){if(h<12)h+=12}else if(mer==='noon'){if(h<=5)h+=12}else if(mer==='night'){if(h===12)h=0;else if(h>=6)h+=12}
   else if(!ti.sure){if(hint==='pm'||fix.pm===true){if(h<12)h+=12}else if(fix.pm===false){if(h===12)h=0}else return{ask:true}}
   return{t:SA.p2(h)+':'+SA.p2(ti.m)}};
+SA.NW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,یک:1,دو:2,سه:3,چهار:4,پنج:5,شش:6,هفت:7,هشت:8,نه:9,ده:10};
+SA.numAt=(n,i)=>{const x=n[i];if(x===undefined)return null;if(/^\d{1,3}$/.test(x))return{len:1,v:+x};if(SA.NW[x]!==undefined)return{len:1,v:SA.NW[x]};return null};
+SA.unit=x=>({day:'d',days:'d',روز:'d',week:'w',weeks:'w',wk:'w',wks:'w',هفته:'w',month:'m',months:'m',ماه:'m'})[x]||null;
+SA.recurN=(n,i)=>{const a=n[i];
+  if(a==='biweekly'||a==='fortnightly')return{len:1,type:'weekly',days:null,wk:2};
+  if(a==='every'||a==='each'||a==='هر'){let k=i+1,v=null;
+    if(n[k]==='other'||n[k]==='second'){v=2;k++}else{const q=SA.numAt(n,k);if(q){v=q.v;k+=q.len}}
+    if(v!==null){const u=SA.unit(n[k]);if(u==='d'&&v>=2&&v<=60)return{len:k+1-i,type:'every',days:null,ev:v};if(u==='w'&&v>=2&&v<=12)return{len:k+1-i,type:'weekly',days:null,wk:v};if(u==='d'&&v===1)return{len:k+1-i,type:'daily',days:null}}}
+  if(SA.numAt(n,i)&&SA.unit(n[i+1])==='d'&&n[i+2]==='در'&&n[i+3]==='میان'){const v=SA.numAt(n,i).v+1;return{len:4,type:'every',days:null,ev:v}}
+  return null};
+SA.dur=(n,i)=>{const a=n[i];let k=-1;
+  if(['for','till','until','تا','برای'].includes(a))k=i+1;else if(a==='به'&&n[i+1]==='مدت')k=i+2;else if(a==='over'&&n[i+1]==='the'&&n[i+2]==='next')k=i+3;
+  if(k<0)return null;if(n[k]==='the'&&n[k+1]==='next')k+=2;if(n[k]==='next'||n[k]==='آینده')k++;
+  let v=1,q=SA.numAt(n,k);if(q){v=q.v;k+=q.len}else if(n[k]==='a'||n[k]==='an')k++;
+  const u=SA.unit(n[k]);if(!u||v<1)return null;const days=u==='d'?v:u==='w'?v*7:v*30;if(days>366)return null;
+  return{len:k+1-i,days}};
 SA.recur=(n,i)=>{
-  const a=n[i],b=n[i+1],two=(x,y)=>a===x&&b===y;
+  const a=n[i],b=n[i+1],two=(x,y)=>a===x&&b===y;const rn=SA.recurN(n,i);if(rn)return rn;
   if(two('every','day')||two('each','day')||a==='everyday'||a==='daily'||two('هر','روز')||a==='هرروز'||a==='روزانه'||a==='هرروزه'||two('همه','روزه')||a==='همهروزه')return{len:(a==='every'||a==='each'||a==='هر'||a==='همه')?2:1,type:'daily',days:null};
   if(two('every','week')||a==='weekly'||two('هر','هفته')||a==='هفتگی')return{len:(a==='every'||a==='هر')?2:1,type:'weekly',days:null};
   if(a==='every'||a==='each'||a==='هر'){const days=[];let k=i+1;for(;;){const w=SA.wdAt(n,k);if(!w)break;days.push(w.wd);k+=w.len;if((n[k]==='and'||n[k]==='و'||n[k]==='&')&&SA.wdAt(n,k+1))k++;else break}
@@ -1035,7 +1075,8 @@ SA.parse=(text,ctx,fix)=>{
   let hint=null,ti=null,dti=null,dueAsk=false;const mark=(i,l)=>{for(let k=i;k<i+l;k++)used[k]=true};
   for(let i=0;i<T.length;){
     let h;
-    if(!r.recur&&(h=SA.recur(n,i))){r.recur={type:h.type,days:h.days};mark(i,h.len);i+=h.len;continue}
+    if(!r.recur&&(h=SA.recur(n,i))){r.recur={type:h.type,days:h.days};if(h.ev)r.recur.ev=h.ev;if(h.wk)r.recur.wk=h.wk;mark(i,h.len);i+=h.len;continue}
+    if(!r.dur&&(h=SA.dur(n,i))){r.dur=h.days;mark(i,h.len);i+=h.len;continue}
     if(r.due===null&&!dueAsk&&(h=SA.deadline(n,i,ctx,fix))){if(h.ask)dueAsk=true;else{r.due=h.date||ctx.today;if(h.time)dti=h.time}mark(i,h.len);i+=h.len;continue}
     if(!r.date&&(h=SA.date(n,i,ctx))){r.date=h.date;if(h.pm)hint='pm';mark(i,h.len);i+=h.len;continue}
     if(!ti&&(h=SA.time(n,i,fix))){ti=h;mark(i,h.len);i+=h.len;continue}
@@ -1043,7 +1084,9 @@ SA.parse=(text,ctx,fix)=>{
   if(dueAsk&&r.due===null){if(fix.date)r.due=fix.date;else r.ask={kind:'date'}}
   if(ti){const v=SA.resolve(ti,hint,fix);if(v.ask)r.ask=r.ask||{kind:'ampm',h:ti.h,m:ti.m};else r.time=v.t}
   if(dti){const v=SA.resolve(dti,hint,fix);if(v.ask)r.ask=r.ask||{kind:'ampm',h:dti.h,m:dti.m};else r.dueTime=v.t}
+  if(r.dur&&!r.recur)r.recur={type:'daily',days:null};
   if(r.recur&&r.recur.type==='weekly'&&!r.recur.days)r.recur.days=[ctx.dow(r.date||ctx.sel)];
+  if(r.recur){r.from=r.date||ctx.today;if(r.dur)r.until=ctx.shift(r.from,r.dur-1)}
   let rest=T.filter((t,k)=>!used[k]),changed=true;
   while(changed){changed=false;for(const f of SA.FILL){if(rest.length>=f.length&&f.every((w,k)=>rest[k]&&rest[k].n===w)){rest=rest.slice(f.length);changed=true;break}}
     if(rest.length&&SA.CONN.includes(rest[0].n)){rest=rest.slice(1);changed=true}}
@@ -1057,8 +1100,8 @@ SA.parse=(text,ctx,fix)=>{
 
 /* ---- Smart Add: UI, clarification and saving ---- */
 const SAT={
-en:{label:'Write one sentence',ph:'e.g. Tomorrow at 5 PM, study Science',go:'Add',confirm:'Confirm and add',edit:'Edit',under:'I understood:',t:'Task',day:'Day',time:'Time',dl:'Deadline',rep:'Repeats',daily:'every day',weekly:'every week on ',errTitle:'I could not find the task title. Write what you want to do, optionally with a day and time, for example: "Tomorrow at 5 PM, study Science".',askAmpm:t=>'Is '+t+' in the morning (AM) or in the afternoon/evening (PM)?',am:'AM (morning)',pm:'PM (afternoon/evening)',notTime:'That is not a time',askDate:'Which day is the deadline? Choose one or write it in your sentence, for example "by Friday".',today:'Today',tomorrow:'Tomorrow',in2:'In 2 days',added:'Added: ',addedR:'Added to your routines: ',dup:'This task already exists on that day, so I did not add it again.',fail:'NOT saved: this device could not store the task (storage may be full or blocked). Your sentence is still in the box.',days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat']},
-fa:{label:'یک جمله بنویس',ph:'مثلاً فردا ساعت ۵ عصر تکلیف علوم',go:'افزودن',confirm:'تأیید و افزودن',edit:'ویرایش',under:'این‌طور فهمیدم:',t:'کار',day:'روز',time:'ساعت',dl:'مهلت',rep:'تکرار',daily:'هر روز',weekly:'هر هفته: ',errTitle:'عنوان کار مشخص نشده. بنویس چه کاری می‌خواهی انجام بدهی و در صورت نیاز روز و ساعت را هم اضافه کن؛ مثلاً: «فردا ساعت ۵ عصر تکلیف علوم».',askAmpm:t=>'ساعت '+t+' صبح است یا عصر/شب؟',am:'صبح',pm:'عصر / شب',notTime:'این ساعت نیست',askDate:'مهلت انجام کدام روز است؟ یکی را انتخاب کن یا در جمله بنویس؛ مثلاً «تا جمعه».',today:'امروز',tomorrow:'فردا',in2:'پس‌فردا',added:'اضافه شد: ',addedR:'به روتین‌هایت اضافه شد: ',dup:'این کار از قبل در همان روز هست؛ دوباره اضافه نکردم.',fail:'ثبت نشد: این دستگاه نتوانست کار را ذخیره کند (حافظه پر یا مسدود است). جمله‌ات هنوز در کادر هست.',days:['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه']}};
+en:{label:'Write one sentence',ph:'e.g. Tomorrow at 5 PM, study Science',go:'Add',confirm:'Confirm and add',edit:'Edit',under:'I understood:',t:'Task',day:'Day',time:'Time',dl:'Deadline',rep:'Repeats',daily:'every day',weekly:'every week on ',everyN:v=>'every '+v+' days',everyW:v=>'every '+v+' weeks on ',untilT:'until ',errTitle:'I could not find the task title. Write what you want to do, optionally with a day and time, for example: "Tomorrow at 5 PM, study Science".',askAmpm:t=>'Is '+t+' in the morning (AM) or in the afternoon/evening (PM)?',am:'AM (morning)',pm:'PM (afternoon/evening)',notTime:'That is not a time',askDate:'Which day is the deadline? Choose one or write it in your sentence, for example "by Friday".',today:'Today',tomorrow:'Tomorrow',in2:'In 2 days',added:'Added: ',addedR:'Added to your routines: ',dup:'This task already exists on that day, so I did not add it again.',fail:'NOT saved: this device could not store the task (storage may be full or blocked). Your sentence is still in the box.',days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat']},
+fa:{label:'یک جمله بنویس',ph:'مثلاً فردا ساعت ۵ عصر تکلیف علوم',go:'افزودن',confirm:'تأیید و افزودن',edit:'ویرایش',under:'این‌طور فهمیدم:',t:'کار',day:'روز',time:'ساعت',dl:'مهلت',rep:'تکرار',daily:'هر روز',weekly:'هر هفته: ',everyN:v=>'هر '+fa(v)+' روز',everyW:v=>'هر '+fa(v)+' هفته: ',untilT:'تا ',errTitle:'عنوان کار مشخص نشده. بنویس چه کاری می‌خواهی انجام بدهی و در صورت نیاز روز و ساعت را هم اضافه کن؛ مثلاً: «فردا ساعت ۵ عصر تکلیف علوم».',askAmpm:t=>'ساعت '+t+' صبح است یا عصر/شب؟',am:'صبح',pm:'عصر / شب',notTime:'این ساعت نیست',askDate:'مهلت انجام کدام روز است؟ یکی را انتخاب کن یا در جمله بنویس؛ مثلاً «تا جمعه».',today:'امروز',tomorrow:'فردا',in2:'پس‌فردا',added:'اضافه شد: ',addedR:'به روتین‌هایت اضافه شد: ',dup:'این کار از قبل در همان روز هست؛ دوباره اضافه نکردم.',fail:'ثبت نشد: این دستگاه نتوانست کار را ذخیره کند (حافظه پر یا مسدود است). جمله‌ات هنوز در کادر هست.',days:['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه']}};
 const sat=k=>(SAT[lang]||SAT.en)[k];
 Object.assign(I.en,{quickAdd:'Smart Add',quickAddDesc:'Write one sentence with the task, and optionally the day and time.',smartRoutine:'My routines'});
 Object.assign(I.fa,{quickAdd:'افزودن هوشمند',quickAddDesc:'یک جمله بنویس: کار و، در صورت نیاز، روز و ساعت.',smartRoutine:'روتین‌های من'});
@@ -1071,7 +1114,7 @@ function saMsg(el,text){el.innerHTML='';el.hidden=false;const p=document.createE
 function saFmtTime(t){return fa(t)}
 function saSummary(r){
   const parts=['📌 '+sat('t')+': '+r.title];
-  if(r.recur)parts.push('🔁 '+sat('rep')+': '+(r.recur.type==='daily'?sat('daily'):sat('weekly')+r.recur.days.map(d=>sat('days')[d]).join('، ')));
+  if(r.recur)parts.push('🔁 '+sat('rep')+': '+(r.recur.type==='daily'?sat('daily'):r.recur.type==='every'?sat('everyN')(r.recur.ev):(r.recur.wk>1?sat('everyW')(r.recur.wk):sat('weekly'))+r.recur.days.map(d=>sat('days')[d]).join('، '))+(r.until?' · '+sat('untilT')+dayLabel(r.until,{day:'numeric',month:'long'}):''));
   else parts.push('📅 '+sat('day')+': '+dayLabel(r.date||(r.due?today():selected),{weekday:'long',day:'numeric',month:'long'}));
   if(r.time)parts.push('⏰ '+sat('time')+': '+saFmtTime(r.time));
   if(r.due)parts.push('⏳ '+sat('dl')+': '+dayLabel(r.due,{weekday:'long',day:'numeric',month:'long'})+(r.dueTime?' '+saFmtTime(r.dueTime):''));
@@ -1097,8 +1140,9 @@ function smartCommit(r){
     let date=null;
     if(r.recur){
       let g=data.routine.find(x=>x.id==='smart');if(!g){g={id:'smart',titleKey:'smartRoutine',items:[]};data.routine.push(g)}
-      const it={id:uid(),name:r.title,time:r.time||''};if(r.recur.days)it.days=r.recur.days.slice();
-      if(g.items.some(x=>x.name===it.name&&(x.time||'')===it.time&&JSON.stringify(x.days||null)===JSON.stringify(it.days||null)))return{ok:false,dup:true};
+      const it={id:uid(),name:r.title,time:r.time||''};if(r.recur.days)it.days=r.recur.days.slice();if(r.recur.ev)it.ev=r.recur.ev;if(r.recur.wk>1)it.wk=r.recur.wk;if(it.ev||it.wk>1||r.until){it.from=r.from}if(r.until)it.until=r.until;
+      const sig=o=>JSON.stringify([o.days||null,o.ev||0,o.wk||0,o.from||'',o.until||'']);
+      if(g.items.some(x=>x.name===it.name&&(x.time||'')===it.time&&sig(x)===sig(it)))return{ok:false,dup:true};
       g.items.push(it);Object.keys(data.days).filter(d=>d>=today()&&data.days[d].built).forEach(d=>buildDay(d,true));
     }else{
       date=r.date||(r.due?today():selected);if(!ensureDay(date).built)buildDay(date);const day=ensureDay(date);
@@ -1111,7 +1155,7 @@ function smartCommit(r){
   }catch(e){console.error('Smart Add failed:',e);try{data=normalize(JSON.parse(snap));persistLocal()}catch(x){}return{ok:false,error:e}}
 }
 function saFinish(r){
-  const key=JSON.stringify([r.title,r.date,r.due,r.time,r.recur]),now=Date.now();
+  const key=JSON.stringify([r.title,r.date,r.due,r.time,r.recur,r.until]),now=Date.now();
   if(key===sa.lastKey&&now-sa.lastAt<1500)return;sa.lastKey=key;sa.lastAt=now;sa.busy=true;
   const res=smartCommit(r);sa.busy=false;
   if(res.ok){$('quickName').value='';saReset();enterNext=true;renderAll();toast((r.recur?sat('addedR'):sat('added'))+r.title)}
@@ -1145,12 +1189,13 @@ function slideEl(el,dir){if(S.reduce||!el.animate)return;el.animate([{opacity:0,
 
 /* ---- v10: habit stats and targets, pet, coins, challenges, calendar reminders, connection tools ---- */
 const dowOf=d=>new Date(d+'T12:00:00').getDay();
+function onDate(it,d){if(it.until&&d>it.until)return false;if(it.from&&d<it.from)return false;const dw=new Date(d+'T12:00:00').getDay();if(it.days&&!it.days.includes(dw))return false;if(it.ev>1)return (dayNum(d)-dayNum(it.from||d))%it.ev===0;if(it.wk>1&&it.from){const ws=x=>dayNum(x)-new Date(x+'T12:00:00').getDay();return Math.floor((ws(d)-ws(it.from))/7)%it.wk===0}return true}
 function allHabits(){const o=[];data.routine.forEach(g=>g.items.forEach(it=>o.push(it)));return o}
 function habitTask(d,it){const x=data.days[d];return x?((x.tasks||[]).find(t=>t.kind==='routine'&&t.id===d+'-'+it.id)||null):null}
 function habitStats(it){
   const td=today(),keys=Object.keys(data.days).filter(d=>d<=td&&habitTask(d,it)).sort();
   if(!keys.length)return{cur:0,best:0,rate:0,dots:[],first:null};
-  const first=keys[0],sched=d=>!it.days||it.days.includes(dowOf(d));
+  const first=keys[0],sched=d=>onDate(it,d);
   const state=d=>{if(!sched(d)||isVac(d))return null;const t=habitTask(d,it);if(!t)return data.days[d]?null:false;return !!t.done};
   let best=0,run=0,cur=0,sc=0,dn=0;const dots=[];
   for(let d=first;d<=td;d=shiftDays(d,1)){const s=state(d);if(s===null)continue;if(s){run++;if(run>best)best=run}else if(d!==td)run=0}
@@ -1248,7 +1293,7 @@ async function connCheck(){const out=$('connOut');out.textContent='';const bad=[
   const p=obEl('p','',adv);p.style.marginTop='8px';out.append(p)}
 $('connBtn').onclick=connCheck;$('fbRetry').onclick=fbRetry;
 $('syncNow').onclick=()=>{if(cloudUser&&cloudReady){retryN=0;pushCloud();toast(L('Syncing...','در حال همگام‌سازی...'))}else if(!cloudAuth)fbRetry();else toast(L('Sign in with Google first.','اول با گوگل وارد شو.'))};
-try{TOUR.splice(6,0,{tab:'pet',e:'🐾',t:['Pet, coins and challenges','دوست، سکه و چالش‌ها'],d:['Your pet grows as you level up and reacts to your day. Earn coins from XP and daily challenges, spend them on hats, and check each habit streak below.','دوستت با بالا رفتن سطحت بزرگ می‌شود و به روزت واکنش نشان می‌دهد. از XP و چالش‌های روزانه سکه بگیر، کلاه بخر و استریک هر عادت را پایین ببین.']})}catch(e){}
+try{TOUR.splice(7,0,{tab:'pet',e:'🐾',t:['Pet, coins and challenges','دوست، سکه و چالش‌ها'],d:['Your pet grows as you level up and reacts to your day. Earn coins from XP and daily challenges, spend them on hats, and check each habit streak below.','دوستت با بالا رفتن سطحت بزرگ می‌شود و به روزت واکنش نشان می‌دهد. از XP و چالش‌های روزانه سکه بگیر، کلاه بخر و استریک هر عادت را پایین ببین.']})}catch(e){}
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
 function localDateLabel0(date){return new Intl.DateTimeFormat(lang==='fa'?'fa-IR':'en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(parseDate(date))}
 function shiftName(s){return tr(s==='morning'?'morning':s==='afternoon'?'afternoon':'off')}
@@ -1266,7 +1311,7 @@ function morningDelta(shift){if(shift==='morning')return 0;const a=wakeMin(shift
 function addMin(t,d){if(!d||!/^\d{1,2}:\d\d$/.test(String(t)))return t;const p=String(t).split(':');let m=Math.min(1435,(+p[0])*60+(+p[1])+d);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
 const AFT_SKIP=['bed','brush-am','wash-am','water'];
 function staleDay(date,day){if(date<today())return false;const sh=activeShift(date);if(notStudent())return day.sh!=='off'||day.tasks.some(t=>t.kind==='school'&&t.id===date+'-s-study');if(day.sh==='off'&&sh!=='off')return true;return sh==='afternoon'&&day.tasks.some(t=>t.kind==='routine'&&AFT_SKIP.some(id=>t.id===date+'-'+id))}
-function buildDay(date,force=false){let day=ensureDay(date);if(day.built&&!force&&!staleDay(date,day))return;const shift=activeShift(date),old=day.tasks,md=morningDelta(shift);let items=[];data.routine.forEach(g=>g.items.filter(it=>!(g.id==='morning'&&shift==='afternoon'&&AFT_SKIP.includes(it.id))).filter(it=>!it.archived).filter(it=>!it.days||it.days.includes(new Date(date+'T12:00:00').getDay())).forEach(it=>items.push({...it,time:g.id==='morning'?addMin(it.time,md):it.time,id:date+'-'+it.id,name:displayTaskName(it),group:tr(g.titleKey)||g.title,kind:'routine',done:old.find(t=>t.id===date+'-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-'+it.id)?.priority||'normal',count:old.find(t=>t.id===date+'-'+it.id)?.count||0,top:old.find(t=>t.id===date+'-'+it.id)?.top,subs:old.find(t=>t.id===date+'-'+it.id)?.subs})));(data.schedule[shift]||[]).filter(it=>!(notStudent()&&it.id==='study')).forEach(it=>items.push({...it,id:date+'-s-'+it.id,name:displayTaskName(it),group:tr('schedule'),kind:'school',done:old.find(t=>t.id===date+'-s-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-s-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-s-'+it.id)?.priority||'normal',top:old.find(t=>t.id===date+'-s-'+it.id)?.top,subs:old.find(t=>t.id===date+'-s-'+it.id)?.subs}));items.push(...old.filter(t=>t.kind==='custom'));day.tasks=items;day.built=true;day.sh=shift;save()}
+function buildDay(date,force=false){let day=ensureDay(date);if(day.built&&!force&&!staleDay(date,day))return;const shift=activeShift(date),old=day.tasks,md=morningDelta(shift);let items=[];data.routine.forEach(g=>g.items.filter(it=>!(g.id==='morning'&&shift==='afternoon'&&AFT_SKIP.includes(it.id))).filter(it=>!it.archived).filter(it=>onDate(it,date)).forEach(it=>items.push({...it,time:g.id==='morning'?addMin(it.time,md):it.time,id:date+'-'+it.id,name:displayTaskName(it),group:tr(g.titleKey)||g.title,kind:'routine',done:old.find(t=>t.id===date+'-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-'+it.id)?.priority||'normal',count:old.find(t=>t.id===date+'-'+it.id)?.count||0,top:old.find(t=>t.id===date+'-'+it.id)?.top,subs:old.find(t=>t.id===date+'-'+it.id)?.subs})));(data.schedule[shift]||[]).filter(it=>!(notStudent()&&it.id==='study')).forEach(it=>items.push({...it,id:date+'-s-'+it.id,name:displayTaskName(it),group:tr('schedule'),kind:'school',done:old.find(t=>t.id===date+'-s-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-s-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-s-'+it.id)?.priority||'normal',top:old.find(t=>t.id===date+'-s-'+it.id)?.top,subs:old.find(t=>t.id===date+'-s-'+it.id)?.subs}));items.push(...old.filter(t=>t.kind==='custom'));day.tasks=items;day.built=true;day.sh=shift;save()}
 function updateStaticText(){document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(I[lang][k])el.textContent=tr(k)});$('langToggle').textContent=lang==='en'?'فارسی / FA':'English / EN';$('quickName').placeholder=saPlaceholder();$('detailNotes').placeholder=tr('typeNote');const shift=$('shiftType'),val=shift.value;shift.innerHTML=`<option value="morning">${tr('morning')} — ${tr('shiftTimeMorning')}</option><option value="afternoon">${tr('afternoon')} — ${tr('shiftTimeAfternoon')}</option><option value="off">${tr('off')}</option>`;shift.value=val}
 function renderToday(){if(!$('selectedDate').value)$('selectedDate').value=selected;const date=$('selectedDate').value||selected;selected=date;$('dateLabel').textContent=localDateLabel(date);const shift=activeShift(date);$('shiftSummary').textContent=tr('schoolShift')+': '+shiftName(shift);$('shiftStat').textContent=shiftName(shift);$('schoolTimeHint').textContent=shift==='off'?tr('noSchoolTime'):tr('schoolStarts')+' · '+(shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon'));$('schoolBannerTitle').textContent=shift==='off'?tr('dayOff'):shift==='morning'?tr('morningSchool'):tr('afternoonSchool');$('schoolBannerText').textContent=shift==='off'?tr('noSchoolTime'):tr('schoolStarts')+' '+(shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon'));$('schoolPill').textContent=shiftName(shift);const day=ensureDay(date);buildDay(date);const tasks=day.tasks,done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0;$('progressBar').style.width=pct+'%';$('progressText').textContent=`${fa(done)} / ${fa(tasks.length)} ${tr('tasks')} ${tr('completeCount')}`;$('progressPct').textContent=fa(pct)+'%';$('doneStat').textContent=fa(done);$('totalStat').textContent=fa(tasks.length);const host=$('todayTasks');host.innerHTML='';renderTodayHead(host,date,tasks,done);if(!tasks.length)host.append(emptyState());else if(done===tasks.length)host.append(doneCard());tasks.slice().sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')).forEach(t=>{const row=document.createElement('div');row.className='task'+(t.done?' done':'')+' k-'+(t.kind||'x')+' p-'+(t.priority||'normal');row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',displayTaskName(t));const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=t.done;cb.setAttribute('aria-label',tr('markDone'));cb.onclick=e=>e.stopPropagation();cb.onchange=()=>{const before=xpTotal();t.done=cb.checked;row.classList.toggle('done',t.done);save();paintProgress();renderReport();xpFeedback(before,row);if(t.done&&ensureDay(selected).tasks.every(x=>x.done))burst(row)};const main=document.createElement('div');main.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=displayTaskName(t);title.dataset.title=displayTaskName(t);const sub=document.createElement('div');sub.className='task-sub';const time=document.createElement('span');time.textContent=t.time||tr('none');sub.append(time);if(t.notes){const note=document.createElement('span');note.textContent='✎ '+(t.notes.length>30?t.notes.slice(0,30)+'…':t.notes);sub.append(note)}main.append(title,sub);const side=document.createElement('div');side.className='task-side';const pill=document.createElement('span');pill.className='pill '+(t.kind==='routine'?'routine':t.kind==='custom'?'custom':'school');pill.textContent=tr(t.kind==='routine'?'routine':t.kind==='custom'?'personal':'plan');const arrow=document.createElement('span');arrow.className='taskarrow';arrow.textContent='›';side.append(pill,arrow);row.append(cb,main,side);attachSwipe(row,t,cb);row.onclick=()=>{if(row._swiped&&Date.now()-row._swiped<400)return;openTask(t.id)};row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTask(t.id)}};host.append(row)})}
 function renderRoutine0(){const host=$('routineEditor');host.innerHTML='';data.routine.forEach(g=>{const sec=document.createElement('div');sec.className='routine-group';const h=document.createElement('div');h.className='group-title';h.textContent=tr(g.titleKey)||g.title;sec.append(h);g.items.forEach(it=>{const row=document.createElement('div');row.className='editrow';const name=document.createElement('input');name.value=displayTaskName(it);name.setAttribute('aria-label',tr('taskName'));name.onchange=()=>{it.name=name.value;it.key=null};const time=document.createElement('input');time.type='time';time.value=it.time||'';time.setAttribute('aria-label',tr('startTime'));time.onchange=()=>it.time=time.value;const del=document.createElement('button');del.className='btn small danger';del.textContent=tr('remove');del.onclick=()=>{g.items=g.items.filter(x=>x.id!==it.id);renderRoutine()};row.append(name,time,del);sec.append(row)});host.append(sec)})}
@@ -1350,14 +1395,19 @@ $('notifToggle').onclick=async()=>{
   try{
     const p=await Notification.requestPermission();
     notif.on=(p==='granted');saveNotif();renderNotifUI();
-    if(notif.on)checkReminders();if(!profileOk()||P.ov!==ONB_VER)setTimeout(()=>obStart(false,profileOk()),700);
+    if(notif.on)checkReminders();
   }catch(e){renderNotifUI(nt('denied'))}
 };
 $('notifLead').onchange=()=>{notif.lead=Number($('notifLead').value)||0;saveNotif();checkReminders()};
 $('notifTest').onclick=async()=>{const ok=await showNotif('LvLBY',nt('testBody'),'lvlby-test');renderNotifUI(ok?undefined:nt('testFail'))};
+
+Object.assign(I.fa,{tabHabits:'روتین‌ها',tabSchedule:'هفته',tabReports:'گزارش'});
+function fixFaBits(){const fa=lang==='fa';const lt=$('langToggle');if(lt)lt.textContent=fa?'English':'فارسی';const a=document.querySelector('.sitefoot a');if(a)a.textContent=fa?'حریم خصوصی':'Privacy';
+ const d=$('selectedDate');if(d){let w=d.parentNode;if(!w.classList.contains('datewrap')){w.classList.add('datewrap');const l=document.createElement('div');l.id='dateLbl';l.className='datelbl';w.insertBefore(l,d)}const l=$('dateLbl');w.classList.toggle('faDate',fa);l.textContent=fa?dayLabel(selected,{weekday:'short',day:'numeric',month:'long',year:'numeric'}):''}
+ document.querySelectorAll('h1,h2,.brand,.logo,.hero-title').forEach(e=>{if(/^LvLBY\.?$/.test(e.textContent.trim())){e.textContent='LvLBY';}})}
 setInterval(checkReminders,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReminders()});
 
-if(!data.days[selected])buildDay(selected);renderAll();setupFirebase();showStatus();checkReminders();
+if(!data.days[selected])buildDay(selected);renderAll();setupFirebase();showStatus();checkReminders();setTimeout(welcomeGate,500);
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker not registered:',e)))}
 </script>
 </body>

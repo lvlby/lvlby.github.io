@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in user may only touch their own document: users/{their own uid}
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['data', 'language', 'rev', 'settings', 'profile', 'updatedAt'])
+        && request.resource.data.data is map
+        && request.resource.data.data.keys().hasOnly(['routine', 'schedule', 'weeks', 'days', 'templates', 'exams', 'vac'])
+        && (!('settings' in request.resource.data) || (request.resource.data.settings is map
+            && request.resource.data.settings.keys().hasOnly(['rotate', 'reduce', 'haptics', 'xp', 'sound', 'theme', 'cal', 'pet', 'pname', 'owned', 'hat'])))
+        && (!('profile' in request.resource.data) || (request.resource.data.profile is map
+            && request.resource.data.profile.keys().hasOnly(['name', 'goal', 'student', 'work', 'age', 'wake', 'sleep', 'challenge', 'interests', 'energy', 'dayType', 'daily', 'remind', 'exp', 'src', 'ov'])
+            && request.resource.data.profile.get('name', '').size() <= 40
+            && request.resource.data.profile.get('work', '').size() <= 40))
+        && (!('language' in request.resource.data) || request.resource.data.language in ['en', 'fa']);
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
