@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101522">
 <meta name="google-site-verification" content="_7FF6-DqwLL2H4nPB4FP7Nh_jmNdA7ZfPe7kicY85B4">
-<meta name="description" content="LvLBY - a calm daily routine, habit and task planner.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -239,11 +238,15 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
 #reportDetails .task{flex-wrap:wrap}#reportDetails .task-main{flex:1 1 110px;min-width:110px}#reportDetails .pill{white-space:normal;max-width:100%}
 @media (max-width:420px){.tabs .tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;white-space:nowrap;font-size:11px;padding:6px 2px;line-height:1.15}.tabs .tab::before{font-size:17px;margin:0}}
 </style>
-<meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks.">
+<meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks. برنامه‌ریز روزانهٔ آرام، با روتین، عادت و استریک.">
+<meta property="og:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:title" content="LvLBY">
 <meta property="og:description" content="A calm daily planner with routines, focus timer and streaks.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
 </head>
 <body>
 <div class="app">
@@ -252,6 +255,7 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
  <div class="topactions"><button class="langbtn" id="langToggle">فارسی / FA</button><button class="btn primary small" id="googleSignIn">Continue with Google</button><button class="iconbtn" id="openSettings" aria-label="Settings">⚙</button></div>
 </header>
 <div id="accountStatus" class="notice" style="margin:-12px 0 18px">Loading…</div>
+<div class="notice" id="installBar" hidden style="margin:-6px 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="installBarTxt" style="flex:1 1 180px"></span><button class="btn small primary" id="installBarGo"></button><button class="btn small" id="installBarX" aria-label="close">✕</button></div>
 <section class="hero">
  <div class="card hero-main">
   <div class="eyebrow" data-i18n="overview">YOUR DAY, IN FOCUS</div>
@@ -336,6 +340,7 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
  <div class="card" id="habCard" style="margin-top:14px"></div>
 </section>
 <section class="view" id="view-reports">
+<div class="actions" style="margin:0 0 12px"><button class="btn primary" id="shareCard"></button></div>
   <div class="card" id="weeklyCard" style="margin-bottom:14px"></div>
  <div class="card"><div class="sectionhead"><div><h2 data-i18n="weeklyInsights">Your last 7 days</h2><p class="muted smalltext" data-i18n="insightDesc">A gentle snapshot of tasks you planned and completed.</p></div></div><div id="reportChart" class="chart"></div><div id="reportDetails" class="tasklist"></div></div>
  <div class="card" style="margin-top:14px"><h2 style="margin-top:0;font-size:17px" id="wkTitle"></h2><p class="muted smalltext" id="wkText"></p><p id="wkMood" style="font-size:20px;letter-spacing:4px;margin:6px 0 0"></p><div class="actions"><button class="btn" id="shareBtn"></button></div></div>
@@ -372,6 +377,7 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
  <div class="set-sec"><div class="group-title" data-s="remind"></div><div class="card" style="margin-top:12px;box-shadow:none"><h2 style="margin-top:0;font-size:17px" id="notifTitle">Reminders</h2><p class="muted smalltext" id="notifDesc"></p><div class="field" style="max-width:260px;margin-top:10px"><label for="notifLead" id="notifLeadLabel">Remind me</label><select id="notifLead"><option value="0"></option><option value="5"></option><option value="10"></option></select></div><div class="notice" id="notifState" style="margin-top:12px"></div><div class="actions"><button class="btn primary" id="notifToggle"></button><button class="btn" id="notifTest"></button></div></div></div>
  <div class="set-sec"><div class="group-title" data-s="remTitle"></div><p class="muted smalltext" data-s="remDesc"></p><div class="actions"><button class="btn primary" id="icsBtn" data-s="icsBtn"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="connTitle"></div><div class="actions"><button class="btn" id="connBtn" data-s="connBtn"></button><button class="btn" id="syncNow" data-s="syncNow"></button><button class="btn" id="fbRetry" data-s="fbRetry"></button></div><div id="connOut" style="margin-top:8px"></div></div>
+ <div class="set-sec"><div class="group-title" id="tplTitle"></div><p class="muted smalltext" id="tplDesc"></p><div class="actions"><button class="btn" data-tpl="konkoor"></button><button class="btn" data-tpl="student"></button><button class="btn" data-tpl="freelance"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="data"></div><p class="muted smalltext" id="setSize"></p><div class="actions"><button class="btn" id="setExport" data-s="export"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="about"></div><p class="muted smalltext" data-s="aboutText"></p><div class="actions"><button class="btn" id="setPriv" data-s="privBtn"></button><button class="btn" id="setTour" data-s="tourBtn"></button><button class="btn" id="setInstall" data-s="installBtn"></button></div><p class="muted smalltext" id="installHint"></p></div>
 </div></div>
@@ -542,6 +548,7 @@ fa:{title:'تنظیمات',account:'حساب',general:'عمومی',language:'ز�
 I.en.footer='LvLBY · Your life, your pace. XP is earned only by tasks you really finish.';I.fa.footer='LvLBY · زندگی تو، با سرعت تو. XP فقط با کارهایی که واقعاً انجام می‌دهی به دست می‌آید.';
 const ss=k=>(SS[lang]||SS.en)[k]||SS.en[k]||k;
 function renderSettings(){
+  try{renderTplUI()}catch(e){}
   document.querySelectorAll('[data-s]').forEach(el=>el.textContent=ss(el.dataset.s));
   const o=$('setTheme').options;o[0].textContent=ss('dark');o[1].textContent=ss('light');o[2].textContent=ss('auto');$('setTheme').value=S.theme;$('setSound').checked=S.sound;
   const gr=$('greet');if(gr)gr.textContent=P.name?(OB[lang]||OB.en).hi+P.name+' 👋':'';const sp=$('setProfile');if(sp)sp.textContent=profileText();
@@ -1374,7 +1381,7 @@ function resetTimer(){pauseTimer();timerSeconds=1500;timerPaint();$('timerStart'
 function pauseTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}if($('timerStart'))$('timerStart').disabled=false}
 $('timerStart').onclick=()=>{if(timerInterval)return;timerInterval=setInterval(()=>{timerSeconds--;timerPaint();if(timerSeconds<=0){pauseTimer();$('timerStart').disabled=false;{const dd=ensureDay(today());dd.focus=(dd.focus||0)+1;save();paintXP();renderExtras()}toast(tr('focusDone')+' +10 XP');try{navigator.vibrate?.([150,80,150])}catch(e){}}},1000);$('timerStart').disabled=true};
 $('timerPause').onclick=()=>{pauseTimer();$('timerStart').disabled=false};$('timerReset').onclick=resetTimer;
-function exportData(){const blob=new Blob([JSON.stringify({version:2,lang,data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lvlby-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportData(){const blob=new Blob([JSON.stringify({version:2,lang,data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lvlby-backup.json';a.click();try{localStorage.setItem('lvlby_lastbackup',String(Date.now()))}catch(e){}setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $('exportData').onclick=exportData;$('restoreLocal').onclick=async()=>{try{const b=JSON.parse(localStorage.getItem(LS.bak));if(!b||!b.data||!(await uiConfirm(tr('confirmRestore'),{danger:true})))return;data=normalize(b.data);save();renderAll();showStatus();toast(sx('restored'))}catch(e){}};$('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());const incoming=obj.data||obj;if(!incoming.routine||!incoming.schedule||!incoming.days)throw Error();if(!(await uiConfirm(tr('confirmImport'),{danger:true})))return;backupDevice();data=normalize(incoming);if(obj.lang){lang=obj.lang;localStorage.setItem('lvlby-lang',lang)}save();renderAll();toast(tr('backupLoaded'))}catch(err){toast(tr('invalidBackup'))}e.target.value=''};
 $('clearData').onclick=()=>{if(undoPoint()||true){backupDevice();data=defaults();save();selected=today();$('selectedDate').value=selected;renderAll();toast(tr('saved'))}};
@@ -1441,6 +1448,38 @@ function fixFaBits(){const fa=lang==='fa';if(fa)document.querySelectorAll('#toda
 setInterval(checkReminders,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReminders()});
 
 if(!data.days[selected])buildDay(selected);renderAll();setupFirebase();showStatus();checkReminders();setTimeout(welcomeGate,500);
+
+/* ---- v20: backup nudge, install bar, share card, templates ---- */
+const DAY=864e5,lsGet=k=>{try{return +localStorage.getItem(k)||0}catch(e){return 0}},lsSet=(k,v)=>{try{localStorage.setItem(k,String(v))}catch(e){}};
+function backupNudge(){if(demo||!Object.keys(data.days).length)return;const now=Date.now();if(!lsGet('lvlby_firstseen'))lsSet('lvlby_firstseen',now);
+ const last=lsGet('lvlby_lastbackup')||lsGet('lvlby_firstseen');if(now-last<7*DAY||now-lsGet('lvlby_bk_snooze')<3*DAY)return;
+ lsSet('lvlby_bk_snooze',now);uiConfirm(L('Your data lives only on this phone. One tap saves a backup file you can restore anytime.','داده‌هات فقط روی همین گوشی ذخیره می‌شه. با یک لمس یه فایل پشتیبان می‌گیری که هر وقت خواستی برش می‌گردونی.'),{title:L('Time for a backup?','وقت پشتیبان‌گیریه؟'),ok:L('Save backup','ذخیرهٔ پشتیبان'),cancel:L('Later','بعداً')}).then(ok=>{if(ok)exportData()})}
+function renderInstallBar(){const b=$('installBar');if(!b)return;const show=!isStandalone()&&Date.now()-lsGet('lvlby_inst_x')>14*DAY&&/^https?:$/.test(location.protocol);b.hidden=!show;b.style.display=show?'flex':'none';if(!show)return;
+ $('installBarTxt').textContent=deferredInstall?L('Install LvLBY for one-tap access and offline use.','LvLBY را نصب کن تا با یک لمس و حتی بدون اینترنت بازش کنی.'):installText();$('installBarGo').textContent=L('Install','نصب');$('installBarGo').style.display=deferredInstall?'':'none'}
+$('installBarGo').onclick=doInstall;$('installBarX').onclick=()=>{lsSet('lvlby_inst_x',Date.now());renderInstallBar()};window.addEventListener('beforeinstallprompt',()=>setTimeout(renderInstallBar,0));
+function shareCardBlob(){return new Promise(res=>{const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),f=lang==='fa',F='system-ui,Vazirmatn,Tahoma,sans-serif';x.direction=f?'rtl':'ltr';x.textAlign='center';
+ const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#101522');g.addColorStop(1,'#1b2a3f');x.fillStyle=g;x.fillRect(0,0,W,H);
+ x.fillStyle='#a8e6c3';x.beginPath();x.roundRect(W/2-80,260,160,160,44);x.fill();x.fillStyle='#10251b';x.font='bold 76px '+F;x.fillText('Lv',W/2,365);
+ const n=n=>f?fa(n):String(n),sn=streakNow(),xp=xpTotal();x.fillStyle='#f0f4fb';x.font='300px '+F;x.fillText(n(sn),W/2,900);
+ x.fillStyle='#a8e6c3';x.font='bold 64px '+F;x.fillText(L('day streak','روز پیاپی'),W/2,1010);
+ [[n(streakBest()),L('Best','بهترین')],[n(lvlOf(xp)),L('Level','سطح')],[n(xp),'XP']].forEach((r,k)=>{const cx=270+k*270;x.fillStyle='#f0f4fb';x.font='96px '+F;x.fillText(r[0],cx,1220);x.fillStyle='#9aa8bc';x.font='44px '+F;x.fillText(r[1],cx,1290)});
+ x.font='44px '+F;x.fillText(L('A calmer way to run your day','راهی آرام‌تر برای اداره‌ی روزت'),W/2,1560);x.fillStyle='#f0f4fb';x.font='bold 54px '+F;x.fillText('LvLBY',W/2,1660);x.fillStyle='#9aa8bc';x.font='34px '+F;x.fillText(location.host+location.pathname.replace(/index\.html$/,''),W/2,1730);
+ c.toBlob(res,'image/png')})}
+async function doShareCard(){try{const bl=await shareCardBlob(),fl=new File([bl],'lvlby-streak.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],text:'LvLBY'});return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='lvlby-streak.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast(L('Image saved. Post it to your story.','عکس ذخیره شد. توی استوری بذارش.'))}catch(e){if(e&&e.name!=='AbortError')toast(L('Could not make the image.','ساختن عکس نشد.'))}}
+$('shareCard').onclick=doShareCard;
+const TPL={konkoor:{en:'Konkoor student',fa:'کنکوری',it:[['06:30','Wake up and stretch','بیدار شدن و کشش'],['07:30','Study block 1 (hardest subject)','مطالعهٔ بلوک ۱ (سخت‌ترین درس)'],['10:30','Practice tests','تست‌زنی'],['16:00','Study block 2','مطالعهٔ بلوک ۲'],['20:00','Review mistakes','مرور غلط‌ها'],['22:30','Wind down, no phone','آماده‌شدن برای خواب، بدون گوشی']]},
+ student:{en:'University student',fa:'دانشجو',it:[['08:00','Plan the day (5 min)','برنامه‌ریزی روز (۵ دقیقه)'],['09:30','Deep study','مطالعهٔ عمیق'],['14:00','Assignments','تمرین و پروژه'],['19:00','Revision','مرور درس‌ها'],['22:30','Plan tomorrow','برنامهٔ فردا']]},
+ freelance:{en:'Freelancer',fa:'فریلنسر',it:[['09:00','Pick today\'s top 3','سه کار مهم امروز'],['09:30','Deep work','کار عمیق'],['13:00','Client messages','پیام‌های مشتری'],['15:00','Deep work 2','کار عمیق ۲'],['17:30','Invoices and admin','فاکتور و کارهای اداری'],['18:30','Shut down','پایان کار']]}};
+function renderTplUI(){$('tplTitle').textContent=L('Quick-start templates','قالب‌های آمادهٔ شروع سریع');$('tplDesc').textContent=L('Fill your day with a ready routine. Replaces earlier template items only.','روزت را با یک روتین آماده پر کن. فقط آیتم‌های قالب قبلی را عوض می‌کند.');document.querySelectorAll('[data-tpl]').forEach(b=>b.textContent=L(TPL[b.dataset.tpl].en,TPL[b.dataset.tpl].fa))}
+document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=async()=>{if(demo)return toast(L('Not available in the demo.','در نسخهٔ دمو در دسترس نیست.'));const t=TPL[b.dataset.tpl];
+ if(!await uiConfirm(L('Add the "'+t.en+'" routine to your day?','روتین «'+t.fa+'» به روزت اضافه شود؟'),{title:L(t.en,t.fa),ok:L('Add','اضافه کن')}))return;
+ data.routine.forEach(g=>{g.items=g.items.filter(it=>String(it.id).slice(0,3)!=='tp-')});
+ t.it.forEach((r,i)=>{const g=data.routine.find(x=>x.id===(pzMin(r[0])<720?'morning':'evening'));if(g)g.items.push({id:'tp-'+b.dataset.tpl+i,name:L(r[1],r[2]),time:r[0]})});
+ save();const td=today();Object.keys(data.days).forEach(d=>{if(d>=td)data.days[d].built=false});buildDay(td,true);if(selected>td)buildDay(selected,true);closeSettings();renderAll();toast(L('Routine added.','روتین اضافه شد.'))});
+$('shareCard').textContent='📤 '+L('Share my streak card','اشتراک‌گذاری کارت استریک');
+$('langToggle').addEventListener('click',()=>setTimeout(()=>{renderInstallBar();$('shareCard').textContent='📤 '+L('Share my streak card','اشتراک‌گذاری کارت استریک')},0));
+setTimeout(()=>{renderInstallBar();backupNudge()},3500);
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker not registered:',e)))}
 </script>
 </body>
