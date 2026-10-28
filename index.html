@@ -480,7 +480,33 @@ const sx=k=>(ST[lang]||ST.en)[k]||ST.en[k]||k;
 function normalize(d){const o=normalize0(d),src=(d&&typeof d==="object")?d:{};o.templates=Array.isArray(src.templates)?src.templates:[];o.exams=Array.isArray(src.exams)?src.exams:[];if(o.schedule&&Array.isArray(o.schedule.afternoon)&&!o.schedule.afternoon.some(it=>it.id==='wake'))o.schedule.afternoon.unshift({id:'wake',key:'wake',name:'Wake up & morning routine',time:'08:30'});o.vac=Array.isArray(src.vac)?src.vac:[];return o}
 function normalize0(d){const f=defaults();if(!d||typeof d!=='object')return f;return{routine:Array.isArray(d.routine)?d.routine:f.routine,schedule:(d.schedule&&typeof d.schedule==='object')?Object.assign({},f.schedule,d.schedule):f.schedule,weeks:Array.isArray(d.weeks)?d.weeks:[],days:(d.days&&typeof d.days==='object')?d.days:{}}}
 function hasUserContent(d){const f=defaults();return JSON.stringify(d.routine)!==JSON.stringify(f.routine)||JSON.stringify(d.schedule)!==JSON.stringify(f.schedule)||d.weeks.length>0||Object.values(d.days).some(x=>(x.tasks||[]).some(t=>t.done||t.kind==='custom'||t.notes))}
-function showStatus(extra){const el=$('accountStatus'),btn=$('googleSignIn');if(!el||!btn)return;btn.hidden=!!cloudUser;btn.textContent=sx('signin');btn.disabled=!cloudAuth;let m;if(!cloudAuth)m=sx(typeof firebase==='undefined'?'offlineNoFb':'nocloud');else if(!cloudUser)m=sx('signedout');else m=sx('as')+(cloudUser.displayName||cloudUser.email||'Google')+' · '+sx(cloudState);el.textContent=extra||m;const ss=$('setSignOut');if(ss){ss.hidden=!cloudUser;ss.textContent=sx('signout')}const sa=$('setAccount');if(sa)sa.textContent=el.textContent;const r=$('restoreLocal');if(r){r.hidden=!localStorage.getItem(LS.bak);r.textContent=tr('restoreCopy')}}
+function lastSyncText(){let ts=0;try{ts=+localStorage.getItem(LS.lastsync)||0}catch(e){}
+  if(!ts)return '';
+  try{const t=new Intl.DateTimeFormat(lang==='fa'?'fa-IR':'en-US',{hour:'2-digit',minute:'2-digit'}).format(new Date(ts));
+    return L('last synced at ','آخرین همگام‌سازی: ')+t}catch(e){return ''}}
+function markSynced(){try{localStorage.setItem(LS.lastsync,String(Date.now()))}catch(e){}}
+function showStatus(extra){
+  const el=$('accountStatus'),btn=$('googleSignIn');if(!el||!btn)return;
+  btn.hidden=!!cloudUser;btn.textContent=sx('signin');btn.disabled=!cloudAuth;
+  let m='',tone='local';
+  if(!cloudAuth){m=sx(typeof firebase==='undefined'?'offlineNoFb':'nocloud')}
+  else if(!cloudUser){m=sx('signedout')+' '+L('Google sign-in is optional: it keeps your plan on all your devices. Without it, everything stays in this browser.','ورود با گوگل اختیاری است: برنامه‌ات را روی همهٔ دستگاه‌ها نگه می‌دارد. بدون آن همه‌چیز در همین مرورگر می‌ماند.')}
+  else{
+    m=sx('as')+(cloudUser.displayName||cloudUser.email||'Google')+' · '+sx(cloudState);
+    if(cloudState==='synced'){tone='ok';const t=lastSyncText();if(t)m+=' · '+t}
+    else if(cloudState==='syncing')tone='ok';
+    else if(cloudState==='pending'){tone='warn';m+=' · '+L('your work is safe on this device','کارت روی همین دستگاه امن است')}
+    else if(cloudState==='toolarge')tone='warn';
+    else tone='bad';
+  }
+  const txt=$('statusText');if(txt)txt.textContent=extra||m;else el.textContent=extra||m;
+  el.classList.remove('ok','warn','bad');if(tone!=='local')el.classList.add(tone);
+  const rb=$('statusRetry');
+  if(rb){rb.hidden=!(cloudUser&&(cloudState==='error'||cloudState==='loaderr'||cloudState==='pending'));rb.textContent=L('Retry sync','تلاش دوباره برای همگام‌سازی')}
+  const ss=$('setSignOut');if(ss){ss.hidden=!cloudUser;ss.textContent=sx('signout')}
+  const sa=$('setAccount');if(sa)sa.textContent=(txt?txt.textContent:el.textContent)||'';
+  const r=$('restoreLocal');if(r){r.hidden=!localStorage.getItem(LS.bak);r.textContent=tr('restoreCopy')}
+}
 let demo=false,demoBackup=null;
 function persistLocal(){if(demo)return true;try{localStorage.setItem(LS.data,JSON.stringify(data));return true}catch(e){toast(sx('localfail'));return false}}
 function save(){
