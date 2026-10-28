@@ -29,7 +29,7 @@ check(dupes.length === 0, 'no duplicate element ids' + (dupes.length ? ' -> ' + 
 /* ---------- 2. every nav data-view resolves to a real view section ---------- */
 const views = [...html.matchAll(/<section class="view[^"]*" id="view-([^"]+)"/g)].map((m) => m[1]);
 const tabs = [...html.matchAll(/<button class="tab[^"]*" data-view="([^"]+)"/g)].map((m) => m[1]);
-const subtabs = [...html.matchAll(/<button class="subtab[^"]*" data-view="([^"]+)"/g)].map((m) => m[1]);
+const subtabs = [...html.matchAll(/<button class="subtab[^"]*"[^>]*data-view="([^"]+)"/g)].map((m) => m[1]);
 check(views.length >= 6, 'all six views still present (' + views.join(',') + ')');
 check(tabs.length === 4, 'primary navigation reduced to 4 destinations (' + tabs.join(',') + ')');
 check(tabs.every((v) => views.includes(v)), 'every primary tab points at an existing view');
@@ -88,11 +88,41 @@ check(/LS=\{[^}]*lastsync:'lvlby-lastsync'/.test(html), 'sync timestamp uses its
 check(/bak:'lvlby-device-backup'/.test(html), 'device backup key unchanged (existing backups still load)');
 check(/data:'lvlby-data'/.test(html), 'main data key unchanged (no data migration)');
 
-/* ---------- 8. i18n parity for keys added by this change ---------- */
+/* ---------- 8. i18n parity (string tables + late I.en.key= assignments) ---------- */
+function i18nKeys() {
+  const keys = { en: new Set(), fa: new Set() };
+  for (const lang of ['en', 'fa']) {
+    for (const m of html.matchAll(new RegExp('I\\.' + lang + '\\.([A-Za-z0-9_]+)\\s*=', 'g'))) keys[lang].add(m[1]);
+  }
+  const start = html.indexOf('const I={');
+  if (start > -1) {
+    const open = html.indexOf('{', start);
+    let depth = 0, end = -1;
+    for (let j = open; j < html.length; j++) {
+      if (html[j] === '{') depth++;
+      else if (html[j] === '}' && --depth === 0) { end = j; break; }
+    }
+    try {
+      const table = new Function('return ' + html.slice(open, end + 1))();
+      Object.keys(table.en || {}).forEach((k) => keys.en.add(k));
+      Object.keys(table.fa || {}).forEach((k) => keys.fa.add(k));
+    } catch (e) {
+      fail('i18n string table could not be evaluated: ' + e.message);
+    }
+  }
+  return keys;
+}
+const i18n = i18nKeys();
+check(i18n.en.size > 100, 'english string table parsed (' + i18n.en.size + ' keys)');
+const onlyEn = [...i18n.en].filter((k) => !i18n.fa.has(k));
+const onlyFa = [...i18n.fa].filter((k) => !i18n.en.has(k));
+check(onlyEn.length === 0, 'every english key has a persian translation' + (onlyEn.length ? ' -> ' + onlyEn.join(', ') : ''));
+check(onlyFa.length === 0, 'no orphan persian keys' + (onlyFa.length ? ' -> ' + onlyFa.join(', ') : ''));
+const trUsed = [...new Set([...html.matchAll(/tr\('([A-Za-z0-9_]+)'\)/g)].map((m) => m[1]))];
+const trMissing = trUsed.filter((k) => !i18n.en.has(k));
+check(trMissing.length === 0, 'all ' + trUsed.length + ' tr() keys resolve' + (trMissing.length ? ' -> missing ' + trMissing.join(', ') : ''));
 for (const key of ['tabPlan', 'tabProgress', 'restoreCopy', 'confirmRestore', 'uncheckConfirm']) {
-  const en = new RegExp('I\\.en\\.' + key + '=').test(html);
-  const fa = new RegExp('I\\.fa\\.' + key + '=').test(html);
-  check(en && fa, 'i18n key ' + key + ' exists in both en and fa');
+  check(i18n.en.has(key) && i18n.fa.has(key), 'i18n key ' + key + ' exists in both en and fa');
 }
 
 /* ---------- 9. every inline script still parses ---------- */
