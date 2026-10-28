@@ -1,0 +1,127 @@
+LvLBY — PROFESSIONAL UX/UI IMPROVEMENT BRIEF
+Prepared for: an AI coding assistant or professional web designer
+Purpose: Improve the existing LvLBY website without unnecessarily rebuilding it.
+
+PROJECT CONTEXT
+LvLBY is a free, bilingual (Persian RTL / English LTR) daily planner and installable web app (PWA). It includes daily tasks, Smart Add, habits and routines, weekly scheduling, calendar, insights, focus timer, gamification/pet features, backup/import/export, and optional Google sign-in with Firebase sync.
+
+The existing project is a single index.html with inline CSS and vanilla JavaScript, plus supporting files such as privacy.html, sw.js, manifest.webmanifest, and icons. Keep the existing technology and hosting approach unless a change is genuinely necessary. The owner prefers free solutions and is not a programmer.
+
+DESIGN PRINCIPLE
+Use the usability philosophy associated with Steve Krug, author of “Don't Make Me Think”: make the next action obvious, reduce unnecessary decisions, and help users complete their tasks with minimal friction. This is an application of his general principles, not a statement written or approved by him.
+
+GOAL
+Make LvLBY feel more professional, polished, trustworthy, accessible, and easy to use on phones and desktop, while preserving its calm identity and existing useful features.
+
+WHAT TO IMPROVE / ADD
+
+1. Simplify primary navigation
+- Review the current six main tabs: Today, Habits & routines, Weekly schedule, Calendar, Pet, and Insights.
+- Consider four primary destinations: Today; Plan (habits/routines and weekly schedule); Calendar; Progress (insights and achievements).
+- Keep useful features accessible, but reduce competition between primary destinations.
+- Do not implement this reorganization blindly: first check all navigation logic and ensure every feature remains reachable.
+
+2. Make saving and cloud sync status clear
+- Distinguish clearly between data saved on this device, data synced to the account, offline state, and sync failure.
+- Show the last successful sync time if it can be implemented reliably.
+- Provide a retry action for failed sync.
+- Explain that Google sign-in is optional and what it enables.
+- Never claim data is synced unless Firebase confirms success. Preserve local data if cloud sync is unavailable.
+
+3. Improve accessibility
+- Add appropriate aria-live/status announcements for meaningful events such as task completion, save success, and sync errors.
+- Ensure keyboard navigation and visible focus indicators work throughout the app.
+- Check contrast in both light and dark themes and in both Persian and English.
+- Check tap targets on mobile; aim for approximately 44 by 44 CSS pixels where practical.
+- Keep semantic labels for icon-only buttons and form inputs.
+- Respect prefers-reduced-motion and ensure animations do not block task completion.
+
+4. Add task search only if it can be kept simple
+- Allow users to find tasks in their history when there is enough history to make search useful.
+- Avoid adding a complicated filter system unless testing shows users need it.
+
+5. Improve first-run onboarding
+- Offer a clear choice between a short guided tour and starting immediately.
+- Keep the tour available in Settings.
+- Avoid forcing users through unnecessary steps or asking questions whose answers are already known.
+
+6. Refine visual hierarchy and interaction design
+- Keep Today’s tasks as the primary focus.
+- Make primary actions visually distinct from secondary or destructive actions.
+- Use consistent spacing, typography, buttons, cards, and states across all views.
+- Keep Persian RTL and English LTR layouts equally polished.
+- Provide useful empty, loading, offline, error, and success states.
+- Make sure the layout is responsive on small phones, tablets, and desktop.
+
+WHAT TO REMOVE, REDUCE, OR DE-EMPHASIZE
+
+1. Pet/gamification in primary navigation
+- Consider moving Pet, shop, and challenges into an optional “Rewards” or “More” area under Progress.
+- Do not delete the features or user data; make them less prominent while keeping them accessible.
+
+2. Secondary actions from the main workflow
+- De-emphasize actions such as “Uncheck all” and “Reset defaults” by placing them in a secondary menu or less prominent area.
+- Keep them available. Use clear confirmation or undo for destructive actions.
+
+3. Decorative motion that adds little value
+- Reduce continuous shimmer and excessive animation.
+- Keep quick, subtle feedback for meaningful events, such as completing a task.
+- Preserve reduced-motion support.
+
+4. Forced onboarding
+- Let users choose “Show me around” or “Let me start”.
+- Do not remove the ability to replay the tour in Settings.
+
+DO NOT
+- Do not rebuild the app from scratch.
+- Do not remove existing features without approval.
+- Do not introduce paid services, frameworks, or dependencies unless explicitly approved.
+- Do not add AI branding to features that are not actually AI-powered.
+- Do not redesign the site only to make it flashy.
+- Do not break Persian RTL, English LTR, offline use, PWA installation, local storage, backup/import/export, or Google/Firebase sync.
+- Do not expose private user data or weaken Firebase security.
+- Do not overwrite or delete existing data during changes.
+- Do not rename project files or change hosting/domain configuration unless specifically requested.
+
+PRIORITY ORDER
+P0 — Reliability and safety:
+- Verify local saving, backup/import/export, and Firebase sync status behavior.
+- Check Firebase security assumptions; each signed-in user must only access their own data.
+- Preserve offline operation and avoid data loss.
+- Confirm service-worker cache version is updated when a release changes cached assets.
+
+P1 — Usability:
+- Improve navigation and reduce unnecessary prominence of secondary actions.
+- Make onboarding optional and clear.
+- Clarify local-save/cloud-sync/offline states.
+
+P2 — Accessibility and polish:
+- Audit keyboard access, focus, contrast, labels, announcements, responsive layout, and reduced motion.
+- Standardize visual spacing and interaction states.
+
+P3 — Optional feature:
+- Add simple task search only if it fits the existing architecture and remains easy to use.
+
+IMPLEMENTATION RULES
+1. Inspect the existing source before editing.
+2. Make the smallest safe set of changes that produces a meaningful improvement.
+3. Preserve existing functionality, saved data formats, file names, and current deployment setup.
+4. Keep Persian and English text complete and accurate.
+5. Run JavaScript syntax checks and test critical flows where possible.
+6. Test mobile and desktop layouts, both languages, offline behavior, task completion, backup restore, and Google sync where possible.
+7. Update the service-worker cache name/version when needed.
+8. Report exactly which files changed, what was tested, what could not be tested, and any remaining risks.
+9. Do not claim a feature works unless it was actually tested.
+10. If a proposed change risks data loss or breaks existing functionality, stop and explain the risk before proceeding.
+
+SUCCESS CRITERIA
+- A new user can understand what to do without needing instructions.
+- Today’s tasks remain the main focus.
+- The interface feels consistent and uncluttered.
+- Persian and English both work correctly.
+- Users can tell whether their data is local, synced, or offline.
+- Existing features and user data are preserved.
+- The app remains free to operate using the current approach.
+
+IMPORTANT
+This is a prioritized design and engineering brief, not permission to implement every suggestion blindly. Inspect the code first, make safe improvements, and ask before any destructive or high-risk change.
