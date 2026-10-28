@@ -527,7 +527,7 @@ async function pushCloud(){
     await Promise.race([ref.set(doc),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),20000))]);
     localStorage.setItem(LS.rev,String(rev));
     if(JSON.stringify(data)===snap)localStorage.setItem(LS.dirty,'0');
-    cloudState='synced';retryN=0;
+    cloudState='synced';retryN=0;markSynced();
   }catch(err){console.error('Cloud save failed:',err);if(err.code==='permission-denied'&&!noSettingsSync){noSettingsSync=true;pushing=false;return pushCloud()}if(err.code==='permission-denied'&&!noNewKeys){noNewKeys=true;toast('Cloud rules are outdated: new features (templates, deadlines, vacation) stay on this device. Publish the new firestore.rules.');pushing=false;return pushCloud()}cloudState='error';setTimeout(pushCloud,Math.min(120000,5000*Math.pow(2,Math.min(retryN++,5))))}
   pushing=false;showStatus();
   if(cloudState==='synced'&&localStorage.getItem(LS.dirty)==='1')pushCloud();
@@ -564,7 +564,7 @@ function setupFirebase(){
         if(foreign){if(hasUserContent(data))backupDevice();data=defaults()}
         pushAfter=true;
       }
-      localStorage.setItem(LS.owner,user.uid);
+      localStorage.setItem(LS.owner,user.uid);markSynced();
       cloudReady=true;window.__cl=0;
       if(!data.days[selected])buildDay(selected);
       renderAll();afterSignIn();
