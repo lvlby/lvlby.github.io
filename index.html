@@ -252,6 +252,24 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
 .modal{background:rgba(20,28,48,.94);border-color:rgba(255,255,255,.14);border-radius:30px}.notice{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
 .logo{background:linear-gradient(145deg,#c4f4d9,#6ee7b7 60%,#38bdf8)}
 @media(prefers-reduced-motion:reduce){.card,.btn{transition:none!important}}
+/* ---- UX brief additions (navigation, status clarity, accessibility) ---- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid #c4f4d9;outline-offset:2px}
+.tab:focus-visible,.subtab:focus-visible,.btn:focus-visible,.iconbtn:focus-visible,.langbtn:focus-visible,.close:focus-visible{outline:2px solid #c4f4d9;outline-offset:2px}
+.tab[data-view=habits]::before{content:'🗂️'}
+.subnav{display:flex;gap:6px;padding:4px;background:#101722;border:1px solid #222d3f;border-radius:12px;margin:0 0 14px;flex-wrap:wrap}
+.subtab{border:0;background:transparent;color:var(--muted);padding:10px 14px;min-height:44px;border-radius:9px;font-size:13px;font-weight:650;cursor:pointer}
+.subtab.active{background:#253247;color:#eaf3ff;box-shadow:inset 0 0 0 1px #33435a}
+#accountStatus{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#accountStatus .statusdot{width:9px;height:9px;border-radius:50%;background:#7f91a9;flex:0 0 auto}
+#accountStatus.ok .statusdot{background:#7ee2b3}#accountStatus.warn .statusdot{background:#ffc36b}#accountStatus.bad .statusdot{background:#f98a8a}
+#statusRetry{margin-inline-start:auto}
+@media (max-width:640px){
+ .tab{min-height:44px;padding:12px 14px}
+ .btn{padding:11px 13px}
+ .iconbtn,.langbtn{min-width:44px;min-height:44px;display:inline-grid;place-items:center}
+ .close{width:44px;height:44px}
+}
 </style>
 <meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks. برنامه‌ریز روزانهٔ آرام، با روتین، عادت و استریک.">
 <meta property="og:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
