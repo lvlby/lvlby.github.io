@@ -287,7 +287,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="brand"><div class="logo">Lv</div><div><div class="brandname">LvLBY<span style="color:var(--accent)">.</span></div><div class="tagline" data-i18n="tagline">A calmer way to run your day.</div></div></div>
  <div class="topactions"><button class="langbtn" id="langToggle">فارسی / FA</button><button class="btn primary small" id="googleSignIn">Continue with Google</button><button class="iconbtn" id="openSettings" aria-label="Settings">⚙</button></div>
 </header>
-<div id="accountStatus" class="notice" style="margin:-12px 0 18px">Loading…</div>
+<div id="accountStatus" class="notice" role="status" aria-live="polite" style="margin:-12px 0 18px"><span class="statusdot" aria-hidden="true"></span><span id="statusText">Loading…</span><button class="btn small" id="statusRetry" type="button" hidden></button></div>
 <div class="notice" id="installBar" hidden style="margin:-6px 0 14px;gap:8px;align-items:center;flex-wrap:wrap"><span id="installBarTxt" style="flex:1 1 180px"></span><button class="btn small primary" id="installBarGo"></button><button class="btn small" id="installBarX" aria-label="close">✕</button></div>
 <section class="hero">
  <div class="card hero-main">
