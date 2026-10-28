@@ -239,6 +239,19 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
 #reportDetails .task{flex-wrap:wrap}#reportDetails .task-main{flex:1 1 110px;min-width:110px}#reportDetails .pill{white-space:normal;max-width:100%}
 @media (max-width:420px){.tabs .tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;white-space:nowrap;font-size:11px;padding:6px 2px;line-height:1.15}.tabs .tab::before{font-size:17px;margin:0}}
 .calday.hol{color:#ff8a8a;font-weight:700}
+/* v26 skin (visual only) */
+#installBar:not([hidden]){display:flex}#undoBar:not(.show){visibility:hidden}
+body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),transparent 70%),radial-gradient(820px 600px at 100% 12%,rgba(139,92,246,.16),transparent 70%),radial-gradient(640px 480px at 40% 100%,rgba(56,189,248,.1),transparent 70%),var(--bg);background-attachment:fixed}
+.card{background:linear-gradient(150deg,rgba(255,255,255,.075),rgba(255,255,255,.03));border-color:rgba(255,255,255,.12);border-radius:26px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
+@media(hover:hover){.card{transition:transform .5s var(--ease),border-color .3s}.card:hover{transform:translateY(-3px);border-color:rgba(110,231,183,.32)}.btn:hover{transform:translateY(-1px)}}
+.heading,.brandname{letter-spacing:-.035em;font-weight:800}.heading{line-height:1.1}
+.iconbtn,.langbtn,.btn{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
+.btn.primary{background:linear-gradient(135deg,#a8e6c3,#6ee7b7 45%,#38bdf8);border-color:transparent;box-shadow:0 10px 34px rgba(110,231,183,.25)}
+.task{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);border-radius:18px}
+.tabs{background:rgba(10,15,30,.72)}.tab.active{background:linear-gradient(135deg,rgba(110,231,183,.22),rgba(56,189,248,.18));box-shadow:inset 0 0 0 1px rgba(110,231,183,.35);color:#eafff6}
+.modal{background:rgba(20,28,48,.94);border-color:rgba(255,255,255,.14);border-radius:30px}.notice{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.logo{background:linear-gradient(145deg,#c4f4d9,#6ee7b7 60%,#38bdf8)}
+@media(prefers-reduced-motion:reduce){.card,.btn{transition:none!important}}
 </style>
 <meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks. برنامه‌ریز روزانهٔ آرام، با روتین، عادت و استریک.">
 <meta property="og:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
@@ -257,7 +270,7 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
  <div class="topactions"><button class="langbtn" id="langToggle">فارسی / FA</button><button class="btn primary small" id="googleSignIn">Continue with Google</button><button class="iconbtn" id="openSettings" aria-label="Settings">⚙</button></div>
 </header>
 <div id="accountStatus" class="notice" style="margin:-12px 0 18px">Loading…</div>
-<div class="notice" id="installBar" hidden style="margin:-6px 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="installBarTxt" style="flex:1 1 180px"></span><button class="btn small primary" id="installBarGo"></button><button class="btn small" id="installBarX" aria-label="close">✕</button></div>
+<div class="notice" id="installBar" hidden style="margin:-6px 0 14px;gap:8px;align-items:center;flex-wrap:wrap"><span id="installBarTxt" style="flex:1 1 180px"></span><button class="btn small primary" id="installBarGo"></button><button class="btn small" id="installBarX" aria-label="close">✕</button></div>
 <section class="hero">
  <div class="card hero-main">
   <div class="eyebrow" data-i18n="overview">YOUR DAY, IN FOCUS</div>
@@ -379,7 +392,7 @@ body{background:radial-gradient(900px 520px at 6% -8%,#34d39926,transparent 60%)
  <div class="set-sec"><div class="group-title" data-s="remind"></div><div class="card" style="margin-top:12px;box-shadow:none"><h2 style="margin-top:0;font-size:17px" id="notifTitle">Reminders</h2><p class="muted smalltext" id="notifDesc"></p><div class="field" style="max-width:260px;margin-top:10px"><label for="notifLead" id="notifLeadLabel">Remind me</label><select id="notifLead"><option value="0"></option><option value="5"></option><option value="10"></option></select></div><div class="notice" id="notifState" style="margin-top:12px"></div><div class="actions"><button class="btn primary" id="notifToggle"></button><button class="btn" id="notifTest"></button></div></div></div>
  <div class="set-sec"><div class="group-title" data-s="remTitle"></div><p class="muted smalltext" data-s="remDesc"></p><div class="actions"><button class="btn primary" id="icsBtn" data-s="icsBtn"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="connTitle"></div><div class="actions"><button class="btn" id="connBtn" data-s="connBtn"></button><button class="btn" id="syncNow" data-s="syncNow"></button><button class="btn" id="fbRetry" data-s="fbRetry"></button></div><div id="connOut" style="margin-top:8px"></div></div>
- <div class="set-sec"><div class="group-title" id="tplTitle"></div><p class="muted smalltext" id="tplDesc"></p><div class="actions"><button class="btn" data-tpl="konkoor"></button><button class="btn" data-tpl="student"></button><button class="btn" data-tpl="freelance"></button></div></div>
+ <div class="set-sec"><div class="group-title" id="tplTitle"></div><p class="muted smalltext" id="tplDesc"></p><div class="actions"><button class="btn" data-tpl="konkoor"></button><button class="btn" data-tpl="student"></button><button class="btn" data-tpl="freelance"></button></div><div class="actions" style="margin-top:8px"><a class="btn" href="about.html" id="aboutLink"></a></div></div>
  <div class="set-sec"><div class="group-title" data-s="data"></div><p class="muted smalltext" id="setSize"></p><div class="actions"><button class="btn" id="setExport" data-s="export"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="about"></div><p class="muted smalltext" data-s="aboutText"></p><div class="actions"><button class="btn" id="setPriv" data-s="privBtn"></button><button class="btn" id="setTour" data-s="tourBtn"></button><button class="btn" id="setInstall" data-s="installBtn"></button></div><p class="muted smalltext" id="installHint"></p></div>
 </div></div>
@@ -538,7 +551,7 @@ window.addEventListener('online',()=>{if(window.__retryCloud)window.__retryCloud
 window.addEventListener('offline',()=>{if(cloudUser)cloudState='pending';showStatus()});
 function paintProgress(){const tasks=ensureDay(selected).tasks,done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0;$('progressBar').style.width=pct+'%';$('progressText').textContent=`${fa(done)} / ${fa(tasks.length)} ${tr('tasks')} ${tr('completeCount')}`;{const el=$('progressPct'),nv=fa(pct)+'%';if(el.textContent!==nv){el.textContent=nv;bump(el)}}$('doneStat').textContent=fa(done);$('totalStat').textContent=fa(tasks.length)}
 
-let S={rotate:true,reduce:false,haptics:true,xp:true,sound:false,theme:'dark',cal:'auto',pet:'cat',pname:'',owned:[],hat:''};try{Object.assign(S,JSON.parse(localStorage.getItem('lvlby-settings')||'{}'))}catch(e){}S.xp=true;
+let S={rotate:true,reduce:false,haptics:true,xp:true,sound:false,theme:'dark',cal:'auto',pet:'cat',pname:'',owned:[],hat:''};try{Object.assign(S,JSON.parse(localStorage.getItem('lvlby-settings')||'{}'))}catch(e){}S.xp=true;try{if(!localStorage.getItem('lvlby_dark26')){S.theme='dark';localStorage.setItem('lvlby_dark26','1');localStorage.setItem('lvlby-settings',JSON.stringify(S))}}catch(e){}
 const HF={'1-1':['Nowruz','نوروز'],'1-2':['Nowruz','نوروز'],'1-3':['Nowruz','نوروز'],'1-4':['Nowruz','نوروز'],'1-12':['Islamic Republic Day','روز جمهوری اسلامی'],'1-13':['Sizdah Bedar','سیزده‌به‌در'],'3-14':['Imam Khomeini memorial','رحلت امام خمینی'],'3-15':['15 Khordad uprising','قیام ۱۵ خرداد'],'11-22':['Revolution Victory Day','پیروزی انقلاب اسلامی'],'12-29':['Oil Nationalization Day','ملی شدن صنعت نفت']},
  HL={1405:{'3-6':['Eid al-Adha','عید قربان'],'3-14':['Eid al-Ghadir','عید غدیر'],'4-3':['Tasua','تاسوعا'],'4-4':['Ashura','عاشورا'],'5-13':['Arbaeen','اربعین'],'5-21':['Prophet\'s demise','رحلت پیامبر'],'5-22':['Imam Reza martyrdom','شهادت امام رضا'],'6-8':['Prophet\'s birthday','میلاد پیامبر'],'8-22':['Fatima martyrdom','شهادت حضرت زهرا'],'10-2':['Imam Ali birthday','ولادت امام علی'],'10-16':['Mab\'ath','مبعث'],'11-4':['Mid-Shaban','نیمه شعبان'],'12-9':['Imam Ali martyrdom','شهادت امام علی'],'12-19':['Eid al-Fitr','عید فطر'],'12-20':['Eid al-Fitr','عید فطر']}};
 const NR={perfect:[['Every single task done. Today was yours.','امروز همه‌چیز را تمام کردی. امروز مال خودت بود.'],['Clean sweep. A day to be proud of.','همه‌ی کارها انجام شد. از این روز می‌شود با افتخار یاد کرد.'],['Nothing left on the list. Nicely done.','هیچ کاری روی لیست نمانده. دمت گرم.']],
@@ -1483,13 +1496,19 @@ function backupNudge(){if(demo||!Object.keys(data.days).length)return;const now=
 function renderInstallBar(){const b=$('installBar');if(!b)return;const show=!isStandalone()&&Date.now()-lsGet('lvlby_inst_x')>14*DAY&&/^https?:$/.test(location.protocol);b.hidden=!show;b.style.display=show?'flex':'none';if(!show)return;
  $('installBarTxt').textContent=deferredInstall?L('Install LvLBY for one-tap access and offline use.','LvLBY را نصب کن تا با یک لمس و حتی بدون اینترنت بازش کنی.'):installText();$('installBarGo').textContent=L('Install','نصب');$('installBarGo').style.display=deferredInstall?'':'none'}
 $('installBarGo').onclick=doInstall;$('installBarX').onclick=()=>{lsSet('lvlby_inst_x',Date.now());renderInstallBar()};window.addEventListener('beforeinstallprompt',()=>setTimeout(renderInstallBar,0));
-function shareCardBlob(){return new Promise(res=>{const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),f=lang==='fa',F='system-ui,Vazirmatn,Tahoma,sans-serif';x.direction=f?'rtl':'ltr';x.textAlign='center';
- const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#101522');g.addColorStop(1,'#1b2a3f');x.fillStyle=g;x.fillRect(0,0,W,H);
- x.fillStyle='#a8e6c3';x.beginPath();x.roundRect(W/2-80,260,160,160,44);x.fill();x.fillStyle='#10251b';x.font='bold 76px '+F;x.fillText('Lv',W/2,365);
- const n=n=>f?fa(n):String(n),sn=streakNow(),xp=xpTotal();x.fillStyle='#f0f4fb';x.font='300px '+F;x.fillText(n(sn),W/2,900);
- x.fillStyle='#a8e6c3';x.font='bold 64px '+F;x.fillText(L('day streak','روز پیاپی'),W/2,1010);
- [[n(streakBest()),L('Best','بهترین')],[n(lvlOf(xp)),L('Level','سطح')],[n(xp),'XP']].forEach((r,k)=>{const cx=270+k*270;x.fillStyle='#f0f4fb';x.font='96px '+F;x.fillText(r[0],cx,1220);x.fillStyle='#9aa8bc';x.font='44px '+F;x.fillText(r[1],cx,1290)});
- x.font='44px '+F;x.fillText(L('A calmer way to run your day','راهی آرام‌تر برای اداره‌ی روزت'),W/2,1560);x.fillStyle='#f0f4fb';x.font='bold 54px '+F;x.fillText('LvLBY',W/2,1660);x.fillStyle='#9aa8bc';x.font='34px '+F;x.fillText(location.host+location.pathname.replace(/index\.html$/,''),W/2,1730);
+function shareCardBlob(){return new Promise(res=>{const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),f=lang==='fa',F='system-ui,Vazirmatn,Tahoma,sans-serif',n=v=>f?fa(v):String(v),sn=streakNow(),td=today(),nm=(P&&P.name)||L('Me','من'),
+ T=(t,px,y,col,w,xx)=>{x.fillStyle=col;x.font=(w||'')+' '+px+'px '+F;x.fillText(t,xx||W/2,y)},G=(x0,y0,x1,y1,a,b)=>{const g=x.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g},
+ glass=(gx,gy,gw,gh,r,fill)=>{x.beginPath();x.roundRect(gx,gy,gw,gh,r);x.fillStyle=fill||'rgba(255,255,255,.06)';x.fill();x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=2;x.stroke()};
+ x.direction=f?'rtl':'ltr';x.textAlign='center';x.fillStyle='#0a0f1e';x.fillRect(0,0,W,H);
+ [[160,300,820,'rgba(110,231,183,.35)'],[950,1500,900,'rgba(139,92,246,.38)'],[900,420,520,'rgba(56,189,248,.22)']].forEach(([gx,gy,r,col])=>{const g=x.createRadialGradient(gx,gy,0,gx,gy,r);g.addColorStop(0,col);g.addColorStop(1,'rgba(10,15,30,0)');x.fillStyle=g;x.fillRect(0,0,W,H)});
+ x.fillStyle=G(0,0,120,120,'#a8e6c3','#6ee7b7');x.beginPath();x.roundRect(W/2-232,96,92,92,26);x.fill();T('Lv',44,160,'#0b2a1d','bold',W/2-186);T('LvLBY',54,160,'#f0f4fb','bold',W/2-30);T(localDateLabel(td),30,262,'#9aa8bc');
+ glass(60,320,960,930,64);T(f?'استریک '+nm:nm+'\u2019s streak',42,420,'#c9d4e6');
+ const ms=[3,7,14,30,50,100,200,365],nx=ms.find(m=>m>sn)||sn+100,pv=[0,...ms].filter(m=>m<=sn).pop(),cx=W/2,cy=760,r=300;x.lineCap='round';x.lineWidth=40;x.strokeStyle='rgba(255,255,255,.09)';x.beginPath();x.arc(cx,cy,r,0,7);x.stroke();
+ if(sn>0){x.strokeStyle=G(cx-r,cy-r,cx+r,cy+r,'#6ee7b7','#38bdf8');x.shadowColor='rgba(110,231,183,.6)';x.shadowBlur=40;x.beginPath();x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.max(.04,(sn-pv)/(nx-pv))*Math.PI*2);x.stroke();x.shadowBlur=0}
+ T(n(sn),270,cy+95,G(0,cy-150,0,cy+150,'#ffffff','#a8e6c3'),'bold');T(L('day streak','روز پیاپی'),54,1130,'#6ee7b7','bold');T(sn?L((nx-sn)+' days to '+nx,n(nx-sn)+' روز تا '+n(nx)+' روز'):L('Start today','از امروز شروع کن'),38,1200,'#9aa8bc');
+ glass(60,1290,960,230,48);for(let k=0;k<7;k++){const d=shiftDays(td,k-6),lx=120+(f?6-k:k)*125,done=dayDone(d);x.beginPath();x.roundRect(lx,1335,90,90,26);if(done){x.fillStyle=G(lx,1335,lx+90,1425,'#6ee7b7','#38bdf8');x.fill()}else{x.fillStyle='rgba(255,255,255,.07)';x.fill()}if(k===6){x.strokeStyle='#f0f4fb';x.lineWidth=4;x.stroke()}T(new Date(d+'T12:00:00').toLocaleDateString(f?'fa-IR':'en',{weekday:'narrow'}),30,1484,k===6?'#f0f4fb':'#9aa8bc','',lx+45)}
+ const st=[[n(streakBest()),L('Best','بهترین')],[n(lvlOf(xpTotal())),L('Level','سطح')],[n(xpTotal()),'XP']];if(f)st.reverse();st.forEach((q,k)=>{const gx=60+k*330;glass(gx,1550,300,170,40);T(q[0],72,1640,'#f0f4fb','bold',gx+150);T(q[1],32,1690,'#9aa8bc','',gx+150)});
+ T(L('A calmer way to run your day','راهی آرام‌تر برای اداره‌ی روزت'),38,1800,'#c9d4e6');T(location.host+location.pathname.replace(/index\.html$/,''),32,1860,'#6b7a90');
  c.toBlob(res,'image/png')})}
 async function doShareCard(){try{const bl=await shareCardBlob(),fl=new File([bl],'lvlby-streak.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],text:'LvLBY'});return}
  const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='lvlby-streak.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast(L('Image saved. Post it to your story.','عکس ذخیره شد. توی استوری بذارش.'))}catch(e){if(e&&e.name!=='AbortError')toast(L('Could not make the image.','ساختن عکس نشد.'))}}
@@ -1497,15 +1516,15 @@ $('shareCard').onclick=doShareCard;
 const TPL={konkoor:{en:'Konkoor student',fa:'کنکوری',it:[['06:30','Wake up and stretch','بیدار شدن و کشش'],['07:30','Study block 1 (hardest subject)','مطالعهٔ بلوک ۱ (سخت‌ترین درس)'],['10:30','Practice tests','تست‌زنی'],['16:00','Study block 2','مطالعهٔ بلوک ۲'],['20:00','Review mistakes','مرور غلط‌ها'],['22:30','Wind down, no phone','آماده‌شدن برای خواب، بدون گوشی']]},
  student:{en:'University student',fa:'دانشجو',it:[['08:00','Plan the day (5 min)','برنامه‌ریزی روز (۵ دقیقه)'],['09:30','Deep study','مطالعهٔ عمیق'],['14:00','Assignments','تمرین و پروژه'],['19:00','Revision','مرور درس‌ها'],['22:30','Plan tomorrow','برنامهٔ فردا']]},
  freelance:{en:'Freelancer',fa:'فریلنسر',it:[['09:00','Pick today\'s top 3','سه کار مهم امروز'],['09:30','Deep work','کار عمیق'],['13:00','Client messages','پیام‌های مشتری'],['15:00','Deep work 2','کار عمیق ۲'],['17:30','Invoices and admin','فاکتور و کارهای اداری'],['18:30','Shut down','پایان کار']]}};
-function renderTplUI(){$('tplTitle').textContent=L('Quick-start templates','قالب‌های آمادهٔ شروع سریع');$('tplDesc').textContent=L('Fill your day with a ready routine. Replaces earlier template items only.','روزت را با یک روتین آماده پر کن. فقط آیتم‌های قالب قبلی را عوض می‌کند.');document.querySelectorAll('[data-tpl]').forEach(b=>b.textContent=L(TPL[b.dataset.tpl].en,TPL[b.dataset.tpl].fa))}
+function renderTplUI(){$('aboutLink').textContent=L('About LvLBY','دربارهٔ LvLBY');$('tplTitle').textContent=L('Quick-start templates','قالب‌های آمادهٔ شروع سریع');$('tplDesc').textContent=L('Fill your day with a ready routine. Replaces earlier template items only.','روزت را با یک روتین آماده پر کن. فقط آیتم‌های قالب قبلی را عوض می‌کند.');document.querySelectorAll('[data-tpl]').forEach(b=>b.textContent=L(TPL[b.dataset.tpl].en,TPL[b.dataset.tpl].fa))}
 document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=async()=>{if(demo)return toast(L('Not available in the demo.','در نسخهٔ دمو در دسترس نیست.'));const t=TPL[b.dataset.tpl];
  if(!await uiConfirm(L('Add the "'+t.en+'" routine to your day?','روتین «'+t.fa+'» به روزت اضافه شود؟'),{title:L(t.en,t.fa),ok:L('Add','اضافه کن')}))return;
  data.routine.forEach(g=>{g.items=g.items.filter(it=>String(it.id).slice(0,3)!=='tp-')});
  t.it.forEach((r,i)=>{const g=data.routine.find(x=>x.id===(pzMin(r[0])<720?'morning':'evening'));if(g)g.items.push({id:'tp-'+b.dataset.tpl+i,name:L(r[1],r[2]),time:r[0]})});
  save();const td=today();Object.keys(data.days).forEach(d=>{if(d>=td)data.days[d].built=false});buildDay(td,true);if(selected>td)buildDay(selected,true);closeSettings();renderAll();toast(L('Routine added.','روتین اضافه شد.'))});
 $('shareCard').textContent='📤 '+L('Share my streak card','اشتراک‌گذاری کارت استریک');
-$('langToggle').addEventListener('click',()=>setTimeout(()=>{renderInstallBar();$('shareCard').textContent='📤 '+L('Share my streak card','اشتراک‌گذاری کارت استریک')},0));
-setTimeout(()=>{renderInstallBar();backupNudge()},3500);
+$('langToggle').addEventListener('click',()=>setTimeout(()=>{renderInstallBar();if(!sa.pending)$('saGo').textContent=sat('go');$('shareCard').textContent='📤 '+L('Share my streak card','اشتراک‌گذاری کارت استریک')},0));
+$('saGo').textContent=sat('go');setTimeout(()=>{renderInstallBar();backupNudge()},3500);
 
 /* ---- v22: official holidays + nightly review ---- */
 function holName(d){try{const q=new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date(d+'T12:00:00')),g=t=>(q.find(x=>x.type===t)||{}).value,y=+(g('year')||g('relatedYear')),k=+g('month')+'-'+ +g('day'),h=HF[k]||(HL[y]||{})[k];return h?L(h[0],h[1]):''}catch(e){return ''}}
