@@ -252,6 +252,24 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
 .modal{background:rgba(20,28,48,.94);border-color:rgba(255,255,255,.14);border-radius:30px}.notice{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
 .logo{background:linear-gradient(145deg,#c4f4d9,#6ee7b7 60%,#38bdf8)}
 @media(prefers-reduced-motion:reduce){.card,.btn{transition:none!important}}
+/* ---- UX brief additions (navigation, status clarity, accessibility) ---- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid #c4f4d9;outline-offset:2px}
+.tab:focus-visible,.subtab:focus-visible,.btn:focus-visible,.iconbtn:focus-visible,.langbtn:focus-visible,.close:focus-visible{outline:2px solid #c4f4d9;outline-offset:2px}
+.tab[data-view=habits]::before{content:'🗂️'}
+.subnav{display:flex;gap:6px;padding:4px;background:#101722;border:1px solid #222d3f;border-radius:12px;margin:0 0 14px;flex-wrap:wrap}
+.subtab{border:0;background:transparent;color:var(--muted);padding:10px 14px;min-height:44px;border-radius:9px;font-size:13px;font-weight:650;cursor:pointer}
+.subtab.active{background:#253247;color:#eaf3ff;box-shadow:inset 0 0 0 1px #33435a}
+#accountStatus{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#accountStatus .statusdot{width:9px;height:9px;border-radius:50%;background:#7f91a9;flex:0 0 auto}
+#accountStatus.ok .statusdot{background:#7ee2b3}#accountStatus.warn .statusdot{background:#ffc36b}#accountStatus.bad .statusdot{background:#f98a8a}
+#statusRetry{margin-inline-start:auto}
+@media (max-width:640px){
+ .tab{min-height:44px;padding:12px 14px}
+ .btn{padding:11px 13px}
+ .iconbtn,.langbtn{min-width:44px;min-height:44px;display:inline-grid;place-items:center}
+ .close{width:44px;height:44px}
+}
 </style>
 <meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks. برنامه‌ریز روزانهٔ آرام، با روتین، عادت و استریک.">
 <meta property="og:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
@@ -269,7 +287,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="brand"><div class="logo">Lv</div><div><div class="brandname">LvLBY<span style="color:var(--accent)">.</span></div><div class="tagline" data-i18n="tagline">A calmer way to run your day.</div></div></div>
  <div class="topactions"><button class="langbtn" id="langToggle">فارسی / FA</button><button class="btn primary small" id="googleSignIn">Continue with Google</button><button class="iconbtn" id="openSettings" aria-label="Settings">⚙</button></div>
 </header>
-<div id="accountStatus" class="notice" style="margin:-12px 0 18px">Loading…</div>
+<div id="accountStatus" class="notice" role="status" aria-live="polite" style="margin:-12px 0 18px"><span class="statusdot" aria-hidden="true"></span><span id="statusText">Loading…</span><button class="btn small" id="statusRetry" type="button" hidden></button></div>
 <div class="notice" id="installBar" hidden style="margin:-6px 0 14px;gap:8px;align-items:center;flex-wrap:wrap"><span id="installBarTxt" style="flex:1 1 180px"></span><button class="btn small primary" id="installBarGo"></button><button class="btn small" id="installBarX" aria-label="close">✕</button></div>
 <section class="hero">
  <div class="card hero-main">
@@ -293,13 +311,11 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
   <div class="stat"><span class="label" data-i18n="schoolShift">School shift</span><span class="value" id="shiftStat" style="font-size:19px">—</span><span class="hint" id="schoolTimeHint">—</span></div>
  </div></div>
 </section>
-<nav class="tabs">
+<nav class="tabs" aria-label="Main navigation">
  <button class="tab active" data-view="today" data-i18n="tabToday">Today</button>
- <button class="tab" data-view="habits" data-i18n="tabHabits">Habits & routines</button>
- <button class="tab" data-view="schedule" data-i18n="tabSchedule">Weekly schedule</button>
+ <button class="tab" data-view="habits" data-i18n="tabPlan">Plan</button>
  <button class="tab" data-view="calendar" id="tabCal">Calendar</button>
- <button class="tab" data-view="pet" id="tabPet">Pet</button>
- <button class="tab" data-view="reports" data-i18n="tabReports">Insights</button>
+ <button class="tab" data-view="reports" data-i18n="tabProgress">Progress</button>
 </nav>
 <section class="view active" id="view-today">
  <div class="card" id="topCard" hidden style="margin-bottom:14px"><div class="eyebrow" id="topTitle"></div><div id="topList" style="margin-top:8px"></div></div>
@@ -321,6 +337,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  </div>
 </section>
 <section class="view" id="view-habits">
+ <div class="subnav" role="group" aria-label="Plan sections"><button class="subtab active" type="button" data-view="habits" data-i18n="tabHabits" aria-pressed="true">Habits &amp; routines</button><button class="subtab" type="button" data-view="schedule" data-i18n="tabSchedule" aria-pressed="false">Weekly schedule</button></div>
  <div class="card">
   <div class="sectionhead"><div><h2 data-i18n="yourRoutines">Your routines</h2><p class="muted smalltext" data-i18n="routineDesc">Keep it realistic. Edit, remove, or add habits that fit your day.</p></div><button class="btn ghost small" id="resetHabits" data-i18n="resetDefaults">Reset defaults</button></div>
   <div id="routineEditor"></div>
@@ -356,6 +373,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="card" id="habCard" style="margin-top:14px"></div>
 </section>
 <section class="view" id="view-reports">
+ <div class="subnav" role="group" aria-label="Progress sections"><button class="subtab active" type="button" data-view="reports" data-i18n="tabReports" aria-pressed="true">Insights</button><button class="subtab" type="button" data-view="pet" data-i18n="tabPet" aria-pressed="false">Rewards &amp; pet</button></div>
 <div class="actions" style="margin:0 0 12px"><button class="btn primary" id="shareCard"></button></div>
   <div class="card" id="weeklyCard" style="margin-bottom:14px"></div>
  <div class="card"><div class="sectionhead"><div><h2 data-i18n="weeklyInsights">Your last 7 days</h2><p class="muted smalltext" data-i18n="insightDesc">A gentle snapshot of tasks you planned and completed.</p></div></div><div id="reportChart" class="chart"></div><div id="reportDetails" class="tasklist"></div></div>
@@ -392,7 +410,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="set-sec"><div class="group-title" data-s="remind"></div><div class="card" style="margin-top:12px;box-shadow:none"><h2 style="margin-top:0;font-size:17px" id="notifTitle">Reminders</h2><p class="muted smalltext" id="notifDesc"></p><div class="field" style="max-width:260px;margin-top:10px"><label for="notifLead" id="notifLeadLabel">Remind me</label><select id="notifLead"><option value="0"></option><option value="5"></option><option value="10"></option></select></div><div class="notice" id="notifState" style="margin-top:12px"></div><div class="actions"><button class="btn primary" id="notifToggle"></button><button class="btn" id="notifTest"></button></div></div></div>
  <div class="set-sec"><div class="group-title" data-s="remTitle"></div><p class="muted smalltext" data-s="remDesc"></p><div class="actions"><button class="btn primary" id="icsBtn" data-s="icsBtn"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="connTitle"></div><div class="actions"><button class="btn" id="connBtn" data-s="connBtn"></button><button class="btn" id="syncNow" data-s="syncNow"></button><button class="btn" id="fbRetry" data-s="fbRetry"></button></div><div id="connOut" style="margin-top:8px"></div></div>
- <div class="set-sec"><div class="group-title" id="tplTitle"></div><p class="muted smalltext" id="tplDesc"></p><div class="actions"><button class="btn" data-tpl="konkoor"></button><button class="btn" data-tpl="student"></button><button class="btn" data-tpl="freelance"></button></div><div class="actions" style="margin-top:8px"><a class="btn" href="about.html" id="aboutLink"></a></div></div>
+ <div class="set-sec"><div class="group-title" id="setTplTitle"></div><p class="muted smalltext" id="setTplDesc"></p><div class="actions"><button class="btn" data-tpl="konkoor"></button><button class="btn" data-tpl="student"></button><button class="btn" data-tpl="freelance"></button></div><div class="actions" style="margin-top:8px"><a class="btn" href="about.html" id="aboutLink"></a></div></div>
  <div class="set-sec"><div class="group-title" data-s="data"></div><p class="muted smalltext" id="setSize"></p><div class="actions"><button class="btn" id="setExport" data-s="export"></button></div></div>
  <div class="set-sec"><div class="group-title" data-s="about"></div><p class="muted smalltext" data-s="aboutText"></p><div class="actions"><button class="btn" id="setPriv" data-s="privBtn"></button><button class="btn" id="setTour" data-s="tourBtn"></button><button class="btn" id="setInstall" data-s="installBtn"></button></div><p class="muted smalltext" id="installHint"></p></div>
 </div></div>
@@ -407,7 +425,8 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="notice" id="delMsg" hidden style="margin-top:10px"></div>
  <div class="actions" style="margin-top:14px"><button class="btn" id="delCancel"></button><button class="btn" id="delExport"></button><button class="btn danger" id="delGo" disabled></button></div>
 </div></div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="srStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <footer class="sitefoot"><a href="privacy.html" target="_blank" rel="noopener">Privacy · حریم خصوصی</a></footer>
 <script>
 /* Firebase loads in the background so the app still opens when Google servers are blocked */
@@ -451,18 +470,47 @@ const defaults=()=>({routine:[{id:'morning',titleKey:'morningRoutine',items:[{id
 const $=id=>document.getElementById(id);const fa=n=>new Intl.NumberFormat(lang==='fa'?'fa-IR':'en-US').format(n);const iso=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`};const parseDate=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d,12)};const shiftDays=(s,n)=>{let d=parseDate(s);d.setDate(d.getDate()+n);return iso(d)};const today=()=>iso(new Date());
 let lang=localStorage.getItem('lvlby-lang')||'en';let data;try{data=normalize(JSON.parse(localStorage.getItem('lvlby-data')||'null'))}catch(e){data=defaults()}let selected=today(),activeTaskId=null,timerInterval=null,timerSeconds=1500;
 function tr(k){return I[lang][k]??I.en[k]??k}
-const LS={data:'lvlby-data',lang:'lvlby-lang',dirty:'lvlby-dirty',rev:'lvlby-rev',owner:'lvlby-owner',bak:'lvlby-device-backup'};
+const LS={data:'lvlby-data',lang:'lvlby-lang',dirty:'lvlby-dirty',rev:'lvlby-rev',owner:'lvlby-owner',bak:'lvlby-device-backup',lastsync:'lvlby-lastsync'};
 let retryN=0,cloudBytes=0,noNewKeys=false,noSettingsSync=false,cloudState='synced',pushTimer=null,pushing=false,unsub=null;
 const ST={
 en:{signin:'Continue with Google',signout:'Sign out',nocloud:'Cloud sync is unavailable right now. Your data is stored only in this browser.',offlineNoFb:'Offline: cloud sign-in is unavailable. Your data is stored on this device.',signedout:'Not signed in. Your data is stored only in this browser.',as:'Signed in as ',syncing:'syncing…',synced:'saved to your account ✓',pending:'saved on this device, will sync when you are online',error:'cloud save failed - your changes are safe on this device, retrying',loaderr:'could not load cloud data (check Firestore rules and connection)',cancelled:'Sign-in was cancelled.',failed:'Sign-in failed. Check your connection and that this website is an authorized domain in Firebase.',conflict:'This device has changes that are not in your account yet, and your account already has saved data.\n\nOK = keep THIS device\'s version (replaces the cloud copy)\nCancel = use the ACCOUNT version (this device\'s copy is kept so you can restore it)',signoutSure:'Are you sure you want to sign out?',signoutUnsynced:'Some changes are not synced to your account yet. Sign out anyway? (They stay on this device.)',restored:'Previous device copy restored.',keptCopy:'Your previous device copy was kept - see "Restore previous device copy" in Insights.',localfail:'Could not save on this device (storage full or blocked).'},
 fa:{signin:'ورود با گوگل',signout:'خروج از حساب',nocloud:'همگام‌سازی ابری در دسترس نیست. اطلاعات فقط در همین مرورگر ذخیره می‌شود.',offlineNoFb:'آفلاین: ورود ابری در دسترس نیست. اطلاعات روی همین دستگاه ذخیره می‌شود.',signedout:'وارد نشده‌ای. اطلاعات فقط در همین مرورگر ذخیره می‌شود.',as:'وارد شدی: ',syncing:'در حال همگام‌سازی…',synced:'در حساب ذخیره شد ✓',pending:'روی دستگاه ذخیره شد؛ با اتصال به اینترنت همگام می‌شود',error:'ذخیره ابری ناموفق بود؛ تغییرات روی دستگاه امن است و دوباره تلاش می‌شود',loaderr:'بارگذاری اطلاعات ابری ممکن نشد (قوانین Firestore و اتصال را بررسی کن)',cancelled:'ورود لغو شد.',failed:'ورود ناموفق بود. اتصال و دامنه مجاز در Firebase را بررسی کن.',conflict:'این دستگاه تغییراتی دارد که هنوز در حساب نیست و حساب هم اطلاعات ذخیره‌شده دارد.\n\nتأیید = نسخه همین دستگاه (جایگزین نسخه ابری)\nلغو = نسخه حساب (نسخه این دستگاه نگه داشته می‌شود)',signoutSure:'مطمئنی که می‌خواهی از حساب خارج شوی؟',signoutUnsynced:'بعضی تغییرات هنوز همگام نشده‌اند. با این حال خارج شوی؟ (روی این دستگاه می‌مانند.)',restored:'نسخه قبلی دستگاه بازیابی شد.',keptCopy:'نسخه قبلی دستگاه نگه داشته شد؛ در «بینش‌ها» می‌توانی بازیابی‌اش کنی.',localfail:'ذخیره روی دستگاه ممکن نشد.'}};
-I.en.confirmImport='Importing replaces everything currently in the app with the backup file. Continue?';I.fa.confirmImport='وارد کردن پشتیبان همهٔ اطلاعات فعلی را جایگزین می‌کند. ادامه می‌دهی؟';
+I.en.tabPlan='Plan';I.fa.tabPlan='برنامه';I.en.tabProgress='Progress';I.fa.tabProgress='پیشرفت';I.en.tabPet='Rewards & pet';I.fa.tabPet='جایزه‌ها و دوست';
+I.en.confirmImport='Importing replaces everything currently in the app with the backup file. Continue?';
+I.en.restoreCopy='Restore backup';I.fa.restoreCopy='بازیابی نسخهٔ پشتیبان';
+I.en.confirmRestore='Restore the last backup saved on this device? Your current data will be replaced.';I.fa.confirmRestore='آخرین نسخهٔ پشتیبان روی این دستگاه بازیابی شود؟ داده‌های فعلی جایگزین می‌شوند.';I.fa.confirmImport='وارد کردن پشتیبان همهٔ اطلاعات فعلی را جایگزین می‌کند. ادامه می‌دهی؟';
 I.en.restoreCopy='Restore previous device copy';I.fa.restoreCopy='بازیابی نسخه قبلی دستگاه';I.en.confirmRestore='Replace current data with the previous device copy?';I.fa.confirmRestore='داده‌های فعلی با نسخه قبلی دستگاه جایگزین شود؟';
 const sx=k=>(ST[lang]||ST.en)[k]||ST.en[k]||k;
 function normalize(d){const o=normalize0(d),src=(d&&typeof d==="object")?d:{};o.templates=Array.isArray(src.templates)?src.templates:[];o.exams=Array.isArray(src.exams)?src.exams:[];if(o.schedule&&Array.isArray(o.schedule.afternoon)&&!o.schedule.afternoon.some(it=>it.id==='wake'))o.schedule.afternoon.unshift({id:'wake',key:'wake',name:'Wake up & morning routine',time:'08:30'});o.vac=Array.isArray(src.vac)?src.vac:[];return o}
 function normalize0(d){const f=defaults();if(!d||typeof d!=='object')return f;return{routine:Array.isArray(d.routine)?d.routine:f.routine,schedule:(d.schedule&&typeof d.schedule==='object')?Object.assign({},f.schedule,d.schedule):f.schedule,weeks:Array.isArray(d.weeks)?d.weeks:[],days:(d.days&&typeof d.days==='object')?d.days:{}}}
 function hasUserContent(d){const f=defaults();return JSON.stringify(d.routine)!==JSON.stringify(f.routine)||JSON.stringify(d.schedule)!==JSON.stringify(f.schedule)||d.weeks.length>0||Object.values(d.days).some(x=>(x.tasks||[]).some(t=>t.done||t.kind==='custom'||t.notes))}
-function showStatus(extra){const el=$('accountStatus'),btn=$('googleSignIn');if(!el||!btn)return;btn.hidden=!!cloudUser;btn.textContent=sx('signin');btn.disabled=!cloudAuth;let m;if(!cloudAuth)m=sx(typeof firebase==='undefined'?'offlineNoFb':'nocloud');else if(!cloudUser)m=sx('signedout');else m=sx('as')+(cloudUser.displayName||cloudUser.email||'Google')+' · '+sx(cloudState);el.textContent=extra||m;const ss=$('setSignOut');if(ss){ss.hidden=!cloudUser;ss.textContent=sx('signout')}const sa=$('setAccount');if(sa)sa.textContent=el.textContent;const r=$('restoreLocal');if(r){r.hidden=!localStorage.getItem(LS.bak);r.textContent=tr('restoreCopy')}}
+function lastSyncText(){let ts=0;try{ts=+localStorage.getItem(LS.lastsync)||0}catch(e){}
+  if(!ts)return '';
+  try{const t=new Intl.DateTimeFormat(lang==='fa'?'fa-IR':'en-US',{hour:'2-digit',minute:'2-digit'}).format(new Date(ts));
+    return L('last synced at ','آخرین همگام‌سازی: ')+t}catch(e){return ''}}
+function markSynced(){try{localStorage.setItem(LS.lastsync,String(Date.now()))}catch(e){}}
+function showStatus(extra){
+  const el=$('accountStatus'),btn=$('googleSignIn');if(!el||!btn)return;
+  btn.hidden=!!cloudUser;btn.textContent=sx('signin');btn.disabled=!cloudAuth;
+  let m='',tone='local';
+  if(!cloudAuth){m=sx(typeof firebase==='undefined'?'offlineNoFb':'nocloud')}
+  else if(!cloudUser){m=sx('signedout')+' '+L('Google sign-in is optional: it keeps your plan on all your devices. Without it, everything stays in this browser.','ورود با گوگل اختیاری است: برنامه‌ات را روی همهٔ دستگاه‌ها نگه می‌دارد. بدون آن همه‌چیز در همین مرورگر می‌ماند.')}
+  else{
+    m=sx('as')+(cloudUser.displayName||cloudUser.email||'Google')+' · '+sx(cloudState);
+    if(cloudState==='synced'){tone='ok';const t=lastSyncText();if(t)m+=' · '+t}
+    else if(cloudState==='syncing')tone='ok';
+    else if(cloudState==='pending'){tone='warn';m+=' · '+L('your work is safe on this device','کارت روی همین دستگاه امن است')}
+    else if(cloudState==='toolarge')tone='warn';
+    else tone='bad';
+  }
+  const txt=$('statusText');if(txt)txt.textContent=extra||m;else el.textContent=extra||m;
+  el.classList.remove('ok','warn','bad');if(tone!=='local')el.classList.add(tone);
+  const rb=$('statusRetry');
+  if(rb){rb.hidden=!(cloudUser&&(cloudState==='error'||cloudState==='loaderr'||cloudState==='pending'));rb.textContent=L('Retry sync','تلاش دوباره برای همگام‌سازی')}
+  const ss=$('setSignOut');if(ss){ss.hidden=!cloudUser;ss.textContent=sx('signout')}
+  const sa=$('setAccount');if(sa)sa.textContent=(txt?txt.textContent:el.textContent)||'';
+  const r=$('restoreLocal');if(r){r.hidden=!localStorage.getItem(LS.bak);r.textContent=tr('restoreCopy')}
+}
 let demo=false,demoBackup=null;
 function persistLocal(){if(demo)return true;try{localStorage.setItem(LS.data,JSON.stringify(data));return true}catch(e){toast(sx('localfail'));return false}}
 function save(){
@@ -483,7 +531,7 @@ async function pushCloud(){
     await Promise.race([ref.set(doc),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),20000))]);
     localStorage.setItem(LS.rev,String(rev));
     if(JSON.stringify(data)===snap)localStorage.setItem(LS.dirty,'0');
-    cloudState='synced';retryN=0;
+    cloudState='synced';retryN=0;markSynced();
   }catch(err){console.error('Cloud save failed:',err);if(err.code==='permission-denied'&&!noSettingsSync){noSettingsSync=true;pushing=false;return pushCloud()}if(err.code==='permission-denied'&&!noNewKeys){noNewKeys=true;toast('Cloud rules are outdated: new features (templates, deadlines, vacation) stay on this device. Publish the new firestore.rules.');pushing=false;return pushCloud()}cloudState='error';setTimeout(pushCloud,Math.min(120000,5000*Math.pow(2,Math.min(retryN++,5))))}
   pushing=false;showStatus();
   if(cloudState==='synced'&&localStorage.getItem(LS.dirty)==='1')pushCloud();
@@ -520,7 +568,7 @@ function setupFirebase(){
         if(foreign){if(hasUserContent(data))backupDevice();data=defaults()}
         pushAfter=true;
       }
-      localStorage.setItem(LS.owner,user.uid);
+      localStorage.setItem(LS.owner,user.uid);markSynced();
       cloudReady=true;window.__cl=0;
       if(!data.days[selected])buildDay(selected);
       renderAll();afterSignIn();
@@ -658,8 +706,9 @@ function obStart(edit,update){
   ob={step:0,stage:'q',edit:!!edit,update:!!update,qs:qs,tmp:t};renderOb();$('onboard').classList.add('open')}
 function obQ(q){return q.k==='work'&&ob.tmp.student===true?['What do you study? (optional)','چه چیزی می‌خوانی؟ (اختیاری)']:q.q}
 function obOk(q){const v=ob.tmp[q.k];if(!q.req)return true;if(q.t==='text')return !!(v&&String(v).trim());if(q.t==='bool')return typeof v==='boolean';return v!==undefined&&v!==''}
-function renderWelcome(box){const upd=obHasAny(),nq=upd?obNeeded().length:0;box.append(obEl('div','',''));const e=obEl('div','','👋');e.style.cssText='font-size:46px;text-align:center';const h=obEl('h2','',upd?L('Quick update for you','یک به‌روزرسانی کوتاه برای تو'):L('Welcome to LvLBY','به LvLBY خوش آمدی'));h.style.textAlign='center';const p=obEl('p','muted',upd?L('We have '+nq+' new question'+(nq>1?'s':'')+' for you, so your plan fits you better. It only takes a moment.','برای اینکه برنامه بهتر با تو جور شود، '+fa(nq)+' سؤال تازه داریم. فقط چند لحظه طول می‌کشد.'):L('Answer a few quick questions and I will set up your day for you. It takes about a minute.','به چند سؤال کوتاه جواب بده تا برنامهٔ روزت را برایت بچینم. حدود یک دقیقه طول می‌کشد.'));p.style.textAlign='center';const b=obEl('button','btn primary',L('Start the questions','شروع سؤال‌ها'));b.type='button';b.style.cssText='width:100%;font-size:18px;padding:16px;margin-top:14px';b.onclick=()=>obStart(false,upd);const l=obEl('button','btn',L('Later','بعداً'));l.type='button';l.style.cssText='width:100%;margin-top:8px';l.onclick=()=>$('onboard').classList.remove('open');box.append(e,h,p,b,l)}
-function welcomeGate(){try{if(demo||$('onboard').classList.contains('open'))return;if(!obPending())return;ob={step:0,stage:'welcome',tmp:{}};renderOb();$('onboard').classList.add('open')}catch(e){console.error(e)}}
+function renderWelcome(box){const upd=obHasAny(),nq=upd?obNeeded().length:0;box.append(obEl('div','',''));const e=obEl('div','','👋');e.style.cssText='font-size:46px;text-align:center';const h=obEl('h2','',upd?L('Quick update for you','یک به‌روزرسانی کوتاه برای تو'):L('Welcome to LvLBY','به LvLBY خوش آمدی'));h.style.textAlign='center';const p=obEl('p','muted',upd?L('We have '+nq+' new question'+(nq>1?'s':'')+' for you, so your plan fits you better. It only takes a moment.','برای اینکه برنامه بهتر با تو جور شود، '+fa(nq)+' سؤال تازه داریم. فقط چند لحظه طول می‌کشد.'):L('Answer a few quick questions and I will set up your day for you. It takes about a minute.','به چند سؤال کوتاه جواب بده تا برنامهٔ روزت را برایت بچینم. حدود یک دقیقه طول می‌کشد.'));p.style.textAlign='center';const b=obEl('button','btn primary',L('Start the questions','شروع سؤال‌ها'));b.type='button';b.style.cssText='width:100%;font-size:18px;padding:16px;margin-top:14px';b.onclick=()=>obStart(false,upd);const l=obEl('button','btn',L('Later','بعداً'));l.type='button';l.style.cssText='width:100%;margin-top:8px';l.onclick=()=>{setObLater();$('onboard').classList.remove('open')};const tb=obEl('button','btn',L('Show me around','یک مرور کوتاه نشانم بده'));tb.type='button';tb.style.cssText='width:100%;margin-top:8px';tb.onclick=()=>{setObLater();$('onboard').classList.remove('open');startTour()};box.append(e,h,p,b,tb,l)}
+function setObLater(){try{localStorage.setItem('lvlby-ob-later',String(ONB_VER))}catch(e){}}
+function welcomeGate(){try{if(demo||$('onboard').classList.contains('open'))return;if(localStorage.getItem('lvlby-ob-later')===String(ONB_VER))return;if(!obPending())return;ob={step:0,stage:'welcome',tmp:{}};renderOb();$('onboard').classList.add('open')}catch(e){console.error(e)}}
 function renderOb(){
   const box=$('obBox');box.innerHTML='';nxBtn=null;if(ob.stage==='welcome')return renderWelcome(box);if(ob.stage==='building')return renderBuilding(box);if(ob.stage==='ready')return renderReady(box);if(ob.stage==='connect')return renderConnect(box);
   const o=OB[lang]||OB.en,st=ob.step,QL=ob.qs||QS,q=QL[st],last=st===QL.length-1;
@@ -778,7 +827,7 @@ function renderCoach(){
   try{renderStartCard()}catch(e){console.error(e)}
   try{fixFaBits()}catch(e){console.error(e)}
   try{renderWeekly()}catch(e){console.error(e)}
-  document.body.classList.toggle('nostudent',notStudent());const st=document.querySelector('.tab[data-view="schedule"]');if(st)st.textContent=notStudent()?L('My daily plan','برنامهٔ روزانه'):tr('tabSchedule');
+  document.body.classList.toggle('nostudent',notStudent());const st=document.querySelector('.subtab[data-view="schedule"]');if(st)st.textContent=notStudent()?L('My daily plan','برنامهٔ روزانه'):tr('tabSchedule');
   const el=$('coach');if(!el)return;
   let hide=!profileOk()||demo;try{if(localStorage.getItem('lvlby-coach')===today())hide=true}catch(e){}
   el.hidden=hide;el.textContent='';if(hide)return;
@@ -851,7 +900,7 @@ function startTour(){tourI=0;renderTour();$('tourModal').classList.add('open')}
 function endTour(){$('tourModal').classList.remove('open');try{localStorage.setItem('lvlby-tour','1')}catch(e){}const b=document.querySelector('.tab[data-view="today"]');if(b)b.click();if(window.__connectAfterTour){window.__connectAfterTour=false;if(!cloudUser&&!demo)setTimeout(()=>{ob={step:0,stage:'connect',tmp:{}};renderOb();$('onboard').classList.add('open')},400)}}
 function renderTour(){
   const TS=TOUR.filter(x=>!(notStudent()&&x.tab==='schedule')),s=TS[tourI],box=$('tourBox'),last=tourI===TS.length-1;box.innerHTML='';
-  const b=document.querySelector('.tab[data-view="'+s.tab+'"]');if(b)b.click();
+  showView(s.tab);
   const e=obEl('div','',s.e);e.style.fontSize='30px';box.append(e);box.append(obEl('div','hero-title',l2(s.t)));box.append(obEl('p','muted smalltext',l2(s.d)));
   if(last){const it=installText();if(it)box.append(obEl('p','smalltext',it))}
   const dots=obEl('div','tourdots');TS.forEach((x,i)=>dots.append(obEl('i',i===tourI?'on':'')));box.append(dots);
@@ -984,7 +1033,7 @@ function renderDue(){
   const ty=$('dueType').options;ty[0].textContent=L('Exam','امتحان');ty[1].textContent=L('Homework','تکلیف');$('dueAdd').textContent=L('Add','افزودن');
   const list=$('dueList');list.innerHTML='';const items=[...A('exams')].sort((a,b)=>a.date.localeCompare(b.date));
   items.forEach(e=>{const row=document.createElement('div');row.className='task'+(e.done?' done':'');
-    const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!e.done;cb.onchange=()=>{e.done=cb.checked;save();renderAll()};
+    const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!e.done;cb.onchange=()=>{e.done=cb.checked;save();announce((e.title||'')+' — '+(e.done?tr('taskComplete'):tr('taskReopened')));renderAll()};
     const mid=document.createElement('div'),ti=document.createElement('div'),sub=document.createElement('div');ti.textContent=(e.type==='exam'?'📝 ':'📚 ')+e.title;sub.className='muted smalltext';sub.textContent=dayLabel(e.date,{day:'numeric',month:'long'})+' · '+dueText(e.date);mid.append(ti,sub);
     const del=document.createElement('button');del.className='btn small danger';del.textContent='×';del.onclick=()=>{undoPoint();data.exams=A('exams').filter(x=>x.id!==e.id);save();renderAll()};row.append(cb,mid,del);list.append(row)});
   if(!items.length){const em=document.createElement('div');em.className='empty';em.textContent=L('No deadlines yet.','هنوز موعدی ثبت نشده.');list.append(em)}
@@ -1286,7 +1335,7 @@ function petMood(){const x=data.days[today()],ts=(x&&x.tasks)||[],dn=ts.filter(t
   if(dn/ts.length>=.5)return{k:'good',e:'😄',m:L('Nice pace. Keep going!','سرعتت عالیه. ادامه بده!')};
   return{k:'start',e:'🙂',m:L('Good to see you! Let us begin.','خوشحالم که اومدی! شروع کنیم.')}}
 function petFace(){const l=lvlOf(xpTotal()),sp=PETS[S.pet]?S.pet:'cat',h=HATS.find(x=>x.id===S.hat&&(S.owned||[]).includes(x.id));return{em:PETS[sp][petStage(l)],hat:h?h.e:'',lvl:l}}
-function renderPetMini(){const m=$('petMini');if(!m)return;const f=petFace();m.textContent=f.em;m.setAttribute('aria-label',L('Open pet','باز کردن دوست'));m.onclick=()=>{const b=document.querySelector('.tab[data-view="pet"]');if(b)b.click()}}
+function renderPetMini(){const m=$('petMini');if(!m)return;const f=petFace();m.textContent=f.em;m.setAttribute('aria-label',L('Open pet','باز کردن دوست'));m.onclick=()=>showView('pet')}
 /* ---- challenges (rule based, derived from your data) ---- */
 function chalSeed(d){let h=2166136261;for(let i=0;i<d.length;i++){h^=d.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function chalRng(seed){let a=seed;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -1310,7 +1359,7 @@ function coinBalance(){return Math.max(0,coinsEarned()-coinsSpent())}
 /* ---- pet tab ---- */
 function renderPet(){
   try{const rr=$('setRotate'),lab=rr&&rr.closest('label');if(lab)lab.hidden=notStudent()}catch(e){}
-  renderPetMini();const pc=$('petCard');if(!pc)return;$('tabPet').textContent=L('Pet','دوست');
+  renderPetMini();const pc=$('petCard');if(!pc)return;{const tp=$('tabPet');if(tp)tp.textContent=L('Rewards & pet','جایزه‌ها و دوست')}
   const f=petFace(),mood=petMood(),str=streakNow();
   pc.textContent='';const row=obEl('div','petrow'),box=obEl('div','petbox',f.em);if(f.hat)box.append(obEl('span','hat',f.hat));
   const right=obEl('div','');right.style.flex='1';const nm=obEl('div','hero-title',S.pname||L('My pet','دوست من'));
@@ -1369,8 +1418,10 @@ async function connCheck(){const out=$('connOut');out.textContent='';const bad=[
   const adv=!navigator.onLine?L('No internet connection.','اینترنت وصل نیست.'):bad.length?L('Some Google addresses are unreachable. Turn on a VPN that covers the whole phone, pick another server, then run this again.','بعضی آدرس‌های گوگل در دسترس نیستند. یک VPN که کل گوشی را پوشش بدهد روشن کن، سرور دیگری انتخاب کن و دوباره بزن.'):(!cloudAuth?L('Network is fine but the login code is not loaded. Tap Retry connection.','شبکه سالم است ولی کد ورود بارگذاری نشده. «تلاش دوباره برای اتصال» را بزن.'):L('Everything is reachable. You can sign in.','همه‌چیز در دسترس است. می‌توانی وارد شوی.'));
   const p=obEl('p','',adv);p.style.marginTop='8px';out.append(p)}
 $('connBtn').onclick=connCheck;$('fbRetry').onclick=fbRetry;
+const statusRetryBtn=$('statusRetry');if(statusRetryBtn)statusRetryBtn.onclick=()=>{if(cloudUser&&!cloudReady&&window.__retryCloud)window.__retryCloud();else{retryN=0;pushCloud()}toast(L('Retrying sync...','در حال تلاش دوباره برای همگام‌سازی...'))};
 $('syncNow').onclick=()=>{if(cloudUser&&cloudReady){retryN=0;pushCloud();toast(L('Syncing...','در حال همگام‌سازی...'))}else if(!cloudAuth)fbRetry();else toast(L('Sign in with Google first.','اول با گوگل وارد شو.'))};
 try{TOUR.splice(7,0,{tab:'pet',e:'🐾',t:['Pet, coins and challenges','دوست، سکه و چالش‌ها'],d:['Your pet grows as you level up and reacts to your day. Earn coins from XP and daily challenges, spend them on hats, and check each habit streak below.','دوستت با بالا رفتن سطحت بزرگ می‌شود و به روزت واکنش نشان می‌دهد. از XP و چالش‌های روزانه سکه بگیر، کلاه بخر و استریک هر عادت را پایین ببین.']})}catch(e){}
+function announce(msg){const el=document.getElementById('srStatus');if(el)el.textContent=msg}
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
 function localDateLabel0(date){return new Intl.DateTimeFormat(lang==='fa'?'fa-IR':'en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(parseDate(date))}
 function shiftName(s){return tr(s==='morning'?'morning':s==='afternoon'?'afternoon':'off')}
@@ -1402,10 +1453,21 @@ function openTask(id){activeTaskId=id;const t=findTask(id);if(!t)return;$('modal
 function closeModal(){pauseTimer();$('taskModal').classList.remove('open');document.body.style.overflow=''}
 function saveTaskDetails(){const t=findTask(activeTaskId);if(!t)return;t.name=$('detailName').value.trim()||displayTaskName(t);t.key=null;t.time=$('detailTime').value;t.priority=$('detailPriority').value;t.notes=$('detailNotes').value;save();closeModal();renderAll();toast(tr('saved'))}
 $('langToggle').onclick=()=>{lang=lang==='en'?'fa':'en';localStorage.setItem(LS.lang,lang);renderAll();showStatus()};
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+b.dataset.view))});
+const VIEW_TAB={today:'today',habits:'habits',schedule:'habits',calendar:'calendar',reports:'reports',pet:'reports'};
+function showView(v){
+  if(!document.getElementById('view-'+v))v='today';
+  const tabKey=VIEW_TAB[v]||'today';
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.view===tabKey));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));
+  document.querySelectorAll('.subtab').forEach(x=>{const on=x.dataset.view===v;x.classList.toggle('active',on);x.setAttribute('aria-pressed',on?'true':'false')});
+  return document.getElementById('view-'+v);
+}
+window.showView=showView;
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+document.querySelectorAll('.subtab').forEach(b=>b.onclick=()=>{showView(b.dataset.view);b.focus()});
 $('selectedDate').value=selected;$('selectedDate').onchange=()=>{selected=$('selectedDate').value||today();if(!ensureDay(selected).built)buildDay(selected);renderAll()};
 $('rebuildToday').onclick=()=>{undoPoint();const d=ensureDay(selected);d.built=false;buildDay(selected,true);renderAll()};
-$('completeNone').onclick=()=>{undoPoint();ensureDay(selected).tasks.forEach(t=>t.done=false);save();renderAll()};
+$('completeNone').onclick=()=>{if(!confirm(tr('uncheckConfirm')))return;undoPoint();ensureDay(selected).tasks.forEach(t=>t.done=false);save();renderAll()};
 $('addRoutine').onclick=()=>{const name=prompt(tr('addHabitPrompt'));if(!name?.trim())return;data.routine[0].items.push({id:uid(),name:name.trim(),time:'',key:null});renderRoutine()};
 $('saveRoutine').onclick=()=>{save();Object.keys(data.days).forEach(d=>{if(d>=selected)data.days[d].built=false});buildDay(selected,true);renderAll();toast(tr('routineSaved'))};
 $('resetHabits').onclick=()=>{if(undoPoint()||true){data.routine=defaults().routine;save();renderRoutine();toast(tr('saved'))}};
@@ -1516,7 +1578,7 @@ $('shareCard').onclick=doShareCard;
 const TPL={konkoor:{en:'Konkoor student',fa:'کنکوری',it:[['06:30','Wake up and stretch','بیدار شدن و کشش'],['07:30','Study block 1 (hardest subject)','مطالعهٔ بلوک ۱ (سخت‌ترین درس)'],['10:30','Practice tests','تست‌زنی'],['16:00','Study block 2','مطالعهٔ بلوک ۲'],['20:00','Review mistakes','مرور غلط‌ها'],['22:30','Wind down, no phone','آماده‌شدن برای خواب، بدون گوشی']]},
  student:{en:'University student',fa:'دانشجو',it:[['08:00','Plan the day (5 min)','برنامه‌ریزی روز (۵ دقیقه)'],['09:30','Deep study','مطالعهٔ عمیق'],['14:00','Assignments','تمرین و پروژه'],['19:00','Revision','مرور درس‌ها'],['22:30','Plan tomorrow','برنامهٔ فردا']]},
  freelance:{en:'Freelancer',fa:'فریلنسر',it:[['09:00','Pick today\'s top 3','سه کار مهم امروز'],['09:30','Deep work','کار عمیق'],['13:00','Client messages','پیام‌های مشتری'],['15:00','Deep work 2','کار عمیق ۲'],['17:30','Invoices and admin','فاکتور و کارهای اداری'],['18:30','Shut down','پایان کار']]}};
-function renderTplUI(){$('aboutLink').textContent=L('About LvLBY','دربارهٔ LvLBY');$('tplTitle').textContent=L('Quick-start templates','قالب‌های آمادهٔ شروع سریع');$('tplDesc').textContent=L('Fill your day with a ready routine. Replaces earlier template items only.','روزت را با یک روتین آماده پر کن. فقط آیتم‌های قالب قبلی را عوض می‌کند.');document.querySelectorAll('[data-tpl]').forEach(b=>b.textContent=L(TPL[b.dataset.tpl].en,TPL[b.dataset.tpl].fa))}
+function renderTplUI(){$('aboutLink').textContent=L('About LvLBY','دربارهٔ LvLBY');$('setTplTitle').textContent=L('Quick-start templates','قالب‌های آمادهٔ شروع سریع');$('setTplDesc').textContent=L('Fill your day with a ready routine. Replaces earlier template items only.','روزت را با یک روتین آماده پر کن. فقط آیتم‌های قالب قبلی را عوض می‌کند.');document.querySelectorAll('[data-tpl]').forEach(b=>b.textContent=L(TPL[b.dataset.tpl].en,TPL[b.dataset.tpl].fa))}
 document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=async()=>{if(demo)return toast(L('Not available in the demo.','در نسخهٔ دمو در دسترس نیست.'));const t=TPL[b.dataset.tpl];
  if(!await uiConfirm(L('Add the "'+t.en+'" routine to your day?','روتین «'+t.fa+'» به روزت اضافه شود؟'),{title:L(t.en,t.fa),ok:L('Add','اضافه کن')}))return;
  data.routine.forEach(g=>{g.items=g.items.filter(it=>String(it.id).slice(0,3)!=='tp-')});
