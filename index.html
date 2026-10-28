@@ -426,6 +426,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="actions" style="margin-top:14px"><button class="btn" id="delCancel"></button><button class="btn" id="delExport"></button><button class="btn danger" id="delGo" disabled></button></div>
 </div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="srStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <footer class="sitefoot"><a href="privacy.html" target="_blank" rel="noopener">Privacy · حریم خصوصی</a></footer>
 <script>
 /* Firebase loads in the background so the app still opens when Google servers are blocked */
@@ -1030,7 +1031,7 @@ function renderDue(){
   const ty=$('dueType').options;ty[0].textContent=L('Exam','امتحان');ty[1].textContent=L('Homework','تکلیف');$('dueAdd').textContent=L('Add','افزودن');
   const list=$('dueList');list.innerHTML='';const items=[...A('exams')].sort((a,b)=>a.date.localeCompare(b.date));
   items.forEach(e=>{const row=document.createElement('div');row.className='task'+(e.done?' done':'');
-    const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!e.done;cb.onchange=()=>{e.done=cb.checked;save();renderAll()};
+    const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!e.done;cb.onchange=()=>{e.done=cb.checked;save();announce((e.title||'')+' — '+(e.done?tr('taskComplete'):tr('taskReopened')));renderAll()};
     const mid=document.createElement('div'),ti=document.createElement('div'),sub=document.createElement('div');ti.textContent=(e.type==='exam'?'📝 ':'📚 ')+e.title;sub.className='muted smalltext';sub.textContent=dayLabel(e.date,{day:'numeric',month:'long'})+' · '+dueText(e.date);mid.append(ti,sub);
     const del=document.createElement('button');del.className='btn small danger';del.textContent='×';del.onclick=()=>{undoPoint();data.exams=A('exams').filter(x=>x.id!==e.id);save();renderAll()};row.append(cb,mid,del);list.append(row)});
   if(!items.length){const em=document.createElement('div');em.className='empty';em.textContent=L('No deadlines yet.','هنوز موعدی ثبت نشده.');list.append(em)}
@@ -1418,6 +1419,7 @@ $('connBtn').onclick=connCheck;$('fbRetry').onclick=fbRetry;
 const statusRetryBtn=$('statusRetry');if(statusRetryBtn)statusRetryBtn.onclick=()=>{if(cloudUser&&!cloudReady&&window.__retryCloud)window.__retryCloud();else{retryN=0;pushCloud()}toast(L('Retrying sync...','در حال تلاش دوباره برای همگام‌سازی...'))};
 $('syncNow').onclick=()=>{if(cloudUser&&cloudReady){retryN=0;pushCloud();toast(L('Syncing...','در حال همگام‌سازی...'))}else if(!cloudAuth)fbRetry();else toast(L('Sign in with Google first.','اول با گوگل وارد شو.'))};
 try{TOUR.splice(7,0,{tab:'pet',e:'🐾',t:['Pet, coins and challenges','دوست، سکه و چالش‌ها'],d:['Your pet grows as you level up and reacts to your day. Earn coins from XP and daily challenges, spend them on hats, and check each habit streak below.','دوستت با بالا رفتن سطحت بزرگ می‌شود و به روزت واکنش نشان می‌دهد. از XP و چالش‌های روزانه سکه بگیر، کلاه بخر و استریک هر عادت را پایین ببین.']})}catch(e){}
+function announce(msg){const el=document.getElementById('srStatus');if(el)el.textContent=msg}
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
 function localDateLabel0(date){return new Intl.DateTimeFormat(lang==='fa'?'fa-IR':'en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(parseDate(date))}
 function shiftName(s){return tr(s==='morning'?'morning':s==='afternoon'?'afternoon':'off')}
