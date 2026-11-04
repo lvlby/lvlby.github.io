@@ -257,22 +257,52 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
 .modal{background:rgba(20,28,48,.94);border-color:rgba(255,255,255,.14);border-radius:30px}.notice{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
 .logo{background:linear-gradient(145deg,#c4f4d9,#6ee7b7 60%,#38bdf8)}
 @media(prefers-reduced-motion:reduce){.card,.btn{transition:none!important}}
+
+/* v32 */
+/* v34: routine rows on phones */
+@media(max-width:520px){.editrow{grid-template-columns:minmax(0,1fr) auto!important}.editrow>input:first-child{grid-column:1/-1}.editrow>input[type=time]{min-width:128px}.editrow>button{justify-self:end}}
+/* v32 chat-style Smart Add */
+#saChat{margin-top:12px}.sabub{display:flex;gap:10px;align-items:flex-start}
+.saav{flex:0 0 32px;height:32px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:13px;background:linear-gradient(145deg,#c4f4d9,#6ee7b7 60%,#38bdf8);color:#06281c}
+.sabody{min-width:0;flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px 18px 18px 18px;padding:12px 14px;line-height:1.7;overflow-wrap:anywhere}
+html[dir=rtl] .sabody{border-radius:18px 6px 18px 18px}
+.satext b{color:var(--accent)}.sachips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.sachips:empty{display:none}
+.sachips .btn{white-space:normal;text-align:start;height:auto;line-height:1.5;padding:8px 12px}
+.saref{display:flex;gap:8px;margin-top:10px}.saref input{flex:1;min-width:0}
+.sadots i{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--muted);animation:saDot 1s infinite ease-in-out}.sadots i:nth-child(2){animation-delay:.15s}.sadots i:nth-child(3){animation-delay:.3s}
+@keyframes saDot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+body.reduce .sadots i{animation:none;opacity:.6}@media (prefers-reduced-motion:reduce){.sadots i{animation:none;opacity:.6}}
+.fab{position:fixed;inset-inline-end:16px;bottom:24px;z-index:9;width:56px;height:56px;border-radius:50%;border:0;font-size:30px;line-height:1;font-weight:700;color:#06281c;background:linear-gradient(135deg,#6ee7b7,#38bdf8);box-shadow:0 10px 26px -8px #000c,0 0 0 1px #ffffff22 inset;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fab[hidden]{display:none}.fab:active{transform:scale(.94)}
+@media (max-width:640px){.fab{bottom:calc(132px + env(safe-area-inset-bottom))}}
+.undobar{width:max-content;max-width:92vw;box-sizing:border-box}.undobar span{min-width:0;overflow-wrap:break-word;word-break:normal;text-align:start}.undobar button[hidden]{display:none}
+@keyframes lvlFlash{0%{box-shadow:0 0 0 0 rgba(110,231,183,.0);background-color:rgba(110,231,183,.28)}60%{box-shadow:0 0 0 6px rgba(110,231,183,.18)}100%{box-shadow:0 0 0 0 rgba(110,231,183,0)}}
+.task.flash{animation:lvlFlash 1.6s ease-out}
+@keyframes lvlTick{0%{transform:scale(1)}35%{transform:scale(1.4)}100%{transform:scale(1)}}
+@keyframes lvlRing{0%{box-shadow:0 0 0 0 rgba(110,231,183,.7)}100%{box-shadow:0 0 0 16px rgba(110,231,183,0)}}
+.task.pop .check{animation:lvlTick .45s ease-out,lvlRing .6s ease-out}
+.xpfloat{font-size:17px!important;animation-duration:1.4s!important}
+body.reduce .task.pop .check,body.reduce .task.flash{animation:none}
+@media (prefers-reduced-motion:reduce){.task.pop .check,.task.flash{animation:none}}
+.set-sec #googleSignIn{max-width:none;width:100%}
 </style>
 <meta name="description" content="LvLBY: a calm daily planner with routines, focus timer and streaks. برنامه‌ریز روزانهٔ آرام، با روتین، عادت و استریک.">
-<meta property="og:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
+<meta property="og:image" content="https://lvlby.github.io/icons/icon-512.png">
 <meta property="og:locale" content="fa_IR">
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:title" content="LvLBY">
 <meta property="og:description" content="A calm daily planner with routines, focus timer and streaks.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://lvlby.github.io/">
+<link rel="canonical" href="https://lvlby.github.io/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://r36140428-gif.github.io/LvLBY-/icons/icon-512.png">
+<meta name="twitter:image" content="https://lvlby.github.io/icons/icon-512.png">
 </head>
 <body>
 <div class="app">
 <header class="topbar">
  <div class="brand"><div class="logo">Lv</div><div><div class="brandname" id="brandName">LvLBY<span style="color:var(--accent)">.</span></div><div class="tagline" data-i18n="tagline">A calmer way to run your day.</div></div></div>
- <div class="topactions"><button class="langbtn" id="langToggle" hidden>فارسی / FA</button><button class="btn primary small" id="googleSignIn">Continue with Google</button><button class="iconbtn" id="openSettings" aria-label="Settings">⚙</button></div>
+ <div class="topactions"><button class="langbtn" id="langToggle" hidden>فارسی / FA</button><button class="iconbtn" id="openSettings" aria-label="Settings">⚙</button></div>
 </header>
 <div id="accountStatus" class="notice" style="margin:-12px 0 18px" aria-live="polite">Loading…</div>
 <button class="btn small" id="stRetry" type="button" hidden style="margin:-8px 0 14px"></button>
@@ -301,8 +331,8 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
 </section>
 <nav class="tabs">
  <button class="tab active" data-view="today" data-i18n="tabToday">Today</button>
- <button class="tab" data-view="habits" data-i18n="tabHabits">Habits & routines</button>
- <button class="tab" data-view="schedule" data-i18n="tabSchedule">Weekly schedule</button>
+ <button class="tab" data-view="habits" data-i18n="tabHabits">Routines</button>
+ <button class="tab" data-view="schedule" data-i18n="tabSchedule">Week</button>
  <button class="tab" data-view="calendar" id="tabCal">Calendar</button>
  <button class="tab" data-view="reports" data-i18n="tabReports">Insights</button>
 </nav>
@@ -311,6 +341,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
  <div class="card" id="checkin" hidden style="margin-bottom:14px"><div class="eyebrow" id="ciTitle"></div><div class="muted smalltext" id="ciSum" style="margin-top:6px"></div><div class="moodrow" id="ciMood"></div><div class="field"><input id="ciNote" maxlength="140"></div></div>
  <div class="card">
   <div class="sectionhead"><div><h2 data-i18n="dailyPlan">Daily plan</h2><p class="muted smalltext" data-i18n="tapTask">Tap any task to see details, add notes, or use the focus timer.</p></div><div class="field" style="min-width:145px"><input id="selectedDate" type="date" aria-label="Select date"></div></div>
+  <button class="btn" id="addJump" type="button" style="width:100%;margin:0 0 12px"></button>
   <div id="schoolBanner" class="school-banner stuonly"><div class="school-icon">▦</div><div class="school-info"><strong id="schoolBannerTitle">School</strong><span id="schoolBannerText"></span></div><span class="pill school" id="schoolPill"></span></div>
   <div id="todayTasks" class="tasklist"></div>
   <div class="actions"><button class="btn primary" id="rebuildToday" data-i18n="refreshPlan">Refresh plan</button><details class="more"><summary class="btn ghost small" data-i18n="more">More</summary><button class="btn ghost" id="completeNone" data-i18n="uncheckAll">Uncheck all</button></details></div>
@@ -360,7 +391,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
   <div class="card" id="searchCard" hidden style="margin-bottom:14px"><h2 id="srTitle" style="margin-top:0;font-size:17px"></h2><input id="taskSearch" type="search" dir="auto" style="width:100%"><div id="searchOut" aria-live="polite" style="margin-top:8px"></div></div>
 <div class="card" id="weeklyCard" style="margin-bottom:14px"></div>
  <div class="card"><div class="sectionhead"><div><h2 data-i18n="weeklyInsights">Your last 7 days</h2><p class="muted smalltext" data-i18n="insightDesc">A gentle snapshot of tasks you planned and completed.</p></div></div><div id="reportChart" class="chart"></div><div id="reportDetails" class="tasklist"></div></div>
- <div class="card" style="margin-top:14px"><h2 style="margin-top:0;font-size:17px" id="wkTitle"></h2><p class="muted smalltext" id="wkText"></p><p id="wkMood" style="font-size:20px;letter-spacing:4px;margin:6px 0 0"></p><div class="actions"><button class="btn" id="shareBtn"></button></div></div>
+ <div class="card" style="margin-top:14px"><h2 style="margin-top:0;font-size:17px" id="wkTitle"></h2><p class="muted smalltext" id="wkText"></p><p id="wkMood" style="font-size:20px;letter-spacing:4px;margin:6px 0 0"></p></div>
  <div class="card" style="margin-top:14px"><h2 style="margin-top:0;font-size:17px" id="actTitle"></h2><div class="heat" id="heat"></div><p class="muted smalltext" id="bestTime" style="margin-top:8px"></p></div>
  <div class="card" style="margin-top:14px"><h2 style="margin-top:0;font-size:17px" id="bdTitle"></h2><div class="badgegrid" id="badgeGrid"></div></div>
  <div class="card" style="margin-top:14px"><h2 style="margin-top:0;font-size:17px" data-i18n="backupPrivacy">Backup & privacy</h2><p class="muted smalltext" data-i18n="backupDesc">Your data stays in this browser. Export a backup before changing devices or clearing browser data.</p><div class="actions"><button class="btn" id="exportData" data-i18n="exportBackup">Export backup</button><button class="btn" id="importBtn" data-i18n="importBackup">Import backup</button><input id="importFile" type="file" accept="application/json" hidden><button class="btn" id="restoreLocal" hidden>Restore previous device copy</button><button class="btn danger" id="clearData" data-i18n="clearAll">Clear all data</button></div></div>
@@ -380,7 +411,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
 </div></div>
 <div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true"><div class="modal">
  <div class="modal-top"><div class="eyebrow" data-s="title">SETTINGS</div><button class="close" id="closeSettings" aria-label="Close">×</button></div>
- <div class="set-sec"><div class="group-title" data-s="account"></div><div class="notice" id="setAccount"></div><div class="actions"><button class="btn danger" id="setSignOut" hidden></button><button class="btn danger" id="setDelete" data-s="delBtn"></button></div></div>
+ <div class="set-sec"><div class="group-title" data-s="account"></div><div class="notice" id="setAccount"></div><div class="actions"><button class="btn primary" id="googleSignIn">Continue with Google</button><button class="btn danger" id="setSignOut" hidden></button><button class="btn danger" id="setDelete" data-s="delBtn"></button></div></div>
  <div class="set-sec" id="emailSec" hidden><div class="group-title" id="emTitle"></div><p class="muted smalltext" id="emDesc"></p>
   <input id="emMail" type="email" autocomplete="email" dir="ltr" aria-label="Email" placeholder="name@example.com" style="width:100%;margin-bottom:8px"><input id="emPass" type="password" autocomplete="current-password" dir="ltr" aria-label="Password" minlength="6" style="width:100%">
   <div class="actions"><button class="btn primary" id="emIn" type="button"></button><button class="btn" id="emUp" type="button"></button></div><p class="muted smalltext" id="emMsg" aria-live="polite"></p></div>
@@ -403,7 +434,7 @@ body{background:radial-gradient(760px 540px at 8% -6%,rgba(110,231,183,.16),tran
 <div class="modal-backdrop" id="onboard" role="dialog" aria-modal="true" style="z-index:20;align-items:center"><div class="modal" id="obBox"></div></div>
 <div class="modal-backdrop" id="privModal" role="dialog" aria-modal="true" style="z-index:25;align-items:center"><div class="modal"><div class="modal-top"><div class="eyebrow" data-s="privBtn"></div><button class="close" id="closePriv" aria-label="Close">×</button></div><div id="privBody" class="muted smalltext" style="line-height:1.7"></div></div></div>
 <div class="modal-backdrop" id="tourModal" role="dialog" aria-modal="true" style="z-index:22;align-items:flex-end;background:#05080d55;backdrop-filter:none"><div class="modal" id="tourBox"></div></div>
-<div class="undobar" id="undoBar"><span id="undoText"></span><button id="undoBtn"></button></div>
+<div class="undobar" id="undoBar"><span id="undoText"></span><button id="undoView" hidden></button><button id="undoBtn"></button></div>
 <div class="modal-backdrop" id="delModal" role="dialog" aria-modal="true" style="z-index:25;align-items:center"><div class="modal">
  <div class="eyebrow" id="delTitle"></div><p class="muted smalltext" id="delText" style="margin-top:10px"></p>
  <p class="smalltext" id="delType" style="margin-top:12px;font-weight:700"></p>
@@ -466,7 +497,7 @@ const sx=k=>(ST[lang]||ST.en)[k]||ST.en[k]||k;
 function normalize(d){const o=normalize0(d),src=(d&&typeof d==="object")?d:{};o.templates=Array.isArray(src.templates)?src.templates:[];o.exams=Array.isArray(src.exams)?src.exams:[];if(o.schedule&&Array.isArray(o.schedule.afternoon)&&!o.schedule.afternoon.some(it=>it.id==='wake'))o.schedule.afternoon.unshift({id:'wake',key:'wake',name:'Wake up & morning routine',time:'08:30'});o.vac=Array.isArray(src.vac)?src.vac:[];return o}
 function normalize0(d){const f=defaults();if(!d||typeof d!=='object')return f;return{routine:Array.isArray(d.routine)?d.routine:f.routine,schedule:(d.schedule&&typeof d.schedule==='object')?Object.assign({},f.schedule,d.schedule):f.schedule,weeks:Array.isArray(d.weeks)?d.weeks:[],days:(d.days&&typeof d.days==='object')?d.days:{}}}
 function hasUserContent(d){const f=defaults();return JSON.stringify(d.routine)!==JSON.stringify(f.routine)||JSON.stringify(d.schedule)!==JSON.stringify(f.schedule)||d.weeks.length>0||Object.values(d.days).some(x=>(x.tasks||[]).some(t=>t.done||t.kind==='custom'||t.notes))}
-function showStatus(extra){const el=$('accountStatus'),btn=$('googleSignIn');if(!el||!btn)return;btn.hidden=!!cloudUser;btn.textContent=sx('signin');btn.disabled=!cloudAuth;let m;if(!cloudAuth)m=sx(typeof firebase==='undefined'?'offlineNoFb':'nocloud');else if(!cloudUser)m=sx('signedout');else m=sx('as')+(cloudUser.displayName||cloudUser.email||'Google')+' · '+sx(cloudState)+(cloudState==='synced'?syncAgo():'');el.textContent=extra||m;{const rb=$('stRetry');if(rb){rb.hidden=!(cloudUser&&['error','loaderr','pending'].includes(cloudState));rb.textContent=L('Retry now','تلاش دوباره')}}const ss=$('setSignOut');if(ss){ss.hidden=!cloudUser;ss.textContent=sx('signout')}const sa=$('setAccount');if(sa)sa.textContent=el.textContent;const r=$('restoreLocal');if(r){r.hidden=!localStorage.getItem(LS.bak);r.textContent=tr('restoreCopy')}}
+function showStatus(extra){const el=$('accountStatus'),btn=$('googleSignIn');if(!el||!btn)return;btn.hidden=!!cloudUser;btn.textContent=sx('signin');btn.disabled=!cloudAuth;let m;if(!cloudAuth)m=sx(typeof firebase==='undefined'?'offlineNoFb':'nocloud');else if(!cloudUser)m=sx('signedout');else m=sx('as')+(cloudUser.displayName||cloudUser.email||'Google')+' · '+sx(cloudState)+(cloudState==='synced'?syncAgo():'');el.textContent=extra||m;el.style.display=(extra||cloudUser)?'':'none';{const rb=$('stRetry');if(rb){rb.hidden=!(cloudUser&&['error','loaderr','pending'].includes(cloudState));rb.textContent=L('Retry now','تلاش دوباره')}}const ss=$('setSignOut');if(ss){ss.hidden=!cloudUser;ss.textContent=sx('signout')}const sa=$('setAccount');if(sa)sa.textContent=el.textContent;const r=$('restoreLocal');if(r){r.hidden=!localStorage.getItem(LS.bak);r.textContent=tr('restoreCopy')}}
 let demo=false,demoBackup=null;
 function persistLocal(){if(demo)return true;try{localStorage.setItem(LS.data,JSON.stringify(data));return true}catch(e){toast(sx('localfail'));return false}}
 function save(){
@@ -612,10 +643,17 @@ function xpFeedback(before,row){
   const after=xpTotal(),d=after-before;paintXP();renderExtras();renderCheckin();
   row.classList.remove('pop');void row.offsetWidth;row.classList.add('pop');
   if(d>0)chime(lvlOf(after)>lvlOf(before));
-  if(S.haptics&&d>0)try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
-  if(S.xp&&d!==0){const f=document.createElement('div');f.className='xpfloat'+(d>0?'':' neg');f.textContent=(d>0?'+':'')+fa(d)+' XP';row.append(f);setTimeout(()=>f.remove(),1000)}
-  if(S.xp&&lvlOf(after)>lvlOf(before)){burst($('lvlBadge'));toast(ss('levelUp')+fa(lvlOf(after))+' 🎉')}
+  if(S.haptics&&d>0)try{navigator.vibrate&&navigator.vibrate(35)}catch(e){}
+  if(S.xp&&d!==0){const f=document.createElement('div');f.className='xpfloat'+(d>0?'':' neg');f.textContent=(d>0?'+':'')+fa(d)+' XP';row.append(f);setTimeout(()=>f.remove(),1400)}
+  if(S.xp&&lvlOf(after)>lvlOf(before)){burst($('lvlBadge'));toast(ss('levelUp')+fa(lvlOf(after))+' 🎉')}else if(d>0)warmLine()
 }
+
+/* v32: short warm line after ticking a task (rotates, never the same twice in a row) */
+const WARM={en:['Nice. {n} to go.','One down, {n} to go.','Good pace. {n} left.','That is done. {n} left.'],fa:['آفرین! {n} کار مانده.','یکی تمام شد؛ {n} تا مانده.','عالی پیش می‌روی. {n} تا مانده.','خوبه! بریم سراغ بعدی ({n} تا مانده).']};
+const WARM1={en:['Almost there. Just 1 left.','So close. One more.'],fa:['تقریباً تمام شد؛ فقط ۱ کار مانده.','خیلی نزدیکی. یکی دیگر مانده.']};
+let warmLast=-1;
+function warmLine(){const x=data.days[selected],ts=(x&&x.tasks)||[],n=ts.filter(t=>!t.done).length;if(!ts.length||n<1)return;
+  const pool=(n===1?WARM1:WARM)[lang==='fa'?'fa':'en'];let i=Math.floor(Math.random()*pool.length);if(i===warmLast)i=(i+1)%pool.length;warmLast=i;toast(pool[i].replace('{n}',fa(n)))}
 /* ---- new day (e.g. Saturday 00:00): refresh plan and shift while the app is open ---- */
 let lastDay=today();setInterval(()=>{const t=today();if(t!==lastDay){if(selected===lastDay){selected=t;$('selectedDate').value=t}lastDay=t;if(!data.days[t])buildDay(t);renderAll()}},30000);
 
@@ -785,7 +823,7 @@ function renderCoach(){
   try{renderStartCard()}catch(e){console.error(e)}
   try{fixFaBits()}catch(e){console.error(e)}
   try{renderWeekly()}catch(e){console.error(e)}
-  document.body.classList.toggle('nostudent',notStudent());const st=document.querySelector('.tab[data-view="schedule"]');if(st)st.textContent=notStudent()?L('My daily plan','برنامهٔ روزانه'):tr('tabSchedule');
+  document.body.classList.toggle('nostudent',notStudent());const st=document.querySelector('.tab[data-view="schedule"]');if(st)st.textContent=notStudent()?L('My plan','برنامهٔ روزانه'):tr('tabSchedule');
   const el=$('coach');if(!el)return;
   let hide=!profileOk()||demo;try{if(localStorage.getItem('lvlby-coach')===today())hide=true}catch(e){}
   el.hidden=hide;el.textContent='';if(hide)return;
@@ -1020,28 +1058,14 @@ $('detailTop').onchange=e=>{const t=findTask(activeTaskId);if(!t)return;const n=
 function renderTop(){const c=$('topCard');if(!c)return;const day=data.days[selected],ts=((day&&day.tasks)||[]).filter(t=>t.top);c.hidden=!ts.length;if(!ts.length)return;$('topTitle').textContent=L('TOP 3 FOCUS (+5 XP each)','۳ کار برتر (هرکدام +۵ XP)');const l=$('topList');l.innerHTML='';ts.forEach(t=>{const d=document.createElement('div');d.style.cssText='padding:4px 0;font-weight:700';d.textContent=(t.done?'✅ ':'⭐ ')+displayTaskName(t);if(t.done)d.style.opacity='.55';l.append(d)})}
 /* activity heat-map + best time */
 function renderActivity(){
-  const h=$('heat');if(!h)return;$('actTitle').textContent=L('Activity (12 weeks)','فعالیت (۱۲ هفته)');$('shareBtn').textContent=L('Share my progress','اشتراک پیشرفت');h.innerHTML='';
+  const h=$('heat');if(!h)return;$('actTitle').textContent=L('Activity (12 weeks)','فعالیت (۱۲ هفته)');h.innerHTML='';
   const td=today(),idx=(new Date(td+'T12:00:00').getDay()+1)%7,end=shiftDays(td,6-idx),hours={};let timed=0;
   for(let i=83;i>=0;i--){const d=shiftDays(end,-i),e=document.createElement('i');if(d>td){e.className='no';h.append(e);continue}const x=data.days[d],ts=(x&&x.tasks)||[],dn=ts.filter(t=>t.done).length,p=ts.length?dn/ts.length:0;e.className=dn?(p<=.25?'l1':p<=.5?'l2':p<=.75?'l3':'l4'):'';e.title=d+': '+dn+'/'+ts.length;h.append(e);ts.forEach(t=>{if(t.done&&t.time){const hr=+t.time.slice(0,2);hours[hr]=(hours[hr]||0)+1;timed++}})}
   const best=Object.keys(hours).sort((a,b)=>hours[b]-hours[a])[0];
   $('bestTime').textContent=timed>=5&&best!=null?L('You finish most timed tasks around '+p2(best)+':00.','بیشتر کارهای ساعت‌دارت را حدود ساعت '+fa(p2(best))+':۰۰ انجام می‌دهی.'):L('Finish a few more timed tasks to see your best time of day.','چند کار ساعت‌دار دیگر انجام بده تا بهترین ساعتت را ببینی.');
 }
 /* share card */
-async function shareCard(){
-  const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),xp=xpTotal(),lv=lvlOf(xp),lo=50*(lv-1)*(lv-1),hi=50*lv*lv,st=statsAll(),bd=BADGES.filter(b=>b.ok(st));
-  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#101522');g.addColorStop(1,'#1d3a2f');x.fillStyle=g;x.fillRect(0,0,W,H);x.textAlign='center';x.direction=lang==='fa'?'rtl':'ltr';
-  const f=(z,w)=>{x.font=(w||'700')+' '+z+'px system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif'};
-  x.fillStyle='#a8e6c3';f(60,'800');x.fillText('LvLBY',W/2,150);x.fillStyle='#e9eef7';f(66);x.fillText(P&&P.name?P.name:'',W/2,260);
-  x.fillStyle='#9fb0c7';f(46);x.fillText(L('LEVEL','سطح'),W/2,420);x.fillStyle='#ffb86b';f(280,'800');x.fillText(fa(lv),W/2,660);
-  x.fillStyle='#2a3445';x.fillRect(140,740,800,34);x.fillStyle='#ffb86b';x.fillRect(140,740,800*Math.min(1,(xp-lo)/(hi-lo)),34);x.fillStyle='#9fb0c7';f(38);x.fillText(fa(xp)+' / '+fa(hi)+' XP',W/2,830);
-  x.fillStyle='#e9eef7';f(64);x.fillText('🔥 '+fa(streakNow()),W/4,1000);x.fillText('✅ '+fa(st.tasks),W/2,1000);x.fillText('🏅 '+fa(bd.length),3*W/4,1000);
-  x.fillStyle='#9fb0c7';f(34);x.fillText(L('day streak','روز پیاپی'),W/4,1055);x.fillText(L('tasks done','کار انجام‌شده'),W/2,1055);x.fillText(L('badges','دستاورد'),3*W/4,1055);
-  f(64);x.fillText(bd.map(b=>b.e).join(' '),W/2,1190);x.fillStyle='#6f8099';f(32);x.fillText('lvlby.pages.dev',W/2,1290);
-  const blob=await new Promise(r=>c.toBlob(r,'image/png')),file=new File([blob],'lvlby-progress.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'LvLBY'});return}catch(e){if(e&&e.name==='AbortError')return}}
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lvlby-progress.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-}
-$('shareBtn').onclick=shareCard;
+
 /* privacy summary */
 const PRIV={en:['What LvLBY keeps: your tasks, routines, progress, XP, streaks, notes, moods, deadlines, templates, your name, goal and student/occupation answers, and your settings.','Where: on this device. If you sign in with Google, a copy is also saved in your private LvLBY account (stored with Google Firebase). Only you can read it.','Google sign-in gives LvLBY your name and email so it can show who is signed in.','LvLBY does not show ads and does not sell your data.','Reminders, sounds and vibration run on your device.','You are in control: export a backup anytime, or use "Delete my account and data" in Settings to remove everything.'],
 fa:['لول بای این‌ها را نگه می‌دارد: کارها، روتین‌ها، پیشرفت، XP، استریک، یادداشت‌ها، حال‌وهوا، موعدها، قالب‌ها، نام و پاسخ‌هایت (هدف، دانش‌آموز بودن، شغل) و تنظیمات.','کجا: روی همین دستگاه. اگر با گوگل وارد شوی، یک نسخه هم در حساب خصوصی لول بای تو (روی Firebase گوگل) ذخیره می‌شود. فقط خودت می‌توانی آن را بخوانی.','ورود با گوگل نام و ایمیل تو را به لول بای می‌دهد تا نشان دهد چه کسی وارد شده است.','لول بای تبلیغ نشان نمی‌دهد و اطلاعاتت را نمی‌فروشد.','یادآورها، صدا و لرزش روی دستگاه خودت اجرا می‌شوند.','کنترل با خودت است: هر وقت خواستی پشتیبان بگیر، یا با «حذف حساب و داده‌های من» در تنظیمات همه‌چیز را پاک کن.']};
@@ -1055,6 +1079,7 @@ SA.norm=s=>SA.digits(String(s)).replace(/ي/g,'ی').replace(/ك/g,'ک').replace(
 SA.typo={tomorow:'tomorrow',tommorow:'tomorrow',tomorrw:'tomorrow',tmrw:'tomorrow',tmr:'tomorrow',tonite:'tonight',evryday:'everyday',پنجشبنه:'پنجشنبه',پنچشنبه:'پنجشنبه',چهارشبنه:'چهارشنبه',یکشبنه:'یکشنبه',دوشبنه:'دوشنبه',سشنبه:'سهشنبه',فرادا:'فردا',فردااا:'فردا',امروزز:'امروز'};
 SA.MER={am:'am',pm:'pm',صبح:'am',بامداد:'am',morning:'am',ظهر:'noon',noon:'noon',عصر:'pm',بعدازظهر:'pm',afternoon:'pm',evening:'pm',شب:'night',night:'night'};
 SA.WD={sunday:0,monday:1,mon:1,tuesday:2,tue:2,tues:2,wednesday:3,wed:3,thursday:4,thu:4,thur:4,thurs:4,friday:5,fri:5,saturday:6,یکشنبه:0,دوشنبه:1,سهشنبه:2,چهارشنبه:3,پنجشنبه:4,جمعه:5,شنبه:6};
+SA.PLU=new Set();Object.keys(SA.WD).slice().forEach(k=>{let q=null;if(/^[a-z]+$/.test(k)&&k.slice(-1)!=='s')q=k+'s';else if(/^[\u0600-\u06ff]+$/.test(k))q=k+'ها';if(q&&SA.WD[q]===undefined){SA.WD[q]=SA.WD[k];SA.PLU.add(q)}});
 SA.WD2=[['یک','شنبه',0],['دو','شنبه',1],['سه','شنبه',2],['چهار','شنبه',3],['پنج','شنبه',4]];
 SA.MON={jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,sept:9,september:9,oct:10,october:10,nov:11,november:11,dec:12,december:12,ژانویه:1,فوریه:2,مارس:3,آوریل:4,مه:5,می:5,ژوئن:6,ژوئیه:7,اوت:8,سپتامبر:9,اکتبر:10,نوامبر:11,دسامبر:12};
 SA.JMON={فروردین:1,اردیبهشت:2,خرداد:3,تیر:4,مرداد:5,شهریور:6,مهر:7,آبان:8,آذر:9,دی:10,بهمن:11,اسفند:12};
@@ -1065,7 +1090,8 @@ SA.tokens=text=>{
   let T=String(text).trim().split(/\s+/).filter(Boolean).map(raw=>{const o=raw.replace(edge,'');let n=SA.norm(o).replace(/^([ap])\.m$/,'$1m');n=SA.typo[n]||n;return{o,n}}).filter(t=>t.n!=='');
   const out=[];for(let i=0;i<T.length;i++){if(T[i].n==='بعد'&&T[i+1]&&T[i+1].n==='از'&&T[i+2]&&T[i+2].n==='ظهر'){out.push({o:'بعد از ظهر',n:'بعدازظهر'});i+=2}else out.push(T[i])}
   return out};
-SA.wdAt=(n,i)=>{if(SA.WD[n[i]]!==undefined)return{len:1,wd:SA.WD[n[i]]};for(const w of SA.WD2)if(n[i]===w[0]&&n[i+1]===w[1])return{len:2,wd:w[2]};return null};
+SA.wdAt=(n,i)=>{let r=null;if(SA.WD[n[i]]!==undefined)r={len:1,wd:SA.WD[n[i]]};else for(const w of SA.WD2)if(n[i]===w[0]&&n[i+1]===w[1]){r={len:2,wd:w[2]};break}
+  if(r&&n[i+r.len]==='ها')r.len++;return r};
 SA.nextWd=(ctx,wd,bump)=>{let d=(wd-ctx.dow(ctx.today)+7)%7;if(bump&&d===0)d=7;return ctx.shift(ctx.today,d)};
 SA.p2=n=>String(n).padStart(2,'0');
 SA.greg=(ctx,m,d)=>{if(d<1||d>31)return null;let y=+ctx.today.slice(0,4);for(let k=0;k<2;k++){if(d>new Date(y+k,m,0).getDate())return null;const iso=(y+k)+'-'+SA.p2(m)+'-'+SA.p2(d);if(iso>=ctx.today)return iso}return null};
@@ -1108,8 +1134,9 @@ SA.time=(n,i,fix)=>{
 SA.resolve=(ti,hint,fix)=>{
   let h=ti.h;const mer=ti.mer;
   if(mer==='am'){if(h===12)h=0}else if(mer==='pm'){if(h<12)h+=12}else if(mer==='noon'){if(h<=5)h+=12}else if(mer==='night'){if(h===12)h=0;else if(h>=6)h+=12}
-  else if(!ti.sure){if(hint==='pm'||fix.pm===true){if(h<12)h+=12}else if(fix.pm===false){if(h===12)h=0}else return{ask:true}}
+  else if(!ti.sure){if(hint==='pm'||fix.pm===true){if(h<12)h+=12}else if(hint==='am'||fix.pm===false){if(h===12)h=0}else return{ask:true}}
   return{t:SA.p2(h)+':'+SA.p2(ti.m)}};
+SA.PART={morning:'am',evening:'pm',afternoon:'pm',night:'pm',صبح:'am',عصر:'pm',شب:'pm',ظهر:'pm'};
 SA.NW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,یک:1,دو:2,سه:3,چهار:4,پنج:5,شش:6,هفت:7,هشت:8,نه:9,ده:10};
 SA.numAt=(n,i)=>{const x=n[i];if(x===undefined)return null;if(/^\d{1,3}$/.test(x))return{len:1,v:+x};if(SA.NW[x]!==undefined)return{len:1,v:SA.NW[x]};return null};
 SA.unit=x=>({day:'d',days:'d',روز:'d',week:'w',weeks:'w',wk:'w',wks:'w',هفته:'w',month:'m',months:'m',ماه:'m'})[x]||null;
@@ -1128,11 +1155,25 @@ SA.dur=(n,i)=>{const a=n[i];let k=-1;
   return{len:k+1-i,days}};
 SA.recur=(n,i)=>{
   const a=n[i],b=n[i+1],two=(x,y)=>a===x&&b===y;const rn=SA.recurN(n,i);if(rn)return rn;
+  if((a==='every'||a==='each'||a==='هر')&&SA.PART[b])return{len:2,type:'daily',days:null,hint:SA.PART[b]};
   if(two('every','day')||two('each','day')||a==='everyday'||a==='daily'||two('هر','روز')||a==='هرروز'||a==='روزانه'||a==='هرروزه'||two('همه','روزه')||a==='همهروزه')return{len:(a==='every'||a==='each'||a==='هر'||a==='همه')?2:1,type:'daily',days:null};
   if(two('every','week')||a==='weekly'||two('هر','هفته')||a==='هفتگی')return{len:(a==='every'||a==='هر')?2:1,type:'weekly',days:null};
   if(a==='every'||a==='each'||a==='هر'){const days=[];let k=i+1;for(;;){const w=SA.wdAt(n,k);if(!w)break;days.push(w.wd);k+=w.len;if((n[k]==='and'||n[k]==='و'||n[k]==='&')&&SA.wdAt(n,k+1))k++;else break}
     if(days.length)return{len:k-i,type:'weekly',days}}
   return null};
+SA.wdList=(n,k)=>{let pl=false;const days=[],FIL=['this','the','on','every','each','این','هر','روز','در'];
+  for(;;){let j=k;while(FIL.includes(n[j])&&j<k+3&&!SA.wdAt(n,j))j++;const w=SA.wdAt(n,j);if(!w)break;for(let q=k;q<j;q++)if(n[q]==='every'||n[q]==='each'||n[q]==='هر')pl=true;if(SA.PLU.has(n[j])||n[j+w.len-1]==='ها')pl=true;days.push(w.wd);k=j+w.len;
+    if(['and','or','&','و','یا'].includes(n[k])){let j2=k+1;while(FIL.includes(n[j2])&&j2<k+4&&!SA.wdAt(n,j2))j2++;if(SA.wdAt(n,j2))k++}}
+  return days.length?{days,end:k,pl}:null};
+SA.SKM=[['except','for'],['except','on'],['except','every'],['except','each'],['except'],['excluding'],['exclude'],['besides'],['but','not','on'],['but','not','every'],['but','not'],['not','on'],['not','every'],['not'],['skip'],['skipping'],['without'],['rest','on'],['rest','every'],['rest','each'],['rest'],['off','on'],['off','every'],['off'],['no'],['بهجز'],['بجز'],['جز'],['غیر','از'],['غیراز'],['بدون'],['استراحت'],['نه'],['به','جز'],['تعطیل']].sort((a,b)=>b.length-a.length);
+SA.STRONG=['except','excluding','exclude','besides','skip','skipping','without','بهجز','بجز','جز','غیر','غیراز','بدون'];
+SA.SKP=['off','rest','free','استراحت','تعطیل','نه','نباشه','نباشد','نیست'];
+SA.skipAt=(n,i)=>{
+  for(const m of SA.SKM){if(m.every((w,j)=>n[i+j]===w)){const l=SA.wdList(n,i+m.length);if(l)return{len:l.end-i,days:l.days,sure:SA.STRONG.includes(m[0])||l.pl||m.includes('every')||m.includes('each')||(m.length>1&&(m[0]==='not'||m[0]==='but'))}}}
+  const l=SA.wdList(n,i);if(l&&l.end>i){let e=l.end;if(n[e]==='هم'||n[e]==='too'||n[e]==='also')e++;if(SA.SKP.includes(n[e]))return{len:e+1-i,days:l.days,sure:l.pl}}return null};
+SA.normSkip=r=>{const c=r.recur;if(!c)return true;const sk=[...new Set(r.skip||[])].sort((a,b)=>a-b);if(c.days&&!c.baseDays)c.baseDays=c.days.slice();
+  if(c.type==='weekly'&&c.baseDays)c.days=c.baseDays.filter(x=>!sk.includes(x));else c.days=sk.length?[0,1,2,3,4,5,6].filter(x=>!sk.includes(x)):null;
+  c.skip=sk;return !(c.days&&!c.days.length)};
 SA.deadline=(n,i,ctx,fix)=>{
   const a=n[i],b=n[i+1];let len=0;
   if(['by','before','until','till','due','تا','مهلت'].includes(a))len=1;else if((a==='قبل'&&b==='از')||(a==='حداکثر'&&b==='تا'))len=2;
@@ -1143,30 +1184,36 @@ SA.deadline=(n,i,ctx,fix)=>{
   return null};
 SA.parse=(text,ctx,fix)=>{
   fix=fix||{};const T=SA.tokens(text),n=T.map(t=>t.n),used=new Array(T.length).fill(false);
-  const r={title:'',date:null,due:null,dueTime:null,time:null,recur:null,priority:'normal',ask:null,error:null,detected:false};
+  const r={title:'',date:null,due:null,dueTime:null,time:null,recur:null,skip:[],priority:'normal',ask:null,error:null,detected:false};
   let hint=null,ti=null,dti=null,dueAsk=false;const mark=(i,l)=>{for(let k=i;k<i+l;k++)used[k]=true};
   for(let i=0;i<T.length;){
     let h;
-    if(!r.recur&&(h=SA.recur(n,i))){r.recur={type:h.type,days:h.days};if(h.ev)r.recur.ev=h.ev;if(h.wk)r.recur.wk=h.wk;mark(i,h.len);i+=h.len;continue}
+    if(!fix.noskip&&(h=SA.skipAt(n,i))){h.days.forEach(x=>{if(!r.skip.includes(x))r.skip.push(x)});if(h.sure)r.skipSure=true;mark(i,h.len);i+=h.len;continue}
+    if(!r.recur&&(h=SA.recur(n,i))){r.recur={type:h.type,days:h.days};if(h.ev)r.recur.ev=h.ev;if(h.wk)r.recur.wk=h.wk;if(h.hint)hint=h.hint;mark(i,h.len);i+=h.len;continue}
     if(!r.dur&&(h=SA.dur(n,i))){r.dur=h.days;mark(i,h.len);i+=h.len;continue}
     if(r.due===null&&!dueAsk&&(h=SA.deadline(n,i,ctx,fix))){if(h.ask)dueAsk=true;else{r.due=h.date||ctx.today;if(h.time)dti=h.time}mark(i,h.len);i+=h.len;continue}
     if(!r.date&&(h=SA.date(n,i,ctx))){r.date=h.date;if(h.pm)hint='pm';mark(i,h.len);i+=h.len;continue}
     if(!ti&&(h=SA.time(n,i,fix))){ti=h;mark(i,h.len);i+=h.len;continue}
     i++}
+  if(r.skip.length&&!r.recur&&!r.dur&&!r.skipSure&&!fix.refine&&!fix.noskip)return SA.parse(text,ctx,Object.assign({},fix,{noskip:true}));
   if(dueAsk&&r.due===null){if(fix.date)r.due=fix.date;else r.ask={kind:'date'}}
   if(ti){const v=SA.resolve(ti,hint,fix);if(v.ask)r.ask=r.ask||{kind:'ampm',h:ti.h,m:ti.m};else r.time=v.t}
   if(dti){const v=SA.resolve(dti,hint,fix);if(v.ask)r.ask=r.ask||{kind:'ampm',h:dti.h,m:dti.m};else r.dueTime=v.t}
   if(r.dur&&!r.recur)r.recur={type:'daily',days:null};
+  if(r.skip.length&&!r.recur&&!fix.refine)r.recur={type:'daily',days:null};
   if(r.recur&&r.recur.type==='weekly'&&!r.recur.days)r.recur.days=[ctx.dow(r.date||ctx.sel)];
+  let skipBad=false;if(r.recur&&!fix.refine)skipBad=!SA.normSkip(r);
   if(r.recur){r.from=r.date||ctx.today;if(r.dur)r.until=ctx.shift(r.from,r.dur-1)}
+  if(r.recur&&r.due){if(!r.until)r.until=r.due;r.due=null;r.dueTime=null}
   let rest=T.filter((t,k)=>!used[k]),changed=true;
   while(changed){changed=false;for(const f of SA.FILL){if(rest.length>=f.length&&f.every((w,k)=>rest[k]&&rest[k].n===w)){rest=rest.slice(f.length);changed=true;break}}
     if(rest.length&&SA.CONN.includes(rest[0].n)){rest=rest.slice(1);changed=true}}
   for(const f of SA.FILL){if(f.length===1&&rest.length&&rest[rest.length-1].n===f[0]&&(f[0]==='please'||f[0]==='pls'||f[0]==='لطفا'))rest=rest.slice(0,-1)}
   r.title=rest.map(t=>t.o).join(' ').trim().slice(0,100);
   if(/(^| )(important|urgent|مهم|فوری)( |$)/.test(rest.map(t=>t.n).join(' ')))r.priority='high';
-  if(!r.title)r.error='title';
-  r.detected=!!(r.date||r.due||r.time||r.recur||ti||dti);
+  if(!r.title&&!fix.refine)r.error='title';
+  if(skipBad)r.error='skipall';
+  r.detected=!!(r.date||r.due||r.time||r.recur||r.skip.length||ti||dti);
   return r};
 /*SA-END*/
 
@@ -1181,9 +1228,9 @@ function saPlaceholder(){return sat('ph')}
 let sa={pending:null,fix:{},busy:false,lastKey:'',lastAt:0};
 function saCtx(){return{today:today(),sel:selected,dow:d=>new Date(d+'T12:00:00').getDay(),shift:shiftDays,g2j,j2g}}
 function saChips(el,items){const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:10px';items.forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.className='btn small';b.textContent=label;b.onclick=fn;row.append(b)});el.append(row)}
-function saReset(){sa.pending=null;sa.fix={};$('saAsk').hidden=true;$('saPreview').hidden=true;$('saGo').textContent=sat('go');$('saEdit').hidden=true;$('saEdit').textContent=sat('edit');$('saLabel').textContent=sat('label')}
+function saReset(){sa.pending=null;sa.fix={};saClearChat();try{$('saGo').parentElement.hidden=false}catch(e){}$('saAsk').hidden=true;$('saPreview').hidden=true;$('saGo').textContent=sat('go');$('saEdit').hidden=true;$('saEdit').textContent=sat('edit');$('saLabel').textContent=sat('label')}
 function saMsg(el,text){el.innerHTML='';el.hidden=false;const p=document.createElement('div');p.textContent=text;el.append(p)}
-function saFmtTime(t){return fa(t)}
+function saFmtTime(t){return lang==='fa'?String(t).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[+d]):String(t)}
 function saSummary(r){
   const parts=['📌 '+sat('t')+': '+r.title];
   if(r.recur)parts.push('🔁 '+sat('rep')+': '+(r.recur.type==='daily'?sat('daily'):r.recur.type==='every'?sat('everyN')(r.recur.ev):(r.recur.wk>1?sat('everyW')(r.recur.wk):sat('weekly'))+r.recur.days.map(d=>sat('days')[d]).join('، '))+(r.until?' · '+sat('untilT')+dayLabel(r.until,{day:'numeric',month:'long'}):''));
@@ -1192,17 +1239,84 @@ function saSummary(r){
   if(r.due)parts.push('⏳ '+sat('dl')+': '+dayLabel(r.due,{weekday:'long',day:'numeric',month:'long'})+(r.dueTime?' '+saFmtTime(r.dueTime):''));
   return parts;
 }
+/* ---- v32: chat-style Smart Add (rule based, runs on the device; no server, no AI service) ---- */
+let saTok=0,saChatEl=null;
+function saChat(){if(!saChatEl||!saChatEl.isConnected){saChatEl=document.createElement('div');saChatEl.id='saChat';saChatEl.setAttribute('role','status');const a=$('saAsk');a.parentNode.insertBefore(saChatEl,a)}return saChatEl}
+function saClearChat(){saTok++;try{saChat().textContent=''}catch(e){}}
+function saSay(text,chips,opt){opt=opt||{};const tok=++saTok,c=saChat();c.textContent='';c.setAttribute('aria-busy','true');
+  const row=document.createElement('div');row.className='sabub';const av=document.createElement('div');av.className='saav';av.textContent='Lv';av.setAttribute('aria-hidden','true');
+  const body=document.createElement('div');body.className='sabody';body.dir='auto';const tx=document.createElement('div');tx.className='satext';const ch=document.createElement('div');ch.className='sachips';body.append(tx,ch);row.append(av,body);c.append(row);
+  const toks=[];String(text).split('**').forEach((seg,p)=>{seg.split(/(\s+)/).forEach(w=>{if(w!=='')toks.push({w,b:p%2===1})})});
+  const paint=k=>{tx.textContent='';let cur=null;for(let i=0;i<k&&i<toks.length;i++){const t=toks[i];if(!cur||cur.b!==t.b){cur={b:t.b,el:document.createElement(t.b?'b':'span'),txt:''};tx.append(cur.el)}cur.txt+=t.w;cur.el.textContent=cur.txt}};
+  const fin=()=>{if(tok!==saTok)return;paint(toks.length);c.removeAttribute('aria-busy');(chips||[]).forEach(([label,fn,cls])=>{const b=document.createElement('button');b.type='button';b.className='btn small'+(cls?' '+cls:'');b.textContent=label;b.onclick=fn;ch.append(b)});if(opt.after)opt.after(body)};
+  const fast=opt.instant||S.reduce||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if(fast){fin();return}
+  const dots=document.createElement('span');dots.className='sadots';dots.setAttribute('aria-hidden','true');dots.append(document.createElement('i'),document.createElement('i'),document.createElement('i'));tx.append(dots);
+  setTimeout(()=>{if(tok!==saTok)return;let k=0;const iv=setInterval(()=>{if(tok!==saTok){clearInterval(iv);return}k+=3;if(k>=toks.length){clearInterval(iv);fin()}else paint(k)},26)},opt.delay===undefined?380:opt.delay)}
+const saWdFull=(d,pl)=>{const n=new Date(2026,0,4+d).toLocaleDateString(lang==='fa'?'fa-IR':'en-US',{weekday:'long'});return pl?(lang==='fa'?n+'‌ها':n+'s'):n};
+const saJoin=a=>a.length<2?a.join(''):a.slice(0,-1).join(lang==='fa'?'، ':', ')+(lang==='fa'?' و ':' and ')+a[a.length-1];
+function saTimeText(t){if(lang==='fa')return saFmtTime(t);const [h,m]=t.split(':').map(Number);return (((h+11)%12)+1)+':'+SA.p2(m)+' '+(h>=12?'PM':'AM')}
+function saDayText(iso){const td=today();if(iso===td)return L('today','امروز');if(iso===shiftDays(td,1))return L('tomorrow','فردا');return dayLabel(iso,{weekday:'long',day:'numeric',month:'long'})}
+function saRepBase(c){if(c.type==='weekly'){const b=(c.type==='weekly'?(c.days||c.baseDays||[]):[]).map(x=>saWdFull(x));return c.wk>1?L('every '+c.wk+' weeks on '+saJoin(b),'هر '+fa(c.wk)+' هفته، '+saJoin(b)):L('every '+saJoin(b),'هر '+saJoin(b))}
+  if(c.type==='every')return c.ev===2?L('every other day','یک روز در میان'):L('every '+c.ev+' days','هر '+fa(c.ev)+' روز');return L('every day','هر روز')}
+function saRepExc(c){const sk=c.skip||[];if(!sk.length||c.type==='weekly')return '';const l=saJoin(sk.map(x=>saWdFull(x,1)));return L(', except '+l,'، به‌جز '+l)}
+function saFirst(r){if(!r.recur)return null;const it={days:r.recur.days,ev:r.recur.ev,wk:r.recur.wk,from:r.from,until:r.until};let d=r.from||today();for(let i=0;i<800;i++){if(onDate(it,d))return d;d=shiftDays(d,1)}return null}
+function saItemRep(it){const c={type:it.ev>1?'every':(it.wk>1||(it.days&&it.days.length&&it.days.length<7&&!it.skip))?'weekly':'daily',ev:it.ev,wk:it.wk,days:it.days,baseDays:it.days,skip:it.skip};let s=saRepBase(c)+saRepExc(c);if(it.until)s+=L(', until '+saDayText(it.until),'، تا '+saDayText(it.until));return s.charAt(0).toUpperCase()+s.slice(1)}
+const saOps=()=>lang==='fa'?['باشه.','حتماً.','فهمیدم.','چشم.']:['Got it.','Sure.','Okay.','Nice.'];
+function saTitleQ(t){return lang==='fa'?'«'+t+'»':t}
+function saPreviewText(r,upd){const op=upd?L('Updated.','به‌روز شد.'):saOps()[Math.floor(Math.random()*4)],tm=r.time?L(' at '+saTimeText(r.time),' ساعت '+saTimeText(r.time)):'',ti='**'+saTitleQ(r.title)+'**';
+  if(r.recur){const un=r.until?L(', until '+saDayText(r.until),'، تا '+saDayText(r.until)):'',f=saFirst(r),rep=saRepBase(r.recur)+tm+saRepExc(r.recur)+un;
+    return L(op+' I will add '+ti+' '+rep+'. '+(f?'The first one is '+saDayText(f)+'. ':'')+'Should I add it?',op+' '+ti+' را '+rep+' اضافه می‌کنم. '+(f?'اولین بار '+saDayText(f)+' است. ':'')+'اضافه کنم؟')}
+  if(r.due){const dd=saDayText(r.due)+(r.dueTime?L(' at '+saTimeText(r.dueTime),' ساعت '+saTimeText(r.dueTime)):''),on=r.date?L(' for '+saDayText(r.date),' برای '+saDayText(r.date)):'';
+    return L(op+' I will add '+ti+on+tm+', with the deadline '+dd+'. Should I add it?',op+' '+ti+' را'+on+tm+' با مهلت '+dd+' اضافه می‌کنم. اضافه کنم؟')}
+  const dy=saDayText(r.date||selected);return L(op+' I will add '+ti+' for '+dy+tm+'. Sound right?',op+' '+ti+' را برای '+dy+tm+' اضافه می‌کنم. درسته؟')}
+function saDoneText(r,res){const tm=r.time?L(' at '+saTimeText(r.time),' ساعت '+saTimeText(r.time)):'',ti='**'+saTitleQ(r.title)+'**';
+  if(r.recur){const un=r.until?L(', until '+saDayText(r.until),'، تا '+saDayText(r.until)):'',f=saFirst(r),rep=saRepBase(r.recur)+tm+saRepExc(r.recur)+un;
+    return L('Done. '+ti+' will repeat '+rep+'.'+(f?' Next one: '+saDayText(f)+'.':''),'انجام شد. '+ti+' '+rep+' تکرار می‌شود.'+(f?' اولین بار: '+saDayText(f)+'.':''))}
+  const dy=saDayText((res&&res.date)||r.date||selected);return L('Done. '+ti+' is on your list for '+dy+tm+'.','انجام شد. '+ti+' برای '+dy+tm+' به فهرستت اضافه شد.')}
+function saExamples(){const ex=lang==='fa'?['فردا ساعت ۵ عصر تکلیف علوم','هر دو روز ساعت ۷ عصر زبان، به‌جز سه‌شنبه‌ها','هر شب ساعت ۱۰ مطالعه، جمعه‌ها استراحت']:['Tomorrow at 5 PM, study Science','Study English every other day at 7 PM, except Tuesdays','Read every night at 10, rest on Fridays'];
+  return ex.map(t=>[t,()=>{saReset();$('quickName').value=t;saSubmit()}])}
+function saTalk(raw){const x=SA.norm(raw).replace(/[!?؟.،,]+/g,' ').replace(/\s+/g,' ').trim();if(!x||/\d/.test(x)||x.split(' ').length>4)return null;
+  if(/^(hi|hello|hey|hola|yo|hi there|hello there|hey there|good morning|good evening|good afternoon|سلام|درود|هی|سلام لول بای|صبح بخیر|شب بخیر|عصر بخیر)$/.test(x))return 'hi';
+  if(/^(help|help me|what can you do|how does this work|how do i use this|examples?|کمک|کمکم کن|راهنما|راهنمایی|چه کار میکنی|چکار میکنی|چطور کار میکنه|مثال)$/.test(x))return 'help';
+  if(/^(thanks|thank you|thanks a lot|thx|ty|مرسی|ممنون|سپاس|دستت درد نکنه)$/.test(x))return 'thanks';return null}
+function saTalkReply(k){const clr=()=>{$('quickName').value=''};
+  if(k==='thanks'){clr();return saSay(L('You are welcome! Anything else to add?','خواهش می‌کنم! کار دیگری هم هست؟'))}
+  clr();saSay(k==='hi'?L('Hi! Tell me what to add and when. I will sort out the day, the time and the repeats. For example:','سلام! بگو چه کاری را کی اضافه کنم؛ روز و ساعت و تکرار را خودم می‌فهمم. مثلاً:'):L('I understand days, times, deadlines ("by Friday"), repeats ("every other day", "every Monday and Wednesday", "every night") and exceptions ("except Tuesdays", "rest on Fridays"). Try one:','من روز، ساعت، مهلت («تا جمعه»)، تکرار («یک روز در میان»، «هر دوشنبه و چهارشنبه»، «هر شب») و استثنا («به‌جز سه‌شنبه‌ها»، «جمعه‌ها استراحت») را می‌فهمم. یکی را امتحان کن:'),saExamples())}
+function saRefineRow(body){const row=document.createElement('div');row.className='saref';const inp=document.createElement('input');inp.type='text';inp.maxLength=120;inp.autocomplete='off';inp.setAttribute('aria-label',L('Change something','تغییر دادن چیزی'));inp.placeholder=L('Change something, e.g. make it 6 pm, also skip Fridays','تغییر بده، مثلاً ساعتش را ۶ عصر کن، جمعه‌ها هم نباشد');
+  const go=document.createElement('button');go.type='button';go.className='btn small';go.textContent=L('Send','ارسال');const run=()=>{const v=inp.value;if(v.trim())saRefine(v)};go.onclick=run;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();run()}};row.append(inp,go);body.append(row)}
+function saShowPreview(r,upd){saSay(saPreviewText(r,upd),[[L('Add it','اضافه کن'),()=>{if(sa.pending)saFinish(sa.pending)},'primary'],[L('Edit sentence','ویرایش جمله'),()=>{saReset();$('quickName').focus()}]],{after:saRefineRow});$('saGo').textContent=sat('confirm');$('saEdit').hidden=false;try{$('saGo').parentElement.hidden=true}catch(e){}}
+function saRefine(raw){raw=String(raw||'').trim();if(!raw||!sa.pending)return;const r=JSON.parse(JSON.stringify(sa.pending)),ctx=saCtx();let ch=0;const nrm=SA.norm(raw).replace(/[!?؟.،,]+/g,' ').replace(/\s+/g,' ').trim();
+  const tm=raw.match(/^(?:call it|rename(?: it)?(?: to)?|name it|title|name|اسم|نام|عنوان)\s*[:：]?\s+(.+)$/i);
+  const explain=()=>saSay(L('I could not tell what to change. Try "make it 6 pm", "also skip Fridays", "until Nov 30" or "every 3 days".','متوجه نشدم چه چیزی را تغییر بدهم. مثلاً بنویس «ساعتش را ۶ عصر کن»، «جمعه‌ها هم نباشد»، «تا ۳۰ آبان» یا «هر ۳ روز».'),[[L('Back to my plan','برگشت به برنامه'),()=>saShowPreview(sa.pending)]]);
+  if(tm){r.title=tm[1].trim().slice(0,100);ch++}
+  else if(/^(include|including|restore|bring|add back|keep|برگردان|شامل|دوباره)/.test(nrm)){const T=SA.tokens(raw).map(t=>t.n);for(let k=0;k<T.length;k++){const l=SA.wdList(T,k);if(l){r.skip=(r.skip||[]).filter(x=>!l.days.includes(x));ch++;break}}}
+  else{const x=SA.parse(raw,ctx,{refine:true});
+    if(x.ask&&x.ask.kind==='ampm'){return saSay(L('Is that AM or PM? For example "6 pm".','ساعت صبح است یا عصر؟ مثلاً «۶ عصر».'),[[L('Back to my plan','برگشت به برنامه'),()=>saShowPreview(sa.pending)]])}
+    if(x.time){r.time=x.time;ch++}
+    if(x.skip.length){r.skip=[...new Set([...(r.skip||[]),...x.skip])];ch++}
+    if(x.recur){r.recur=x.recur;r.from=x.date||r.from||today();delete r.until;ch++}
+    else if(x.date){r.date=x.date;if(r.recur)r.from=x.date;ch++}
+    if(x.dur&&r.recur){r.until=ctx.shift(r.from||today(),x.dur-1);ch++}
+    if(x.due){if(r.recur)r.until=x.due;else{r.due=x.due;if(x.dueTime)r.dueTime=x.dueTime}ch++}
+    if(x.priority==='high'&&r.priority!=='high'){r.priority='high';ch++}}
+  if(!ch)return explain();
+  if(r.recur&&!SA.normSkip(r)){return saSay(L('That would exclude every day, so nothing could repeat. Which days should stay?','با این شرط هیچ روزی باقی نمی‌ماند. کدام روزها بماند؟'),[[L('Back to my plan','برگشت به برنامه'),()=>saShowPreview(sa.pending)]])}
+  sa.pending=r;saShowPreview(r,true)}
 function saSubmit(){
   if(sa.busy)return;
   if(sa.pending)return saFinish(sa.pending);
   const raw=$('quickName').value.trim();if(!raw){$('quickName').focus();return}
+  const talk=saTalk(raw);if(talk)return saTalkReply(talk);
   const r=SA.parse(raw,saCtx(),sa.fix);$('saAsk').hidden=true;$('saPreview').hidden=true;
-  if(r.error){saMsg($('saAsk'),'⚠️ '+sat('errTitle'));return}
-  if(r.ask){const el=$('saAsk');
-    if(r.ask.kind==='ampm'){const tt=fa(SA.p2(r.ask.h)+':'+SA.p2(r.ask.m));saMsg(el,'❓ '+sat('askAmpm')(tt));saChips(el,[[sat('am'),()=>{sa.fix.pm=false;saSubmit()}],[sat('pm'),()=>{sa.fix.pm=true;saSubmit()}],[sat('notTime'),()=>{sa.fix.notTime=true;saSubmit()}]])}
-    else{saMsg(el,'❓ '+sat('askDate'));saChips(el,[[sat('today'),()=>{sa.fix.date=today();saSubmit()}],[sat('tomorrow'),()=>{sa.fix.date=shiftDays(today(),1);saSubmit()}],[sat('in2'),()=>{sa.fix.date=shiftDays(today(),2);saSubmit()}]])}
+  if(r.error==='skipall')return saSay(L('That would exclude every day, so nothing could ever repeat. Which days should stay?','با این شرط هیچ روزی باقی نمی‌ماند و کاری تکرار نمی‌شود. کدام روزها بماند؟'));
+  if(r.error)return saSay(sat('errTitle'),saExamples());
+  if(r.ask){
+    if(r.ask.kind==='ampm'){const tt=saFmtTime(SA.p2(r.ask.h)+':'+SA.p2(r.ask.m));saSay(sat('askAmpm')(tt),[[sat('am'),()=>{sa.fix.pm=false;saSubmit()}],[sat('pm'),()=>{sa.fix.pm=true;saSubmit()}],[sat('notTime'),()=>{sa.fix.notTime=true;saSubmit()}]])}
+    else saSay(sat('askDate'),[[sat('today'),()=>{sa.fix.date=today();saSubmit()}],[sat('tomorrow'),()=>{sa.fix.date=shiftDays(today(),1);saSubmit()}],[sat('in2'),()=>{sa.fix.date=shiftDays(today(),2);saSubmit()}]]);
     return}
-  if(r.detected){sa.pending=r;const el=$('saPreview');el.hidden=false;el.innerHTML='';const h=document.createElement('div');h.style.fontWeight='700';h.textContent=sat('under');el.append(h);saSummary(r).forEach(t=>{const d=document.createElement('div');d.textContent=t;el.append(d)});$('saGo').textContent=sat('confirm');$('saEdit').hidden=false;return}
+  if(r.detected&&!r.recur&&!r.due)return saFinish(r);
+  if(r.detected){sa.pending=r;saShowPreview(r);return}
   saFinish(r)}
 $('quickForm').onsubmit=e=>{e.preventDefault();saSubmit()};
 $('quickName').oninput=saReset;$('saEdit').onclick=()=>{saReset();$('quickName').focus()};
@@ -1212,7 +1326,7 @@ function smartCommit(r){
     let date=null;
     if(r.recur){
       let g=data.routine.find(x=>x.id==='smart');if(!g){g={id:'smart',titleKey:'smartRoutine',items:[]};data.routine.push(g)}
-      const it={id:uid(),name:r.title,time:r.time||''};if(r.recur.days)it.days=r.recur.days.slice();if(r.recur.ev)it.ev=r.recur.ev;if(r.recur.wk>1)it.wk=r.recur.wk;if(it.ev||it.wk>1||r.until){it.from=r.from}if(r.until)it.until=r.until;
+      const it={id:uid(),name:r.title,time:r.time||''};if(r.recur.days)it.days=r.recur.days.slice();if(r.recur.skip&&r.recur.skip.length)it.skip=r.recur.skip.slice();if(r.recur.ev)it.ev=r.recur.ev;if(r.recur.wk>1)it.wk=r.recur.wk;if(it.ev||it.wk>1||r.until){it.from=r.from}if(r.until)it.until=r.until;
       const sig=o=>JSON.stringify([o.days||null,o.ev||0,o.wk||0,o.from||'',o.until||'']);
       if(g.items.some(x=>x.name===it.name&&(x.time||'')===it.time&&sig(x)===sig(it)))return{ok:false,dup:true};
       g.items.push(it);Object.keys(data.days).filter(d=>d>=today()&&data.days[d].built).forEach(d=>buildDay(d,true));
@@ -1229,11 +1343,25 @@ function smartCommit(r){
 function saFinish(r){
   const key=JSON.stringify([r.title,r.date,r.due,r.time,r.recur,r.until]),now=Date.now();
   if(key===sa.lastKey&&now-sa.lastAt<1500)return;sa.lastKey=key;sa.lastAt=now;sa.busy=true;
-  const res=smartCommit(r);sa.busy=false;
-  if(res.ok){$('quickName').value='';saReset();enterNext=true;renderAll();toast((r.recur?sat('addedR'):sat('added'))+r.title)}
-  else if(res.dup){saReset();saMsg($('saAsk'),'ℹ️ '+sat('dup'))}
-  else{saMsg($('saAsk'),'⚠️ '+sat('fail'));sa.pending=null;$('saGo').textContent=sat('go')}
+  undoPoint();const res=smartCommit(r);sa.busy=false;
+  if(res.ok){$('quickName').value='';saReset();enterNext=true;renderAll();saAddedBar(r,res);saSay(saDoneText(r,res),null,{delay:200})}
+  else if(res.dup){undoArmed=false;saReset();saSay('ℹ️ '+sat('dup'))}
+  else{undoArmed=false;saSay('⚠️ '+sat('fail'));sa.pending=null;$('saGo').textContent=sat('go');try{$('saGo').parentElement.hidden=false}catch(e){}}
 }
+
+/* v32: "added" bar with Undo and View (shows where the task went) */
+function saFlash(title){const rows=[...document.querySelectorAll('#todayTasks .task')].filter(r=>{const t=r.querySelector('.task-title');return t&&t.textContent.trim()===title});const r=rows[rows.length-1];if(!r)return;r.classList.remove('flash');void r.offsetWidth;r.classList.add('flash');r.scrollIntoView({block:'center',behavior:S.reduce?'auto':'smooth'});setTimeout(()=>r.classList.remove('flash'),1800)}
+function saAddedBar(r,res){
+  let msg=(r.recur?sat('addedR'):sat('added'))+r.title;const far=res.date&&res.date!==selected;
+  if(far)msg+=' — '+dayLabel(res.date,{weekday:'long',day:'numeric',month:'long'});
+  const t=$('undoText'),v=$('undoView');t.textContent=msg;
+  v.hidden=!(res.date&&(far||!r.recur));v.textContent=L('View','نمایش');
+  v.onclick=()=>{if(res.date&&res.date!==selected){selected=res.date;$('selectedDate').value=res.date;if(!ensureDay(selected).built)buildDay(selected);enterNext=true;renderAll();document.querySelector('.tab[data-view=today]').click()}setTimeout(()=>saFlash(r.title),far?250:0);$('undoBar').classList.remove('show')};
+  if(res.date===selected)setTimeout(()=>{const rows=[...document.querySelectorAll('#todayTasks .task')].filter(x=>{const q=x.querySelector('.task-title');return q&&q.textContent.trim()===r.title});const row=rows[rows.length-1];if(row){row.classList.remove('flash');void row.offsetWidth;row.classList.add('flash');setTimeout(()=>row.classList.remove('flash'),1800)}},60);
+}
+
+/* v34: static 'Add a task' button above the task list jumps to Smart Add (replaces the floating +) */
+(function(){const b=$('addJump');if(!b)return;b.onclick=()=>{const q=$('quickName');if(!q)return;q.scrollIntoView({block:'center',behavior:S.reduce?'auto':'smooth'});setTimeout(()=>{try{q.focus({preventScroll:true})}catch(e){q.focus()}},S.reduce?0:350)}})();
 /* ---- cloud size guard (Firestore documents are limited to about 1 MB) ---- */
 const CLOUD_LIMIT=800000;
 function payloadBytes(o){return new Blob([JSON.stringify(o)]).size}
@@ -1282,75 +1410,16 @@ function renderRoutine(){renderRoutine0();const host=$('routineEditor');if(!host
     const lab=document.createElement('span');lab.textContent=L('Daily target','هدف روزانه');const tg=document.createElement('input');tg.type='number';tg.min=1;tg.max=99;tg.value=it.target>1?it.target:1;tg.style.width='64px';tg.setAttribute('aria-label',lab.textContent);tg.onchange=()=>{it.target=Math.max(1,Math.min(99,Math.round(+tg.value)||1));tg.value=it.target;save()};
     const ar=document.createElement('button');ar.type='button';ar.className='btn small';ar.textContent=it.archived?L('Restore','بازگردانی'):L('Archive','بایگانی');ar.onclick=()=>{it.archived=!it.archived;rebuildFuture();save();renderAll()};
     ex.append(lab,tg,ar);if(it.archived)row.style.opacity='.5';row.after(ex)})}
-/* ---- pet ---- */
-const PETS={cat:['🥚','🐱','😺','🦁'],fox:['🥚','🦊','🦊','🐺'],dragon:['🥚','🦎','🐉','🐲']};
-const HATS=[{id:'bow',e:'🎀',p:20,n:['Bow','پاپیون']},{id:'cap',e:'🧢',p:25,n:['Cap','کلاه لبه‌دار']},{id:'shades',e:'🕶️',p:35,n:['Shades','عینک']},{id:'grad',e:'🎓',p:40,n:['Graduate','فارغ‌التحصیل']},{id:'top',e:'🎩',p:30,n:['Top hat','کلاه سیلندر']},{id:'crown',e:'👑',p:80,n:['Crown','تاج']}];
-function petStage(l){return l<2?0:l<4?1:l<7?2:3}
-function petMood(){const x=data.days[today()],ts=(x&&x.tasks)||[],dn=ts.filter(t=>t.done).length,h=new Date().getHours();
-  if(!ts.length)return{k:'idle',e:'😌',m:L('A free day. Add a task and we will start.','روز آزاده. یه کار اضافه کن تا شروع کنیم.')};
-  if(dn===ts.length)return{k:'happy',e:'🤩',m:L('All done! I am so proud of you.','همه را انجام دادی! خیلی بهت افتخار می‌کنم.')};
-  if(dn===0&&h>=16)return{k:'sleepy',e:'😴',m:L('I am sleepy... one small task would wake me up.','خوابم می‌آید… یک کار کوچک بیدارم می‌کند.')};
-  if(dn/ts.length>=.5)return{k:'good',e:'😄',m:L('Nice pace. Keep going!','سرعتت عالیه. ادامه بده!')};
-  return{k:'start',e:'🙂',m:L('Good to see you! Let us begin.','خوشحالم که اومدی! شروع کنیم.')}}
-function petFace(){const l=lvlOf(xpTotal()),sp=PETS[S.pet]?S.pet:'cat',h=HATS.find(x=>x.id===S.hat&&(S.owned||[]).includes(x.id));return{em:PETS[sp][petStage(l)],hat:h?h.e:'',lvl:l}}
-function renderPetMini(){const m=$('petMini');if(!m)return;const f=petFace();m.textContent=f.em;m.setAttribute('aria-label',L('Open pet','باز کردن دوست'));m.onclick=()=>{const b=document.querySelector('.tab[data-view="pet"]');if(b)b.click()}}
-/* ---- challenges (rule based, derived from your data) ---- */
-function chalSeed(d){let h=2166136261;for(let i=0;i<d.length;i++){h^=d.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-function chalRng(seed){let a=seed;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function daySummary(x){const ts=(x&&x.tasks)||[];return{total:ts.length,done:ts.filter(t=>t.done).length,rdone:ts.filter(t=>t.done&&t.kind==='routine').length,topDone:ts.filter(t=>t.done&&t.top).length,focus:(x&&x.focus)||0,mood:x&&x.mood,note:x&&x.note}}
-const CHDEF=[
-{id:'tasks',e:'✅',need:r=>2+Math.floor(r()*4),t:n=>['Finish '+n+' tasks',fa(n)+' کار را انجام بده'],p:(s,n)=>Math.min(s.done,n)},
-{id:'habits',e:'🔁',need:r=>2+Math.floor(r()*3),t:n=>['Complete '+n+' routine habits','‍'+fa(n)+' عادت روتین را انجام بده'],p:(s,n)=>Math.min(s.rdone,n)},
-{id:'focus',e:'🎯',t:()=>['Do a focus session','یک جلسهٔ تمرکز انجام بده'],p:s=>s.focus>0?1:0},
-{id:'mood',e:'🙂',t:()=>['Log your mood in the evening check-in','حال‌وهوایت را در مرور عصرانه ثبت کن'],p:s=>s.mood?1:0},
-{id:'top',e:'⭐',t:()=>['Finish a Top 3 task','یکی از ۳ کار برتر را انجام بده'],p:s=>s.topDone>0?1:0},
-{id:'perfect',e:'🏆',t:()=>['Finish every task today (3 or more)','همهٔ کارهای امروز را انجام بده (حداقل ۳ کار)'],p:s=>(s.total>=3&&s.done===s.total)?1:0},
-{id:'note',e:'📝',t:()=>['Write a one-line note for the day','یک جملهٔ کوتاه برای امروز بنویس'],p:s=>s.note?1:0}];
-function dailyChallenges(d){const r=chalRng(chalSeed(d)),idx=CHDEF.map((_,i)=>i);for(let i=idx.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}return idx.slice(0,3).map(i=>{const def=CHDEF[i];return{def,n:def.need?def.need(r):1}})}
-function chalState(d,c){const s=daySummary(data.days[d]),v=c.def.p(s,c.n);return{v,max:c.n,done:v>=c.n}}
-function weekActive(d){const w=satWeek(d);let n=0;for(const k in data.days){if(satWeek(k)===w&&dayDone(k))n++}return n}
-function coinsEarned(){let c=Math.floor(xpTotal()/5);const td=today(),weeks={};
-  for(const d in data.days){if(d>td)continue;dailyChallenges(d).forEach(ch=>{if(chalState(d,ch).done)c+=5});if(dayDone(d))weeks[satWeek(d)]=(weeks[satWeek(d)]||0)+1}
-  for(const w in weeks)if(weeks[w]>=5)c+=15;return c}
-function coinsSpent(){return (S.owned||[]).reduce((a,id)=>{const h=HATS.find(x=>x.id===id);return a+(h?h.p:0)},0)}
-function coinBalance(){return Math.max(0,coinsEarned()-coinsSpent())}
-/* ---- pet tab ---- */
-function renderPet(){
-  try{const rr=$('setRotate'),lab=rr&&rr.closest('label');if(lab)lab.hidden=notStudent()}catch(e){}
-  renderPetMini();const pc=$('petCard');if(!pc)return;$('tabPet').textContent=L('Pet','دوست');
-  const f=petFace(),mood=petMood(),str=streakNow();
-  pc.textContent='';const row=obEl('div','petrow'),box=obEl('div','petbox',f.em);if(f.hat)box.append(obEl('span','hat',f.hat));
-  const right=obEl('div','');right.style.flex='1';const nm=obEl('div','hero-title',S.pname||L('My pet','دوست من'));
-  const sub=obEl('div','muted smalltext',L('Level ','سطح ')+fa(f.lvl)+' · '+mood.e);const bub=obEl('div','bubble',mood.m+(str>=3?' 🔥 '+fa(str):''));bub.style.marginTop='8px';right.append(nm,sub,bub);row.append(box,right);pc.append(row);
-  const ctl=obEl('div','actions');ctl.style.marginTop='12px';
-  Object.keys(PETS).forEach(k=>{const b=obEl('button','btn small'+(S.pet===k?' primary':''),PETS[k][3]);b.setAttribute('aria-label',k);b.onclick=()=>{S.pet=k;saveS();syncSettings();renderAll()};ctl.append(b)});
-  const rn=obEl('button','btn small',L('Rename','تغییر نام'));rn.onclick=()=>{const v=prompt(L('Name your pet (up to 16 letters)','اسم دوستت را بنویس (تا ۱۶ حرف)'),S.pname||'');if(v!==null){S.pname=v.trim().slice(0,16);saveS();syncSettings();renderAll()}};ctl.append(rn);pc.append(ctl);
-  // challenges
-  const cc=$('chalCard');cc.textContent='';cc.append(obEl('div','eyebrow',L('TODAY\'S CHALLENGES (+5 coins each)','چالش‌های امروز (هرکدام ۵ سکه)')));
-  dailyChallenges(today()).forEach(ch=>{const st=chalState(today(),ch),w=obEl('div','chal'+(st.done?' done':'')),top=obEl('div','top');top.append(obEl('span','',ch.def.e+' '+l2(ch.def.t(ch.n))),obEl('span','',st.done?'✓':fa(st.v)+'/'+fa(st.max)));const bar=obEl('div','xptrack'),fl=obEl('div','xpfill');fl.style.width=Math.round(st.v/st.max*100)+'%';bar.append(fl);w.append(top,bar);cc.append(w)});
-  const wa=weekActive(today()),ww=obEl('div','chal'+(wa>=5?' done':'')),wt=obEl('div','top');wt.append(obEl('span','','📅 '+L('Be active on 5 days this week (+15 coins)','در ۵ روز این هفته فعال باش (۱۵ سکه)')),obEl('span','',wa>=5?'✓':fa(wa)+'/'+fa(5)));const wb=obEl('div','xptrack'),wf=obEl('div','xpfill');wf.style.width=Math.min(100,Math.round(wa/5*100))+'%';wb.append(wf);ww.append(wt,wb);cc.append(ww);
-  // shop
-  const sc=$('shopCard');sc.textContent='';const bal=coinBalance(),cr=obEl('div','coinrow');cr.append(obEl('span','','🪙 '+fa(bal)),obEl('span','muted smalltext',L('coins: 1 per 5 XP, plus challenges','سکه: هر ۵ XP یک سکه، به‌علاوهٔ چالش‌ها')));sc.append(obEl('div','eyebrow',L('SHOP','فروشگاه')),cr);
-  const grid=obEl('div','shopgrid');HATS.forEach(h=>{const own=(S.owned||[]).includes(h.id),eq=S.hat===h.id&&own,it=obEl('div','shopitem'+(eq?' eq':''));it.append(obEl('div','e',h.e),obEl('div','smalltext',l2(h.n)));
-    const b=obEl('button','btn small'+(own?'':' primary'),own?(eq?L('Remove','برداشتن'):L('Wear','پوشیدن')):'🪙 '+fa(h.p));b.style.marginTop='6px';
-    b.onclick=()=>{if(own){S.hat=eq?'':h.id}else{if(coinBalance()<h.p){toast(L('Not enough coins yet.','سکهٔ کافی نداری.'));return}S.owned=(S.owned||[]).concat(h.id);S.hat=h.id}saveS();syncSettings();renderAll()};it.append(b);grid.append(it)});sc.append(grid);
-  // habits
-  const hc=$('habCard');hc.textContent='';hc.append(obEl('div','eyebrow',L('YOUR HABITS','عادت‌های تو')));
-  const td=today(),tx=(data.days[td]&&data.days[td].tasks)||[];
-  allHabits().filter(it=>!it.archived).forEach(it=>{const s=habitStats(it),w=obEl('div','hab'),tg=it.target>1?it.target:1,t=tx.find(z=>z.id===td+'-'+it.id);
-    const head=obEl('div','nm',displayTaskName(it));w.append(head);
-    if(tg>1&&t){const r=obEl('div','editextra');r.append(obEl('span','',fa(t.count||0)+' / '+fa(tg)));const mk=(lab,dl)=>{const b=obEl('button','btn small',lab);b.onclick=()=>{t.count=Math.max(0,Math.min(tg,(t.count||0)+dl));t.done=t.count>=tg;save();renderAll()};return b};r.append(mk('−',-1),mk('+',1));w.append(r)}
-    const st=obEl('div','st');st.append(obEl('span','','🔥 '+fa(s.cur)),obEl('span','',L('Best ','بهترین ')+fa(s.best)),obEl('span','',L('30 days ','۳۰ روز ')+fa(s.rate)+'%'));w.append(st);
-    const dots=obEl('div','dots');s.dots.forEach(v=>{const i=document.createElement('i');i.className=v===true?'y':v===false?'n':'';dots.append(i)});w.append(dots);hc.append(w)});
-}
+/* v32: pet, coins and challenges code removed (UI gone since v29). Saved pet/coin keys stay in settings so the cloud rules still match. */
+function fixRotateLabel(){try{const rr=$('setRotate'),lab=rr&&rr.closest('label');if(lab)lab.hidden=notStudent()}catch(e){}}
 /* ---- calendar file (.ics) so the phone itself rings ---- */
 function icsEsc(t){return String(t).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
 function icsStamp(){return new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z')}
 function buildICS(o){o=Object.assign({routine:true,tasks:true,exams:!!(P&&P.student===true),lead:(typeof notif==='object'&&notif&&notif.lead)||0},o||{});
   const td=today(),lead=o.lead,BY=['SU','MO','TU','WE','TH','FR','SA'],out=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LvLBY//EN','CALSCALE:GREGORIAN'],c={rt:0,tk:0,ex:0};
   const dt=(d,t)=>d.replace(/-/g,'')+'T'+t.replace(':','')+'00',al=(txt,m)=>['BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(txt),'TRIGGER:-PT'+m+'M','END:VALARM'];
-  if(o.routine)allHabits().filter(it=>!it.archived&&it.time).forEach(it=>{const nm=displayTaskName(it),ds=it.days&&it.days.length?it.days:null;let d0=td;for(let i=0;i<7;i++){if(!ds||ds.includes(dowOf(d0)))break;d0=shiftDays(d0,1)}
-    out.push('BEGIN:VEVENT','UID:lvlby-h-'+it.id+'@lvlby.github.io','DTSTAMP:'+icsStamp(),'DTSTART:'+dt(d0,it.time),'DURATION:PT10M','RRULE:FREQ='+(ds?'WEEKLY;BYDAY='+ds.map(x=>BY[x]).join(','):'DAILY'),'SUMMARY:'+icsEsc(nm),...al(nm,lead),'END:VEVENT');c.rt++});
+  if(o.routine)allHabits().filter(it=>!it.archived&&it.time).forEach(it=>{const nm=displayTaskName(it),ds=it.days&&it.days.length?it.days:null;let d0=it.from&&it.from>td?it.from:td,found=false;for(let i=0;i<800;i++){if(onDate(it,d0)){found=true;break}d0=shiftDays(d0,1)}if(!found)return;
+    out.push('BEGIN:VEVENT','UID:lvlby-h-'+it.id+'@lvlby.github.io','DTSTAMP:'+icsStamp(),'DTSTART:'+dt(d0,it.time),'DURATION:PT10M','RRULE:FREQ='+(it.wk>1?'WEEKLY;INTERVAL='+it.wk+(ds?';BYDAY='+ds.map(x=>BY[x]).join(','):''):it.ev>1?'DAILY;INTERVAL='+it.ev+(ds&&ds.length<7?';BYDAY='+ds.map(x=>BY[x]).join(','):''):(ds?'WEEKLY;BYDAY='+ds.map(x=>BY[x]).join(','):'DAILY'))+(it.until?';UNTIL='+it.until.replace(/-/g,'')+'T235959':''),'SUMMARY:'+icsEsc(nm),...al(nm,lead),'END:VEVENT');c.rt++});
   if(o.tasks)for(let i=0;i<30;i++){const d=shiftDays(td,i),x=data.days[d];((x&&x.tasks)||[]).forEach(t=>{if(t.kind!=='custom'||t.done||!t.time)return;const nm=displayTaskName(t);out.push('BEGIN:VEVENT','UID:lvlby-t-'+t.id+'@lvlby.github.io','DTSTAMP:'+icsStamp(),'DTSTART:'+dt(d,t.time),'DURATION:PT15M','SUMMARY:'+icsEsc(nm),...al(nm,lead),'END:VEVENT');c.tk++})}
   if(o.exams)(data.exams||[]).filter(e=>!e.done&&e.date>=td).forEach(e=>{const nm=(e.type==='exam'?'📝 ':'📚 ')+e.title;out.push('BEGIN:VEVENT','UID:lvlby-e-'+e.id+'@lvlby.github.io','DTSTAMP:'+icsStamp(),'DTSTART;VALUE=DATE:'+e.date.replace(/-/g,''),'SUMMARY:'+icsEsc(nm),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(e.title),'TRIGGER:-P1D','END:VALARM','END:VEVENT');c.ex++});
   out.push('END:VCALENDAR');return{text:out.join('\r\n')+'\r\n',count:c.rt+c.tk+c.ex,c}}
@@ -1399,11 +1468,22 @@ const AFT_SKIP=['bed','brush-am','wash-am','water'];
 function staleDay(date,day){if(date<today())return false;const sh=activeShift(date);if(notStudent())return day.sh!=='off'||day.tasks.some(t=>t.kind==='school'&&t.id===date+'-s-study');if(day.sh==='off'&&sh!=='off')return true;return sh==='afternoon'&&day.tasks.some(t=>t.kind==='routine'&&AFT_SKIP.some(id=>t.id===date+'-'+id))}
 function buildDay(date,force=false){let day=ensureDay(date);if(day.built&&!force&&!staleDay(date,day))return;const shift=activeShift(date),old=day.tasks,md=morningDelta(shift);let items=[];data.routine.forEach(g=>g.items.filter(it=>!(g.id==='morning'&&shift==='afternoon'&&AFT_SKIP.includes(it.id))).filter(it=>!it.archived).filter(it=>onDate(it,date)).forEach(it=>items.push({...it,time:g.id==='morning'?addMin(it.time,md):it.time,id:date+'-'+it.id,name:displayTaskName(it),group:tr(g.titleKey)||g.title,kind:'routine',done:old.find(t=>t.id===date+'-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-'+it.id)?.priority||'normal',count:old.find(t=>t.id===date+'-'+it.id)?.count||0,top:old.find(t=>t.id===date+'-'+it.id)?.top,subs:old.find(t=>t.id===date+'-'+it.id)?.subs})));(data.schedule[shift]||[]).filter(it=>!(notStudent()&&it.id==='study')).forEach(it=>items.push({...it,id:date+'-s-'+it.id,name:displayTaskName(it),group:tr('schedule'),kind:'school',done:old.find(t=>t.id===date+'-s-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-s-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-s-'+it.id)?.priority||'normal',top:old.find(t=>t.id===date+'-s-'+it.id)?.top,subs:old.find(t=>t.id===date+'-s-'+it.id)?.subs}));items.push(...old.filter(t=>t.kind==='custom'));day.tasks=items;day.built=true;day.sh=shift;save()}
 function updateStaticText(){document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(I[lang][k])el.textContent=tr(k)});$('langToggle').textContent=lang==='en'?'فارسی / FA':'English / EN';{const bn=$('brandName');if(bn&&bn.firstChild)bn.firstChild.nodeValue=lang==='fa'?'لول بای':'LvLBY';document.title=lang==='fa'?'لول بای — زندگی، با تمرکز':'LvLBY — Life, in focus'}$('quickName').placeholder=saPlaceholder();$('detailNotes').placeholder=tr('typeNote');const shift=$('shiftType'),val=shift.value;shift.innerHTML=`<option value="morning">${tr('morning')} — ${tr('shiftTimeMorning')}</option><option value="afternoon">${tr('afternoon')} — ${tr('shiftTimeAfternoon')}</option><option value="off">${tr('off')}</option>`;shift.value=val}
-function renderToday(){renderNight();if(!$('selectedDate').value)$('selectedDate').value=selected;const date=$('selectedDate').value||selected;selected=date;$('dateLabel').textContent=localDateLabel(date)+(holName(date)?' — '+holName(date):'');const shift=activeShift(date);$('shiftSummary').textContent=tr('schoolShift')+': '+shiftName(shift);$('shiftStat').textContent=shiftName(shift);$('schoolTimeHint').textContent=shift==='off'?tr('noSchoolTime'):tr('schoolStarts')+' · '+(shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon'));$('schoolBannerTitle').textContent=shift==='off'?tr('dayOff'):shift==='morning'?tr('morningSchool'):tr('afternoonSchool');$('schoolBannerText').textContent=shift==='off'?tr('noSchoolTime'):tr('schoolStarts')+' '+(shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon'));$('schoolPill').textContent=shiftName(shift);const day=ensureDay(date);buildDay(date);const tasks=day.tasks,done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0;$('progressBar').style.width=pct+'%';$('progressText').textContent=`${fa(done)} / ${fa(tasks.length)} ${tr('tasks')} ${tr('completeCount')}`;$('progressPct').textContent=fa(pct)+'%';$('doneStat').textContent=fa(done);$('totalStat').textContent=fa(tasks.length);const host=$('todayTasks');host.innerHTML='';renderTodayHead(host,date,tasks,done);if(!tasks.length)host.append(emptyState());else if(done===tasks.length)host.append(doneCard());tasks.slice().sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')).forEach(t=>{const row=document.createElement('div');row.className='task'+(t.done?' done':'')+' k-'+(t.kind||'x')+' p-'+(t.priority||'normal');row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',displayTaskName(t));const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=t.done;cb.setAttribute('aria-label',tr('markDone'));cb.onclick=e=>e.stopPropagation();cb.onchange=()=>{const before=xpTotal();t.done=cb.checked;row.classList.toggle('done',t.done);say((t.done?L('Done: ','انجام شد: '):L('Reopened: ','دوباره باز شد: '))+displayTaskName(t));save();paintProgress();renderReport();xpFeedback(before,row);if(t.done&&ensureDay(selected).tasks.every(x=>x.done))burst(row)};const main=document.createElement('div');main.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=displayTaskName(t);title.dataset.title=displayTaskName(t);const sub=document.createElement('div');sub.className='task-sub';const time=document.createElement('span');time.textContent=t.time||tr('none');sub.append(time);if(t.notes){const note=document.createElement('span');note.textContent='✎ '+(t.notes.length>30?t.notes.slice(0,30)+'…':t.notes);sub.append(note)}main.append(title,sub);const side=document.createElement('div');side.className='task-side';const pill=document.createElement('span');pill.className='pill '+(t.kind==='routine'?'routine':t.kind==='custom'?'custom':'school');pill.textContent=tr(t.kind==='routine'?'routine':t.kind==='custom'?'personal':'plan');const arrow=document.createElement('span');arrow.className='taskarrow';arrow.textContent='›';side.append(pill,arrow);row.append(cb,main,side);attachSwipe(row,t,cb);row.onclick=()=>{if(row._swiped&&Date.now()-row._swiped<400)return;openTask(t.id)};row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTask(t.id)}};host.append(row)})}
-function renderRoutine0(){const host=$('routineEditor');host.innerHTML='';data.routine.forEach(g=>{const sec=document.createElement('div');sec.className='routine-group';const h=document.createElement('div');h.className='group-title';h.textContent=tr(g.titleKey)||g.title;sec.append(h);g.items.forEach(it=>{const row=document.createElement('div');row.className='editrow';const name=document.createElement('input');name.value=displayTaskName(it);name.setAttribute('aria-label',tr('taskName'));name.onchange=()=>{it.name=name.value;it.key=null};const time=document.createElement('input');time.type='time';time.value=it.time||'';time.setAttribute('aria-label',tr('startTime'));time.onchange=()=>it.time=time.value;const del=document.createElement('button');del.className='btn small danger';del.textContent=tr('remove');del.onclick=()=>{g.items=g.items.filter(x=>x.id!==it.id);renderRoutine()};row.append(name,time,del);if(it.until&&it.until<today())row.style.opacity='.5';sec.append(row);if(g.id==='smart'){const ended=it.until&&it.until<today();const n=document.createElement('div');n.className='rowhint';if(ended){n.textContent=L('Ended — earlier days are kept in your history.','پایان یافته — روزهای قبل در تاریخچه می‌مانند.')}else{const sb=document.createElement('button');sb.type='button';sb.className='btn small ghost';sb.textContent='⏹ '+L('Stop repeating from today','توقف تکرار از امروز');sb.onclick=async()=>{if(await uiConfirm(L('Stop "'+displayTaskName(it)+'" from today? Earlier days stay in your history.','«'+displayTaskName(it)+'» از امروز تکرار نشود؟ روزهای قبل در تاریخچه می‌مانند.'),{title:L('Stop repeating?','تکرار متوقف شود؟'),ok:L('Stop repeating','توقف تکرار')})){stopRoutineFrom(g,it,today(),false);renderAll();toast(L('Repeat stopped. Past days kept.','تکرار متوقف شد. روزهای قبل حفظ شد.'))}};n.append(sb)}sec.append(n)}});host.append(sec)})}
+/* v32: a brand-new user sees only the next 5 tasks (rest behind one button); nothing is deleted and progress still counts all tasks */
+let showAllToday=false;
+function foldNewUser(){let n=0;for(const k in data.days){const x=data.days[k];if(x&&(x.tasks||[]).some(t=>t.done)&&++n>=2)return false}return true}
+function todayFold(tasks,date){const s=tasks.slice().sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  if(date!==today()||s.length<=7||!foldNewUser())return{list:s,hidden:0,can:false};
+  if(showAllToday)return{list:s,hidden:0,can:true};
+  const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'),und=s.filter(t=>!t.done);
+  let up=und.filter(t=>(t.time||'99:99')>=hm);if(!up.length)up=und;const keep=new Set(up.slice(0,5).map(t=>t.id)),list=s.filter(t=>t.done||keep.has(t.id));
+  return{list,hidden:s.length-list.length,can:true}}
+function todayFoldBtn(host,f,total){if(!f.can)return;const b=document.createElement('button');b.type='button';b.className='btn ghost';b.style.cssText='width:100%;margin-top:8px';
+  b.textContent=showAllToday?L('Show fewer','نمایش کمتر'):L('Show all '+total+' tasks','نمایش همهٔ '+fa(total)+' کار');b.onclick=()=>{showAllToday=!showAllToday;renderToday()};host.append(b)}
+function renderToday(){renderNight();{const aj=$('addJump');if(aj)aj.textContent='+ '+L('Add a task','افزودن کار')}if(!$('selectedDate').value)$('selectedDate').value=selected;const date=$('selectedDate').value||selected;selected=date;$('dateLabel').textContent=localDateLabel(date)+(holName(date)?' — '+holName(date):'');const shift=activeShift(date);$('shiftSummary').textContent=tr('schoolShift')+': '+shiftName(shift);$('shiftStat').textContent=shiftName(shift);$('schoolTimeHint').textContent=shift==='off'?tr('noSchoolTime'):tr('schoolStarts')+' · '+(shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon'));$('schoolBannerTitle').textContent=shift==='off'?tr('dayOff'):shift==='morning'?tr('morningSchool'):tr('afternoonSchool');$('schoolBannerText').textContent=shift==='off'?tr('noSchoolTime'):tr('schoolStarts')+' '+(shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon'));$('schoolPill').textContent=shiftName(shift);const day=ensureDay(date);buildDay(date);const tasks=day.tasks,done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0;$('progressBar').style.width=pct+'%';$('progressText').textContent=`${fa(done)} / ${fa(tasks.length)} ${tr('tasks')} ${tr('completeCount')}`;$('progressPct').textContent=fa(pct)+'%';$('doneStat').textContent=fa(done);$('totalStat').textContent=fa(tasks.length);const host=$('todayTasks');host.innerHTML='';renderTodayHead(host,date,tasks,done);if(!tasks.length)host.append(emptyState());else if(done===tasks.length)host.append(doneCard());const fold=todayFold(tasks,date);fold.list.forEach(t=>{const row=document.createElement('div');row.className='task'+(t.done?' done':'')+' k-'+(t.kind||'x')+' p-'+(t.priority||'normal');row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label',displayTaskName(t));const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=t.done;cb.setAttribute('aria-label',tr('markDone'));cb.onclick=e=>e.stopPropagation();cb.onchange=()=>{const before=xpTotal();t.done=cb.checked;row.classList.toggle('done',t.done);say((t.done?L('Done: ','انجام شد: '):L('Reopened: ','دوباره باز شد: '))+displayTaskName(t));save();paintProgress();renderReport();xpFeedback(before,row);if(t.done&&ensureDay(selected).tasks.every(x=>x.done))burst(row)};const main=document.createElement('div');main.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=displayTaskName(t);title.dataset.title=displayTaskName(t);const sub=document.createElement('div');sub.className='task-sub';const time=document.createElement('span');time.textContent=t.time||tr('none');sub.append(time);if(t.notes){const note=document.createElement('span');note.textContent='✎ '+(t.notes.length>30?t.notes.slice(0,30)+'…':t.notes);sub.append(note)}main.append(title,sub);const side=document.createElement('div');side.className='task-side';const pill=document.createElement('span');pill.className='pill '+(t.kind==='routine'?'routine':t.kind==='custom'?'custom':'school');pill.textContent=tr(t.kind==='routine'?'routine':t.kind==='custom'?'personal':'plan');const arrow=document.createElement('span');arrow.className='taskarrow';arrow.textContent='›';side.append(pill,arrow);row.append(cb,main,side);attachSwipe(row,t,cb);row.onclick=()=>{if(row._swiped&&Date.now()-row._swiped<400)return;openTask(t.id)};row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTask(t.id)}};host.append(row)});todayFoldBtn(host,fold,tasks.length)}
+function renderRoutine0(){const host=$('routineEditor');host.innerHTML='';data.routine.forEach(g=>{const sec=document.createElement('div');sec.className='routine-group';const h=document.createElement('div');h.className='group-title';h.textContent=tr(g.titleKey)||g.title;sec.append(h);g.items.forEach(it=>{const row=document.createElement('div');row.className='editrow';const name=document.createElement('input');name.value=displayTaskName(it);name.setAttribute('aria-label',tr('taskName'));name.onchange=()=>{it.name=name.value;it.key=null};const time=document.createElement('input');time.type='time';time.value=it.time||'';time.setAttribute('aria-label',tr('startTime'));time.onchange=()=>it.time=time.value;const del=document.createElement('button');del.className='btn small danger';del.textContent=tr('remove');del.onclick=()=>{g.items=g.items.filter(x=>x.id!==it.id);renderRoutine()};row.append(name,time,del);if(it.until&&it.until<today())row.style.opacity='.5';sec.append(row);if(g.id==='smart'){const ended=it.until&&it.until<today();const sm=document.createElement('div');sm.className='muted smalltext';sm.style.margin='2px 2px 0';sm.textContent=saItemRep(it);sec.append(sm);const n=document.createElement('div');n.className='rowhint';if(ended){n.textContent=L('Ended — earlier days are kept in your history.','پایان یافته — روزهای قبل در تاریخچه می‌مانند.')}else{const sb=document.createElement('button');sb.type='button';sb.className='btn small ghost';sb.textContent='⏹ '+L('Stop repeating from today','توقف تکرار از امروز');sb.onclick=async()=>{if(await uiConfirm(L('Stop "'+displayTaskName(it)+'" from today? Earlier days stay in your history.','«'+displayTaskName(it)+'» از امروز تکرار نشود؟ روزهای قبل در تاریخچه می‌مانند.'),{title:L('Stop repeating?','تکرار متوقف شود؟'),ok:L('Stop repeating','توقف تکرار')})){stopRoutineFrom(g,it,today(),false);renderAll();toast(L('Repeat stopped. Past days kept.','تکرار متوقف شد. روزهای قبل حفظ شد.'))}};n.append(sb)}sec.append(n)}});host.append(sec)})}
 function renderSchedule(){const host=$('scheduleEditor');host.innerHTML='';(notStudent()?['off']:['morning','afternoon','off']).forEach(sh=>{const sec=document.createElement('div');sec.className='routine-group';const h=document.createElement('div');h.className='group-title';h.textContent=(notStudent()?L('Your daily plan','برنامهٔ روزانهٔ تو'):shiftName(sh))+(sh==='morning'?' · '+tr('shiftTimeMorning'):sh==='afternoon'?' · '+tr('shiftTimeAfternoon'):'');sec.append(h);(data.schedule[sh]||[]).forEach(it=>{const row=document.createElement('div');row.className='editrow';const name=document.createElement('input');name.value=displayTaskName(it);name.setAttribute('aria-label',tr('taskName'));name.onchange=()=>{it.name=name.value;it.key=null};const time=document.createElement('input');time.type='time';time.value=it.time||'';time.setAttribute('aria-label',tr('startTime'));time.onchange=()=>it.time=time.value;const del=document.createElement('button');del.className='btn small danger';del.textContent=tr('remove');del.onclick=()=>{data.schedule[sh]=data.schedule[sh].filter(x=>x.id!==it.id);renderSchedule()};row.append(name,time,del);sec.append(row)});const add=document.createElement('button');add.className='btn small ghost';add.textContent=tr('add')+' +';add.onclick=()=>{data.schedule[sh].push({id:uid(),name:lang==='fa'?'کار جدید':'New task',time:'',key:null});renderSchedule()};sec.append(add);host.append(sec)});const week=$('weekList');week.innerHTML='';[...data.weeks].sort((a,b)=>b.start.localeCompare(a.start)).forEach(w=>{const row=document.createElement('div');row.className='task';const main=document.createElement('div');main.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=tr('week')+' '+localDateLabel(w.start);const sub=document.createElement('div');sub.className='task-sub';sub.textContent=shiftName(w.shift)+(w.shift==='off'?'':' · '+(w.shift==='morning'?tr('shiftTimeMorning'):tr('shiftTimeAfternoon')));main.append(title,sub);const del=document.createElement('button');del.className='btn small danger';del.textContent=tr('remove');del.onclick=()=>{data.weeks=data.weeks.filter(x=>x.start!==w.start);save();renderAll()};row.append(main,del);week.append(row)});if(!data.weeks.length)week.innerHTML=`<div class="empty">${tr('noData')}</div>`}
-function renderReport(){const host=$('reportChart');host.innerHTML='';let sum=0,count=0;const rows=[];for(let i=6;i>=0;i--){const date=shiftDays(today(),-i),day=data.days[date],tasks=day?.tasks||[],pct=tasks.length?Math.round(tasks.filter(t=>t.done).length/tasks.length*100):0;if(tasks.length){sum+=pct;count++}const col=document.createElement('div');col.className='chartcol';const value=document.createElement('span');value.className='chartlabel';value.textContent=tasks.length?fa(pct)+'%':'—';const bar=document.createElement('div');bar.className='chartbar';bar.style.height=Math.max(3,tasks.length?pct:2)+'%';bar.style.opacity=tasks.length?'1':'.25';const label=document.createElement('span');label.className='chartlabel';label.textContent=I[lang].weekday[parseDate(date).getDay()];col.append(value,bar,label);host.append(col);rows.push({date,tasks,pct})}$('weekStat').textContent=count?fa(Math.round(sum/count))+'%':'—';const details=$('reportDetails');details.innerHTML='';rows.reverse().forEach(r=>{const row=document.createElement('div');row.className='task';const main=document.createElement('div');main.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=localDateLabel(r.date);const sub=document.createElement('div');sub.className='task-sub';sub.textContent=r.tasks.length?`${fa(r.tasks.filter(t=>t.done).length)} / ${fa(r.tasks.length)} ${tr('tasks')}`:tr('noData');main.append(title,sub);const pill=document.createElement('span');pill.className='pill';pill.textContent=r.tasks.length?fa(r.pct)+'%':'—';row.append(main,pill);details.append(row)})}
-function renderAll0(){renderNotifUI();renderSettings();setTimeout(()=>{paintXP();renderExtras();renderCoach();renderCheckin();renderCal();renderDue();renderTpl();renderTop();renderActivity();renderPet();habFill()},0);updateStaticText();renderToday();renderRoutine();renderSchedule();renderReport();$('weekStart').value=$('weekStart').value||today();$('shiftType').value=activeShift(today())}
+function renderReport(){const host=$('reportChart');host.innerHTML='';let sum=0,count=0;const rows=[];for(let i=6;i>=0;i--){const date=shiftDays(today(),-i),day=data.days[date],tasks=day?.tasks||[],pct=tasks.length?Math.round(tasks.filter(t=>t.done).length/tasks.length*100):0;if(tasks.length){sum+=pct;count++}const col=document.createElement('div');col.className='chartcol';const value=document.createElement('span');value.className='chartlabel';value.textContent=tasks.length?fa(pct)+'%':'—';const bar=document.createElement('div');bar.className='chartbar';bar.style.height=Math.max(3,tasks.length?pct:2)+'%';bar.style.opacity=tasks.length?'1':'.25';const label=document.createElement('span');label.className='chartlabel';label.textContent=I[lang].weekday[parseDate(date).getDay()];col.append(value,bar,label);host.append(col);rows.push({date,tasks,pct})}$('weekStat').textContent=count?fa(Math.round(sum/count))+'%':'—';const details=$('reportDetails');details.innerHTML='';const shown=rows.filter(r=>r.tasks.length);if(!shown.length){const e=document.createElement('div');e.className='notice';e.textContent=L('Your first week starts today. Tick a task and it shows up here.','هفتهٔ اول تو از امروز شروع می‌شود. یک کار را تیک بزن تا اینجا ببینی.');details.append(e)}shown.reverse().forEach(r=>{const row=document.createElement('div');row.className='task';const main=document.createElement('div');main.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=localDateLabel(r.date);const sub=document.createElement('div');sub.className='task-sub';sub.textContent=r.tasks.length?`${fa(r.tasks.filter(t=>t.done).length)} / ${fa(r.tasks.length)} ${tr('tasks')}`:tr('noData');main.append(title,sub);const pill=document.createElement('span');pill.className='pill';pill.textContent=r.tasks.length?fa(r.pct)+'%':'—';row.append(main,pill);details.append(row)})}
+function renderAll0(){renderNotifUI();renderSettings();setTimeout(()=>{paintXP();renderExtras();renderCoach();renderCheckin();renderCal();renderDue();renderTpl();renderTop();renderActivity();fixRotateLabel();habFill()},0);updateStaticText();renderToday();renderRoutine();renderSchedule();renderReport();$('weekStart').value=$('weekStart').value||today();$('shiftType').value=activeShift(today())}
 function findTask(id){return ensureDay(selected).tasks.find(t=>t.id===id)}
 function openTask(id){activeTaskId=id;const t=findTask(id);if(!t)return;$('modalTaskTitle').textContent=displayTaskName(t);$('modalTaskMeta').textContent=localDateLabel(selected)+' · '+tr(t.kind==='routine'?'routine':t.kind==='custom'?'personal':'plan');$('detailName').value=displayTaskName(t);$('detailTime').value=t.time||'';$('detailPriority').value=t.priority||'normal';$('detailNotes').value=t.notes||'';$('toggleTaskDone').textContent=t.done?tr('taskReopened'):tr('markDone');renderSubs(t);$('detailTop').checked=!!t.top;{const b=$('stopRepeat');b.textContent='⏹ '+L('Stop repeating from this day','توقف تکرار از این روز به بعد');b.hidden=!routineOf(t)}resetTimer();$('taskModal').classList.add('open');document.body.style.overflow='hidden'}
 function closeModal(){pauseTimer();$('taskModal').classList.remove('open');document.body.style.overflow=''}
@@ -1497,7 +1577,7 @@ $('notifToggle').onclick=async()=>{
 $('notifLead').onchange=()=>{notif.lead=Number($('notifLead').value)||0;saveNotif();checkReminders()};
 $('notifTest').onclick=async()=>{const ok=await showNotif('LvLBY',nt('testBody'),'lvlby-test');renderNotifUI(ok?undefined:nt('testFail'))};
 
-Object.assign(I.fa,{tabHabits:'روتین‌ها',tabSchedule:'هفته',tabReports:'گزارش'});
+Object.assign(I.fa,{tabHabits:'روتین‌ها',tabSchedule:'هفته',tabReports:'گزارش'});Object.assign(I.en,{tabHabits:'Routines',tabSchedule:'Week'});
 function fixFaBits(){const fa=lang==='fa';if(fa)document.querySelectorAll('#todayTasks span').forEach(e=>{if(!e.children.length&&/^\d{1,2}:\d{2}$/.test(e.textContent.trim()))e.textContent=e.textContent.trim().replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])});const lt=$('langToggle');if(lt)lt.textContent=fa?'English':'فارسی';const a=document.querySelector('.sitefoot a');if(a)a.textContent=fa?'حریم خصوصی':'Privacy';
  const d=$('selectedDate');if(d){let w=d.parentNode;if(!w.classList.contains('datewrap')){w.classList.add('datewrap');const l=document.createElement('div');l.id='dateLbl';l.className='datelbl';w.insertBefore(l,d)}const l=$('dateLbl');w.classList.toggle('faDate',fa);l.textContent=fa?dayLabel(selected,{weekday:'short',day:'numeric',month:'long',year:'numeric'}):''}
  document.querySelectorAll('h1,h2,.brand,.logo,.hero-title').forEach(e=>{if(/^LvLBY\.?$/.test(e.textContent.trim())){e.textContent='LvLBY';}})}
