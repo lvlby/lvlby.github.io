@@ -1,0 +1,8 @@
+{
+  "appId": "com.lvlby.app",
+  "appName": "LvLBY",
+  "webDir": "www",
+  "backgroundColor": "#101522",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false }
+}
