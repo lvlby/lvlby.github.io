@@ -1,0 +1,75 @@
+name: Build Android app
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Collect the web files
+        run: |
+          mkdir www
+          cp index.html about.html privacy.html manifest.webmanifest www/
+          cp -r icons www/icons
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Create the Android project
+        run: npx cap add android
+
+      - name: Patch manifest, version and icons
+        run: |
+          set -e
+          M=android/app/src/main/AndroidManifest.xml
+          sed -i 's#<application#<uses-permission android:name="android.permission.USE_EXACT_ALARM" />\n    <application#' "$M"
+          G=android/app/build.gradle
+          sed -i "s/versionCode 1/versionCode ${GITHUB_RUN_NUMBER}/" "$G"
+          sed -i "s/versionName \"1.0\"/versionName \"35.${GITHUB_RUN_NUMBER}\"/" "$G"
+          R=android/app/src/main/res
+          if command -v magick >/dev/null 2>&1; then IM="magick"; else IM="convert"; fi
+          for d in "mdpi 48 108" "hdpi 72 162" "xhdpi 96 216" "xxhdpi 144 324" "xxxhdpi 192 432"; do
+            set -- $d
+            $IM icons/icon-192.png -resize ${2}x${2} "$R/mipmap-$1/ic_launcher.png" || true
+            $IM icons/icon-192.png -resize ${2}x${2} "$R/mipmap-$1/ic_launcher_round.png" || true
+            $IM icons/icon-maskable-512.png -resize ${3}x${3} "$R/mipmap-$1/ic_launcher_foreground.png" || true
+          done
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#101522</color>\n</resources>\n' > "$R/values/ic_launcher_background.xml"
+
+      - name: Copy web files into the app
+        run: npx cap sync android
+
+      - name: Build the APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Name the file
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk LvLBY.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LvLBY-apk
+          path: LvLBY.apk
+
+      - name: Publish a release with the APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "app-${GITHUB_RUN_NUMBER}" LvLBY.apk \
+            --title "LvLBY app ${GITHUB_RUN_NUMBER}" \
+            --notes "Android app with phone-side reminders. Install LvLBY.apk (allow installing from this source when your phone asks)."
