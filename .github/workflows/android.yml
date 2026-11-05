@@ -34,6 +34,34 @@ jobs:
       - name: Create the Android project
         run: npx cap add android
 
+      - name: Configure Firebase Google Services
+        run: |
+          set -e
+          cp google-services.json android/app/google-services.json
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          root_gradle = Path("android/build.gradle")
+          root_text = root_gradle.read_text()
+          plugin_classpath = "classpath 'com.google.gms:google-services:4.4.2'"
+          if plugin_classpath not in root_text:
+              if "dependencies {" not in root_text:
+                  raise SystemExit("Could not find dependencies block in android/build.gradle")
+              root_text = root_text.replace(
+                  "dependencies {",
+                  "dependencies {\n        " + plugin_classpath,
+                  1,
+              )
+              root_gradle.write_text(root_text)
+
+          app_gradle = Path("android/app/build.gradle")
+          app_text = app_gradle.read_text()
+          plugin_apply = "apply plugin: 'com.google.gms.google-services'"
+          if plugin_apply not in app_text:
+              app_gradle.write_text(app_text.rstrip() + "\n\n" + plugin_apply + "\n")
+          PY
+
       - name: Patch manifest, version and icons
         run: |
           set -e
