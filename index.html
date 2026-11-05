@@ -456,6 +456,10 @@ function start(){window.fbLoad(function(ok){if(ok&&typeof setupFirebase==='funct
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start()})();
 </script>
 <script>
+/* v36: in the Android app the Capacitor plugins are bundled into native-plugins.js (built by the GitHub workflow). A normal browser never loads it. */
+try{if(window.Capacitor&&typeof Capacitor.isNativePlatform==='function'&&Capacitor.isNativePlatform())document.write('<script src="native-plugins.js"><\/script>')}catch(e){}
+</script>
+<script>
 /*
   SETUP REQUIRED:
   1) Create a Firebase project and enable Google sign-in.
@@ -576,10 +580,12 @@ function setupFirebase(){
   btn.onclick=async()=>{
     try{
       if(cloudUser){await doSignOut();return}
-      showStatus(sx('waitg'));const provider=new firebase.auth.GoogleAuthProvider();
+      showStatus(sx('waitg'));
+      if(nativeGoogle()){await cloudAuth.signInWithCredential(await nativeGoogleCredential());return}
+      const provider=new firebase.auth.GoogleAuthProvider();
       try{await cloudAuth.signInWithPopup(provider)}
       catch(err){if(err.code==='auth/popup-blocked'||err.code==='auth/operation-not-supported-in-this-environment')await cloudAuth.signInWithRedirect(provider);else throw err}
-    }catch(err){console.error('Google sign-in failed:',err);toast(L('Google not opening? Use email sign-in in Settings.','گوگل باز نمی‌شود؟ از تنظیمات با ایمیل وارد شو.'));showStatus(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request'?sx('cancelled'):(err.code==='auth/network-request-failed'?sx('needvpn'):sx('failed'))+' ['+(err.code||err.message||'unknown')+']')}
+    }catch(err){console.error('Google sign-in failed:',err);if(!isCancelErr(err))toast(L('Google not opening? Use email sign-in in Settings.','گوگل باز نمی‌شود؟ از تنظیمات با ایمیل وارد شو.'));showStatus(err.code==='auth/popup-closed-by-user'||err.code==='auth/cancelled-popup-request'||isCancelErr(err)?sx('cancelled'):(err.code==='auth/network-request-failed'?sx('needvpn'):sx('failed'))+' ['+String(err.code||err.message||'unknown').slice(0,90)+']')}
   };
   showStatus();
 }
@@ -626,7 +632,7 @@ async function doSignOut(){
   if(!cloudAuth||!cloudUser)return;
   if(!confirm(sx('signoutSure')))return;
   if(localStorage.getItem(LS.dirty)==='1'&&cloudState!=='synced'&&!confirm(sx('signoutUnsynced')))return;
-  try{await cloudAuth.signOut();closeSettings()}catch(e){showStatus(sx('failed')+' ['+(e.code||'')+']')}
+  try{if(nativeGoogle()){try{await nplug('FirebaseAuthentication').signOut()}catch(e){console.warn('Native sign-out:',e)}}await cloudAuth.signOut();closeSettings()}catch(e){showStatus(sx('failed')+' ['+(e.code||'')+']')}
 }
 $('openSettings').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('settingsModal').onclick=e=>{if(e.target===$('settingsModal'))closeSettings()};
 $('setSignOut').onclick=doSignOut;$('setLang').onchange=()=>setLanguage($('setLang').value);$('setExport').onclick=()=>exportData();
@@ -930,7 +936,7 @@ $('delGo').onclick=async()=>{
     if(cloudUser&&cloudAuth){
       const u=cloudUser;clearTimeout(pushTimer);cloudReady=false;if(unsub){unsub();unsub=null}
       await cloudDb.collection('users').doc(u.uid).delete();docGone=true;
-      try{await u.delete()}catch(e){if(e.code==='auth/requires-recent-login'){await u.reauthenticateWithPopup(new firebase.auth.GoogleAuthProvider());await u.delete()}else throw e}
+      try{await u.delete()}catch(e){if(e.code==='auth/requires-recent-login'){if(nativeGoogle())await u.reauthenticateWithCredential(await nativeGoogleCredential());else await u.reauthenticateWithPopup(new firebase.auth.GoogleAuthProvider());await u.delete()}else throw e}
     }
     Object.keys(localStorage).filter(k=>k.indexOf('lvlby-')===0).forEach(k=>localStorage.removeItem(k));
     location.reload();
@@ -1535,7 +1541,8 @@ fa:{title:'یادآورها',desc:'وقتی زمان یک کار می‌رسد،
 const nt=k=>(NT[lang]||NT.en)[k]||NT.en[k];
 /* ---- v35: native Android app (Capacitor). In a normal browser IS_APP is false and nothing below changes. ---- */
 var IS_APP=false,nativePerm='prompt',NATIVE_TMR=0,NATIVE_BUSY=false,NATIVE_AGAIN=false;const NATIVE_DAYS=14,NATIVE_MAX=200;
-function nplug(n){try{return (window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins[n||'LocalNotifications'])||null}catch(e){return null}}
+var NPL={};
+function nplug(n){n=n||'LocalNotifications';try{if(window.LvNative&&window.LvNative[n])return window.LvNative[n];const C=window.Capacitor;if(!C)return null;if(C.Plugins&&C.Plugins[n])return C.Plugins[n];if(NPL[n])return NPL[n];if(typeof C.registerPlugin==='function'&&typeof C.isNativePlatform==='function'&&C.isNativePlatform())return (NPL[n]=C.registerPlugin(n));return null}catch(e){return null}}
 IS_APP=!!(window.Capacitor&&typeof Capacitor.isNativePlatform==='function'&&Capacitor.isNativePlatform()&&nplug());
 const NTA={en:'Reminders ring on your phone at each task time, even when LvLBY is closed. The next 14 days are scheduled, so open the app once in a while to refresh them. If reminders come late, allow "Alarms & reminders" and remove the battery limit for LvLBY in your phone settings. These settings are stored on this device only.',fa:'یادآورها سر ساعت هر کار روی گوشی زنگ می‌خورند، حتی وقتی لول بای بسته است. کارهای ۱۴ روز آینده زمان‌بندی می‌شوند؛ پس گاهی برنامه را باز کن تا به‌روز شوند. اگر یادآوری‌ها دیر آمدند، در تنظیمات گوشی اجازهٔ «هشدارها و یادآورها» را بده و محدودیت باتری را برای لول بای بردار. این تنظیمات فقط روی همین دستگاه ذخیره می‌شود.'};
 function nativeId(str){let h=2166136261;for(let k=0;k<str.length;k++){h^=str.charCodeAt(k);h=Math.imul(h,16777619)>>>0}return (h%2147483646)+1}
@@ -1573,6 +1580,14 @@ async function nativeInit(){
     else if(!asked&&nativePerm==='granted'&&!notif.on&&P&&P.done){try{localStorage.setItem('lvlby-app-asked','1')}catch(e){}notif.on=true;saveNotif()}
   }catch(e){}
   renderNotifUI();nativeSyncSoon()}
+function nativeGoogle(){return IS_APP&&!!nplug('FirebaseAuthentication')}
+function isCancelErr(err){const t=String((err&&err.code)||'')+' '+String((err&&err.message)||err||'');return /cancel|dismiss|12501/i.test(t)}
+/* Android: the native plugin shows Google's account picker and returns an ID token; the web Firebase SDK then signs in with it (same user, same Firestore data). */
+async function nativeGoogleCredential(){
+  const r=await nplug('FirebaseAuthentication').signInWithGoogle({skipNativeAuth:true});
+  const idToken=r&&r.credential&&r.credential.idToken;
+  if(!idToken){const e=new Error('Google did not return an ID token');e.code='lvlby/no-id-token';throw e}
+  return firebase.auth.GoogleAuthProvider.credential(idToken)}
 async function appSaveFile(name,text,mime){const FS=nplug('Filesystem'),SH=nplug('Share');if(!FS||!SH)return false;try{const r=await FS.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'});await SH.share({title:name,url:r.uri,dialogTitle:name});return true}catch(e){console.warn('App share failed:',e);return false}}
 function notifSupported(){return IS_APP||('Notification' in window)}
 function notifActive(){return notif.on&&notifSupported()&&(IS_APP?nativePerm==='granted':Notification.permission==='granted')}

@@ -45,3 +45,14 @@ v14 - tour
 
 v15 - "Building your routine" screen
 After the last question, a short loading screen (spinner, changing messages, progress bar) shows for a random 1.8 to 2.8 seconds, then the "Your routine is ready" screen appears. The routine itself is computed instantly and saved first; the wait is only for the feel of the moment.
+
+
+v36 - Google sign-in inside the Android app
+Why: in the app the old Google button used a pop-up page (Firebase "signInWithPopup"), which an Android WebView cannot do. It ended with "The requested action is invalid." The website was never affected.
+Added: in the app only, the Google button now opens Android's own Google account picker (plugin @capacitor-firebase/authentication 6.x). The ID token it returns is given to the same Firebase web login (signInWithCredential), so it is the same account, the same cloud data and the same sync as the website. Cancelling shows the calm "cancelled" text without the error toast; other errors show the plugin's message (for example 10 / DEVELOPER_ERROR). Sign-out signs out of both the native side and the web side. Deleting the account asks for a fresh Google login the native way in the app.
+Added (build): the plugins are bundled into one file (native-plugins.js, made by esbuild in the GitHub workflow) because the page has no bundler; the page loads it only inside the app. The workflow also sets the Android variables the plugin needs (rgcfaIncludeGoogle, androidxCredentialsVersion), and can sign every build with ONE fixed key (three GitHub secrets). It then prints the APK's SHA-1/SHA-256 and warns if the SHA-1 is not in google-services.json.
+Changed: the website behaves exactly as before (popup / redirect login, email login, Firestore sync untouched). The reminder and backup code now finds its plugins through the same bundle.
+Why a fixed key: without it every GitHub build gets a new random signing key, so the SHA-1 registered in Firebase can never match the next APK and Google rejects the sign-in.
+Not done: Firebase and Firestore still need the whole phone to reach Google (a VPN in Iran). Loading the Firebase web SDK from the app's own files instead of gstatic is possible later. Google sign-in needs Google Play services and a Google account on the phone.
+Tested: with a fake Google plugin and a fake Firebase in Chromium: website popup unchanged; app signs in with the ID token and never uses the pop-up; cancel, plugin error and missing-token paths; sign-out on both sides; email login still reachable; all older suites still pass. NOT tested: the GitHub build (esbuild bundle, Gradle with the plugin), the real plugin, a real Google sign-in, a real phone.
+

@@ -1,16 +1,19 @@
 {
   "name": "lvlby-android",
-  "version": "35.0.0",
+  "version": "36.0.0",
   "private": true,
-  "description": "Android wrapper for LvLBY (phone-side reminders). The website itself is index.html.",
+  "description": "Android wrapper for LvLBY (phone-side reminders, native Google sign-in). The website itself is index.html.",
   "dependencies": {
+    "@capacitor-firebase/authentication": "^6.0.0",
     "@capacitor/android": "^6.0.0",
     "@capacitor/core": "^6.0.0",
     "@capacitor/filesystem": "^6.0.0",
     "@capacitor/local-notifications": "^6.0.0",
-    "@capacitor/share": "^6.0.0"
+    "@capacitor/share": "^6.0.0",
+    "firebase": "10.14.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.0.0"
+    "@capacitor/cli": "^6.0.0",
+    "esbuild": "^0.21.5"
   }
 }
