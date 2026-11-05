@@ -503,6 +503,7 @@ function persistLocal(){if(demo)return true;try{localStorage.setItem(LS.data,JSO
 function save(){
   if(undoArmed){undoArmed=false;showUndo()}
   if(demo)return;
+  try{nativeSyncSoon()}catch(e){}
   if(persistLocal())try{localStorage.setItem(LS.dirty,'1')}catch(e){}
   if(cloudUser&&cloudReady){cloudState=navigator.onLine?'syncing':'pending';showStatus();clearTimeout(pushTimer);pushTimer=setTimeout(pushCloud,700)}
 }
@@ -729,7 +730,8 @@ function obCommit(){
   QS.forEach(q=>{if(q.k==='cal')return;const v=t[q.k];if(v===undefined||v===''||(Array.isArray(v)&&!v.length))return;P[q.k]=q.t==='text'?String(v).trim().slice(0,40):v});
   saveP();
   if(t.cal!==undefined){S.cal=['auto','shamsi','gregorian'][t.cal]||'auto';saveS()}
-  if(P.remind!==undefined&&P.remind<3&&notifSupported()){try{if(Notification.permission==='granted'){notif.on=true;saveNotif()}else if(Notification.permission==='default')Notification.requestPermission().then(r=>{notif.on=r==='granted';saveNotif();renderNotifUI()})}catch(e){}}
+  if(IS_APP){if(P.remind!==undefined&&P.remind<3)nativeReq().then(r=>{notif.on=(r==='granted');saveNotif();renderNotifUI();nativeSyncSoon()}).catch(()=>{})}
+  else if(P.remind!==undefined&&P.remind<3&&notifSupported()){try{if(Notification.permission==='granted'){notif.on=true;saveNotif()}else if(Notification.permission==='default')Notification.requestPermission().then(r=>{notif.on=r==='granted';saveNotif();renderNotifUI()})}catch(e){}}
   syncSettings();renderAll()}
 function obAfterQuestions(){
   obCommit();let plan=[];
@@ -1423,7 +1425,7 @@ function buildICS(o){o=Object.assign({routine:true,tasks:true,exams:!!(P&&P.stud
   if(o.tasks)for(let i=0;i<30;i++){const d=shiftDays(td,i),x=data.days[d];((x&&x.tasks)||[]).forEach(t=>{if(t.kind!=='custom'||t.done||!t.time)return;const nm=displayTaskName(t);out.push('BEGIN:VEVENT','UID:lvlby-t-'+t.id+'@lvlby.github.io','DTSTAMP:'+icsStamp(),'DTSTART:'+dt(d,t.time),'DURATION:PT15M','SUMMARY:'+icsEsc(nm),...al(nm,lead),'END:VEVENT');c.tk++})}
   if(o.exams)(data.exams||[]).filter(e=>!e.done&&e.date>=td).forEach(e=>{const nm=(e.type==='exam'?'📝 ':'📚 ')+e.title;out.push('BEGIN:VEVENT','UID:lvlby-e-'+e.id+'@lvlby.github.io','DTSTAMP:'+icsStamp(),'DTSTART;VALUE=DATE:'+e.date.replace(/-/g,''),'SUMMARY:'+icsEsc(nm),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(e.title),'TRIGGER:-P1D','END:VALARM','END:VEVENT');c.ex++});
   out.push('END:VCALENDAR');return{text:out.join('\r\n')+'\r\n',count:c.rt+c.tk+c.ex,c}}
-function downloadICS(o){const r=buildICS(o);if(!r.count)return toast(L('Nothing with a time to export yet.','هنوز چیزی با ساعت برای خروجی نیست.'));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.text],{type:'text/calendar;charset=utf-8'}));a.download='lvlby-reminders.ics';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast(L('Calendar file ready: ','فایل تقویم آماده شد: ')+fa(r.count)+' '+L('reminders. Open it to add them.','یادآوری. بازش کن تا اضافه شوند.'))}
+function downloadICS(o){const r=buildICS(o);if(!r.count)return toast(L('Nothing with a time to export yet.','هنوز چیزی با ساعت برای خروجی نیست.'));if(IS_APP){appSaveFile('lvlby-reminders.ics',r.text,'text/calendar').then(ok=>{if(!ok)toast(L('Could not share the calendar file.','فایل تقویم ارسال نشد.'))});return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.text],{type:'text/calendar;charset=utf-8'}));a.download='lvlby-reminders.ics';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast(L('Calendar file ready: ','فایل تقویم آماده شد: ')+fa(r.count)+' '+L('reminders. Open it to add them.','یادآوری. بازش کن تا اضافه شوند.'))}
 function openIcsDialog(){const base=buildICS();if(!base.count)return toast(L('Nothing with a time to export yet.','هنوز چیزی با ساعت برای خروجی نیست.'));
   const stu=!!(P&&P.student===true),b=document.createElement('div');b.className='uidlg';b.setAttribute('role','alertdialog');b.setAttribute('aria-modal','true');
   const h=document.createElement('h3');h.textContent=L('Add to your phone calendar?','به تقویم گوشی اضافه شود؟');
@@ -1466,7 +1468,8 @@ function morningDelta(shift){if(shift==='morning')return 0;const a=wakeMin(shift
 function addMin(t,d){if(!d||!/^\d{1,2}:\d\d$/.test(String(t)))return t;const p=String(t).split(':');let m=Math.min(1435,(+p[0])*60+(+p[1])+d);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
 const AFT_SKIP=['bed','brush-am','wash-am','water'];
 function staleDay(date,day){if(date<today())return false;const sh=activeShift(date);if(notStudent())return day.sh!=='off'||day.tasks.some(t=>t.kind==='school'&&t.id===date+'-s-study');if(day.sh==='off'&&sh!=='off')return true;return sh==='afternoon'&&day.tasks.some(t=>t.kind==='routine'&&AFT_SKIP.some(id=>t.id===date+'-'+id))}
-function buildDay(date,force=false){let day=ensureDay(date);if(day.built&&!force&&!staleDay(date,day))return;const shift=activeShift(date),old=day.tasks,md=morningDelta(shift);let items=[];data.routine.forEach(g=>g.items.filter(it=>!(g.id==='morning'&&shift==='afternoon'&&AFT_SKIP.includes(it.id))).filter(it=>!it.archived).filter(it=>onDate(it,date)).forEach(it=>items.push({...it,time:g.id==='morning'?addMin(it.time,md):it.time,id:date+'-'+it.id,name:displayTaskName(it),group:tr(g.titleKey)||g.title,kind:'routine',done:old.find(t=>t.id===date+'-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-'+it.id)?.priority||'normal',count:old.find(t=>t.id===date+'-'+it.id)?.count||0,top:old.find(t=>t.id===date+'-'+it.id)?.top,subs:old.find(t=>t.id===date+'-'+it.id)?.subs})));(data.schedule[shift]||[]).filter(it=>!(notStudent()&&it.id==='study')).forEach(it=>items.push({...it,id:date+'-s-'+it.id,name:displayTaskName(it),group:tr('schedule'),kind:'school',done:old.find(t=>t.id===date+'-s-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-s-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-s-'+it.id)?.priority||'normal',top:old.find(t=>t.id===date+'-s-'+it.id)?.top,subs:old.find(t=>t.id===date+'-s-'+it.id)?.subs}));items.push(...old.filter(t=>t.kind==='custom'));day.tasks=items;day.built=true;day.sh=shift;save()}
+function buildDay(date,force=false){let day=ensureDay(date);if(day.built&&!force&&!staleDay(date,day))return;const shift=activeShift(date);day.tasks=makeDayItems(date,day.tasks);day.built=true;day.sh=shift;save()}
+function makeDayItems(date,old){const shift=activeShift(date),md=morningDelta(shift);let items=[];data.routine.forEach(g=>g.items.filter(it=>!(g.id==='morning'&&shift==='afternoon'&&AFT_SKIP.includes(it.id))).filter(it=>!it.archived).filter(it=>onDate(it,date)).forEach(it=>items.push({...it,time:g.id==='morning'?addMin(it.time,md):it.time,id:date+'-'+it.id,name:displayTaskName(it),group:tr(g.titleKey)||g.title,kind:'routine',done:old.find(t=>t.id===date+'-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-'+it.id)?.priority||'normal',count:old.find(t=>t.id===date+'-'+it.id)?.count||0,top:old.find(t=>t.id===date+'-'+it.id)?.top,subs:old.find(t=>t.id===date+'-'+it.id)?.subs})));(data.schedule[shift]||[]).filter(it=>!(notStudent()&&it.id==='study')).forEach(it=>items.push({...it,id:date+'-s-'+it.id,name:displayTaskName(it),group:tr('schedule'),kind:'school',done:old.find(t=>t.id===date+'-s-'+it.id)?.done||false,notes:old.find(t=>t.id===date+'-s-'+it.id)?.notes||'',priority:old.find(t=>t.id===date+'-s-'+it.id)?.priority||'normal',top:old.find(t=>t.id===date+'-s-'+it.id)?.top,subs:old.find(t=>t.id===date+'-s-'+it.id)?.subs}));items.push(...old.filter(t=>t.kind==='custom'));return items}
 function updateStaticText(){document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(I[lang][k])el.textContent=tr(k)});$('langToggle').textContent=lang==='en'?'فارسی / FA':'English / EN';{const bn=$('brandName');if(bn&&bn.firstChild)bn.firstChild.nodeValue=lang==='fa'?'لول بای':'LvLBY';document.title=lang==='fa'?'لول بای — زندگی، با تمرکز':'LvLBY — Life, in focus'}$('quickName').placeholder=saPlaceholder();$('detailNotes').placeholder=tr('typeNote');const shift=$('shiftType'),val=shift.value;shift.innerHTML=`<option value="morning">${tr('morning')} — ${tr('shiftTimeMorning')}</option><option value="afternoon">${tr('afternoon')} — ${tr('shiftTimeAfternoon')}</option><option value="off">${tr('off')}</option>`;shift.value=val}
 /* v32: a brand-new user sees only the next 5 tasks (rest behind one button); nothing is deleted and progress still counts all tasks */
 let showAllToday=false;
@@ -1517,7 +1520,8 @@ function resetTimer(){pauseTimer();timerSeconds=1500;timerPaint();$('timerStart'
 function pauseTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}if($('timerStart'))$('timerStart').disabled=false}
 $('timerStart').onclick=()=>{if(timerInterval)return;timerInterval=setInterval(()=>{timerSeconds--;timerPaint();if(timerSeconds<=0){pauseTimer();$('timerStart').disabled=false;{const dd=ensureDay(today());dd.focus=(dd.focus||0)+1;save();paintXP();renderExtras()}toast(tr('focusDone')+' +10 XP');try{navigator.vibrate?.([150,80,150])}catch(e){}}},1000);$('timerStart').disabled=true};
 $('timerPause').onclick=()=>{pauseTimer();$('timerStart').disabled=false};$('timerReset').onclick=resetTimer;
-function exportData(){const blob=new Blob([JSON.stringify({version:2,lang,data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lvlby-backup.json';a.click();try{localStorage.setItem('lvlby_lastbackup',String(Date.now()))}catch(e){}setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportData(){const blob=new Blob([JSON.stringify({version:2,lang,data},null,2)],{type:'application/json'});
+  if(IS_APP){appSaveFile('lvlby-backup.json',JSON.stringify({version:2,lang,data},null,2),'application/json').then(ok=>{if(ok){try{localStorage.setItem('lvlby_lastbackup',String(Date.now()))}catch(e){}}else toast(L('Could not share the backup file.','فایل پشتیبان ارسال نشد.'))});return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lvlby-backup.json';a.click();try{localStorage.setItem('lvlby_lastbackup',String(Date.now()))}catch(e){}setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $('exportData').onclick=exportData;$('restoreLocal').onclick=async()=>{try{const b=JSON.parse(localStorage.getItem(LS.bak));if(!b||!b.data||!(await uiConfirm(tr('confirmRestore'),{danger:true})))return;data=normalize(b.data);save();renderAll();showStatus();toast(sx('restored'))}catch(e){}};$('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());const incoming=obj.data||obj;if(!incoming.routine||!incoming.schedule||!incoming.days)throw Error();if(!(await uiConfirm(tr('confirmImport'),{danger:true})))return;backupDevice();data=normalize(incoming);if(obj.lang){lang=obj.lang;localStorage.setItem('lvlby-lang',lang)}save();renderAll();toast(tr('backupLoaded'))}catch(err){toast(tr('invalidBackup'))}e.target.value=''};
 $('clearData').onclick=()=>{if(undoPoint()||true){backupDevice();data=defaults();save();selected=today();$('selectedDate').value=selected;renderAll();toast(tr('saved'))}};
@@ -1529,19 +1533,61 @@ const NT={
 en:{title:'Reminders',desc:'Get a phone notification when a task\'s time arrives. This is a free, on-device feature: it only works while LvLBY is open or still running in the background. If you close the app, reminders can be missed. On iPhone, add LvLBY to your Home Screen first. These settings are stored on this device only.',lead:'Remind me',l0:'At the task time',l5:'5 minutes before',l10:'10 minutes before',enable:'Turn on reminders',disable:'Turn off reminders',test:'Send test notification',unsupported:'This browser does not support notifications.',denied:'Notifications are blocked. Allow them in your browser or site settings, then try again.',on:'Reminders are ON.',off:'Reminders are OFF.',testFail:'Could not show a notification. Check your phone\'s notification settings.',testBody:'Notifications are working.',at:'at'},
 fa:{title:'یادآورها',desc:'وقتی زمان یک کار می‌رسد، اعلان گوشی دریافت کن. این قابلیت رایگان و روی خود دستگاه است: فقط وقتی لول بای باز است یا در پس‌زمینه فعال است کار می‌کند. اگر برنامه را ببندی ممکن است یادآوری‌ها از دست بروند. در آیفون ابتدا لول بای را به صفحهٔ اصلی اضافه کن. این تنظیمات فقط روی همین دستگاه ذخیره می‌شود.',lead:'یادآوری',l0:'همان زمان کار',l5:'۵ دقیقه قبل',l10:'۱۰ دقیقه قبل',enable:'روشن کردن یادآورها',disable:'خاموش کردن یادآورها',test:'ارسال اعلان آزمایشی',unsupported:'این مرورگر از اعلان پشتیبانی نمی‌کند.',denied:'اعلان‌ها مسدود است. در تنظیمات مرورگر یا سایت اجازه بده و دوباره تلاش کن.',on:'یادآورها روشن است.',off:'یادآورها خاموش است.',testFail:'نمایش اعلان ممکن نشد. تنظیمات اعلان گوشی را بررسی کن.',testBody:'اعلان‌ها کار می‌کنند.',at:'ساعت'}};
 const nt=k=>(NT[lang]||NT.en)[k]||NT.en[k];
-function notifSupported(){return 'Notification' in window}
-function notifActive(){return notif.on&&notifSupported()&&Notification.permission==='granted'}
+/* ---- v35: native Android app (Capacitor). In a normal browser IS_APP is false and nothing below changes. ---- */
+var IS_APP=false,nativePerm='prompt',NATIVE_TMR=0,NATIVE_BUSY=false,NATIVE_AGAIN=false;const NATIVE_DAYS=14,NATIVE_MAX=200;
+function nplug(n){try{return (window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins[n||'LocalNotifications'])||null}catch(e){return null}}
+IS_APP=!!(window.Capacitor&&typeof Capacitor.isNativePlatform==='function'&&Capacitor.isNativePlatform()&&nplug());
+const NTA={en:'Reminders ring on your phone at each task time, even when LvLBY is closed. The next 14 days are scheduled, so open the app once in a while to refresh them. If reminders come late, allow "Alarms & reminders" and remove the battery limit for LvLBY in your phone settings. These settings are stored on this device only.',fa:'یادآورها سر ساعت هر کار روی گوشی زنگ می‌خورند، حتی وقتی لول بای بسته است. کارهای ۱۴ روز آینده زمان‌بندی می‌شوند؛ پس گاهی برنامه را باز کن تا به‌روز شوند. اگر یادآوری‌ها دیر آمدند، در تنظیمات گوشی اجازهٔ «هشدارها و یادآورها» را بده و محدودیت باتری را برای لول بای بردار. این تنظیمات فقط روی همین دستگاه ذخیره می‌شود.'};
+function nativeId(str){let h=2166136261;for(let k=0;k<str.length;k++){h^=str.charCodeAt(k);h=Math.imul(h,16777619)>>>0}return (h%2147483646)+1}
+function nativeTasksFor(date){const day=data.days[date];if(day&&day.built&&!staleDay(date,day))return day.tasks||[];return makeDayItems(date,(day&&day.tasks)||[])}
+function nativeSyncSoon(){if(!IS_APP)return;clearTimeout(NATIVE_TMR);NATIVE_TMR=setTimeout(nativeSync,1500)}
+async function nativeReq(){const LN=nplug();if(!LN)return 'denied';try{let p=await LN.checkPermissions();if(p.display==='prompt'||p.display==='prompt-with-rationale')p=await LN.requestPermissions();nativePerm=p.display;
+  try{if(typeof LN.checkExactNotificationSetting==='function'){const e=await LN.checkExactNotificationSetting();if(e&&e.exact_alarm==='denied')toast(L('Please allow Alarms & reminders for LvLBY in phone settings so reminders ring on time.','لطفاً در تنظیمات گوشی اجازهٔ «هشدارها و یادآورها» را برای لول بای بده تا یادآوری‌ها سر وقت زنگ بخورند.'))}}catch(e){}
+  return nativePerm}catch(e){return 'denied'}}
+async function nativeSync(){
+  if(!IS_APP)return;if(NATIVE_BUSY){NATIVE_AGAIN=true;return}NATIVE_BUSY=true;
+  try{const LN=nplug();
+    try{const p=await LN.checkPermissions();nativePerm=p.display}catch(e){}
+    let pend={notifications:[]};try{pend=await LN.getPending()}catch(e){}
+    if(pend&&pend.notifications&&pend.notifications.length)await LN.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    if(!(notif.on&&nativePerm==='granted')||demo){renderNotifUI();return}
+    const now=Date.now(),list=[],seen={};
+    for(let n=0;n<NATIVE_DAYS;n++){
+      const d=shiftDays(today(),n);if(isVac(d))continue;
+      const ymd=d.split('-').map(Number);
+      nativeTasksFor(d).forEach(t=>{
+        if(t.done||!t.time)return;const hm=String(t.time).split(':').map(Number);if(hm.length<2||isNaN(hm[0])||isNaN(hm[1]))return;
+        const at=new Date(ymd[0],ymd[1]-1,ymd[2],hm[0],hm[1]-(Number(notif.lead)||0),0);
+        if(at.getTime()<=now+3000)return;const id=nativeId(String(t.id));if(seen[id])return;seen[id]=1;
+        list.push({id,title:displayTaskName(t),body:nt('at')+' '+t.time,schedule:{at,allowWhileIdle:true},extra:{date:d}});
+      })}
+    list.sort((x,y)=>x.schedule.at-y.schedule.at);
+    if(list.length)await LN.schedule({notifications:list.slice(0,NATIVE_MAX)});
+    renderNotifUI();
+  }catch(e){console.warn('Native reminders failed:',e)}
+  finally{NATIVE_BUSY=false;if(NATIVE_AGAIN){NATIVE_AGAIN=false;nativeSyncSoon()}}}
+async function nativeInit(){
+  try{const LN=nplug();const p=await LN.checkPermissions();nativePerm=p.display;
+    let asked=false;try{asked=!!localStorage.getItem('lvlby-app-asked')}catch(e){}
+    if(!asked&&nativePerm!=='granted'&&P&&P.done){try{localStorage.setItem('lvlby-app-asked','1')}catch(e){}const r=await nativeReq();notif.on=(r==='granted');saveNotif()}
+    else if(!asked&&nativePerm==='granted'&&!notif.on&&P&&P.done){try{localStorage.setItem('lvlby-app-asked','1')}catch(e){}notif.on=true;saveNotif()}
+  }catch(e){}
+  renderNotifUI();nativeSyncSoon()}
+async function appSaveFile(name,text,mime){const FS=nplug('Filesystem'),SH=nplug('Share');if(!FS||!SH)return false;try{const r=await FS.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'});await SH.share({title:name,url:r.uri,dialogTitle:name});return true}catch(e){console.warn('App share failed:',e);return false}}
+function notifSupported(){return IS_APP||('Notification' in window)}
+function notifActive(){return notif.on&&notifSupported()&&(IS_APP?nativePerm==='granted':Notification.permission==='granted')}
 function saveNotif(){try{localStorage.setItem(NK,JSON.stringify(notif))}catch(e){}}
 function renderNotifUI(extra){
   if(!$('notifTitle'))return;
-  $('notifTitle').textContent=nt('title');$('notifDesc').textContent=nt('desc');$('notifLeadLabel').textContent=nt('lead');
+  $('notifTitle').textContent=nt('title');$('notifDesc').textContent=IS_APP?(NTA[lang]||NTA.en):nt('desc');$('notifLeadLabel').textContent=nt('lead');
   const opts=$('notifLead').options;opts[0].textContent=nt('l0');opts[1].textContent=nt('l5');opts[2].textContent=nt('l10');$('notifLead').value=String(notif.lead);
   const supported=notifSupported();
   $('notifToggle').textContent=nt(notifActive()?'disable':'enable');$('notifTest').textContent=nt('test');
   $('notifToggle').disabled=!supported;$('notifTest').disabled=!notifActive();
-  $('notifState').textContent=extra||(!supported?nt('unsupported'):(supported&&Notification.permission==='denied'?nt('denied'):nt(notifActive()?'on':'off')));
+  $('notifState').textContent=extra||(!supported?nt('unsupported'):((IS_APP?nativePerm==='denied':Notification.permission==='denied')?nt('denied'):nt(notifActive()?'on':'off')));
 }
 async function showNotif(title,body,tag){
+  if(IS_APP){try{await nplug().schedule({notifications:[{id:nativeId(String(tag||title)),title,body,schedule:{at:new Date(Date.now()+1500),allowWhileIdle:true}}]});return true}catch(e){console.warn('Notification failed:',e);return false}}
   try{
     const reg=('serviceWorker' in navigator)?await navigator.serviceWorker.getRegistration():null;
     if(reg&&reg.showNotification){await reg.showNotification(title,{body,tag,icon:'icons/icon-192.png',badge:'icons/icon-192.png'});return true}
@@ -1549,7 +1595,7 @@ async function showNotif(title,body,tag){
   }catch(e){console.warn('Notification failed:',e);return false}
 }
 function checkReminders(){
-  if(!notifActive()||demo||isVac(today()))return;
+  if(IS_APP||!notifActive()||demo||isVac(today()))return;
   const date=today(),day=data.days[date];if(!day||!day.tasks)return;
   let sent={};try{sent=JSON.parse(localStorage.getItem(NDK)||'{}')}catch(e){}
   if(sent.date!==date)sent={date,ids:[]};
@@ -1567,6 +1613,8 @@ function checkReminders(){
 }
 $('notifToggle').onclick=async()=>{
   if(!notifSupported())return renderNotifUI();
+  if(IS_APP){if(notifActive()){notif.on=false;saveNotif();renderNotifUI();nativeSyncSoon();return}
+    const r=await nativeReq();notif.on=(r==='granted');saveNotif();renderNotifUI(notif.on?undefined:nt('denied'));nativeSyncSoon();return}
   if(notifActive()){notif.on=false;saveNotif();return renderNotifUI()}
   try{
     const p=await Notification.requestPermission();
@@ -1574,14 +1622,15 @@ $('notifToggle').onclick=async()=>{
     if(notif.on)checkReminders();
   }catch(e){renderNotifUI(nt('denied'))}
 };
-$('notifLead').onchange=()=>{notif.lead=Number($('notifLead').value)||0;saveNotif();checkReminders()};
+$('notifLead').onchange=()=>{notif.lead=Number($('notifLead').value)||0;saveNotif();checkReminders();nativeSyncSoon()};
 $('notifTest').onclick=async()=>{const ok=await showNotif('LvLBY',nt('testBody'),'lvlby-test');renderNotifUI(ok?undefined:nt('testFail'))};
 
 Object.assign(I.fa,{tabHabits:'روتین‌ها',tabSchedule:'هفته',tabReports:'گزارش'});Object.assign(I.en,{tabHabits:'Routines',tabSchedule:'Week'});
 function fixFaBits(){const fa=lang==='fa';if(fa)document.querySelectorAll('#todayTasks span').forEach(e=>{if(!e.children.length&&/^\d{1,2}:\d{2}$/.test(e.textContent.trim()))e.textContent=e.textContent.trim().replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])});const lt=$('langToggle');if(lt)lt.textContent=fa?'English':'فارسی';const a=document.querySelector('.sitefoot a');if(a)a.textContent=fa?'حریم خصوصی':'Privacy';
  const d=$('selectedDate');if(d){let w=d.parentNode;if(!w.classList.contains('datewrap')){w.classList.add('datewrap');const l=document.createElement('div');l.id='dateLbl';l.className='datelbl';w.insertBefore(l,d)}const l=$('dateLbl');w.classList.toggle('faDate',fa);l.textContent=fa?dayLabel(selected,{weekday:'short',day:'numeric',month:'long',year:'numeric'}):''}
  document.querySelectorAll('h1,h2,.brand,.logo,.hero-title').forEach(e=>{if(/^LvLBY\.?$/.test(e.textContent.trim())){e.textContent='LvLBY';}})}
-setInterval(checkReminders,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReminders()});
+setInterval(checkReminders,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkReminders();nativeSyncSoon()}});
+if(IS_APP)setTimeout(nativeInit,1200);
 
 if(!data.days[selected])buildDay(selected);renderAll();setupFirebase();showStatus();checkReminders();setTimeout(welcomeGate,500);
 
@@ -1590,7 +1639,7 @@ const DAY=864e5,lsGet=k=>{try{return +localStorage.getItem(k)||0}catch(e){return
 function backupNudge(){if(demo||!Object.keys(data.days).length)return;const now=Date.now();if(!lsGet('lvlby_firstseen'))lsSet('lvlby_firstseen',now);
  const last=lsGet('lvlby_lastbackup')||lsGet('lvlby_firstseen');if(now-last<7*DAY||now-lsGet('lvlby_bk_snooze')<3*DAY)return;
  lsSet('lvlby_bk_snooze',now);uiConfirm(L('Your data lives only on this phone. One tap saves a backup file you can restore anytime.','داده‌هات فقط روی همین گوشی ذخیره می‌شه. با یک لمس یه فایل پشتیبان می‌گیری که هر وقت خواستی برش می‌گردونی.'),{title:L('Time for a backup?','وقت پشتیبان‌گیریه؟'),ok:L('Save backup','ذخیرهٔ پشتیبان'),cancel:L('Later','بعداً')}).then(ok=>{if(ok)exportData()})}
-function renderInstallBar(){const b=$('installBar');if(!b)return;const show=!isStandalone()&&Date.now()-lsGet('lvlby_inst_x')>14*DAY&&/^https?:$/.test(location.protocol);b.hidden=!show;b.style.display=show?'flex':'none';if(!show)return;
+function renderInstallBar(){const b=$('installBar');if(!b)return;const show=!IS_APP&&!isStandalone()&&Date.now()-lsGet('lvlby_inst_x')>14*DAY&&/^https?:$/.test(location.protocol);b.hidden=!show;b.style.display=show?'flex':'none';if(!show)return;
  $('installBarTxt').textContent=deferredInstall?L('Install LvLBY for one-tap access and offline use.','لول بای را نصب کن تا با یک لمس و حتی بدون اینترنت بازش کنی.'):installText();$('installBarGo').textContent=L('Install','نصب');$('installBarGo').style.display=deferredInstall?'':'none'}
 $('installBarGo').onclick=doInstall;$('installBarX').onclick=()=>{lsSet('lvlby_inst_x',Date.now());renderInstallBar()};window.addEventListener('beforeinstallprompt',()=>setTimeout(renderInstallBar,0));
 function shareCardBlob(){return new Promise(res=>{const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),f=lang==='fa',F='system-ui,Vazirmatn,Tahoma,sans-serif',n=v=>f?fa(v):String(v),sn=streakNow(),td=today(),nm=(P&&P.name)||L('Me','من'),
@@ -1675,7 +1724,7 @@ $('taskSearch').oninput=runSearch;document.querySelector('.tab[data-view=reports
 function runSearch(){const q=$('taskSearch').value.trim().toLowerCase(),r=$('searchRes');r.textContent='';if(q.length<2)return;let n=0;Object.keys(data.days).sort().reverse().forEach(d=>{((data.days[d]||{}).tasks||[]).forEach(t=>{if(n>=20)return;const nm=displayTaskName(t);if(!nm.toLowerCase().includes(q))return;n++;const b=obEl('button','btn ghost',dayLabel(d,{day:'numeric',month:'short'})+' — '+nm+(t.done?' ✓':''));b.type='button';b.style.cssText='display:block;width:100%;text-align:start;margin-top:6px';b.onclick=()=>{selected=d;$('selectedDate').value=d;if(!ensureDay(d).built)buildDay(d);renderAll();document.querySelector('.tab[data-view=today]').click()};r.append(b)})});if(!n)r.append(obEl('p','muted smalltext',L('Nothing found.','چیزی پیدا نشد.')))}
 function renderSearch(){const c=$('searchCard');c.hidden=Object.keys(data.days).length<14;if(c.hidden)return;$('taskSearch').placeholder=L('Search your tasks','جستجوی کارها');$('taskSearch').setAttribute('aria-label',L('Search your tasks','جستجوی کارها'));runSearch()}
 $('taskSearch').oninput=runSearch;document.querySelector('.tab[data-view=calendar]').addEventListener('click',renderSearch);
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker not registered:',e)))}
+if(!IS_APP&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker not registered:',e)))}
 </script>
 </body>
 </html>
