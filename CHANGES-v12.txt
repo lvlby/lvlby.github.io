@@ -63,3 +63,10 @@ Added: the creator-attribution safeguard rule in PROMPT_TO_PASTE.txt and HANDOFF
 Changed: sw.js cache name is now lvlby-v37-credits. Workflow text (PASTE-AS-android.yml.txt) builds a signed RELEASE apk (not debuggable) when the three signing secrets exist, otherwise falls back to the debug build; versionName 37.x.
 Merged: v36 native Google sign-in code with the Credits popup (3-way merge, no conflicts, all test suites pass).
 Not tested: the real GitHub build, the release signing, the install warning on a phone, real Google sign-in. Known and NOT fixed: the repo is flat but manifest.webmanifest, index.html and sw.js refer to icons/...; the icons probably give 404 on the live site.
+
+
+v38.1 - routine and school tasks can be edited for all days
+Problem: changing the name or time of a routine or school task in the daily plan only changed that one day, and the next rebuild brought the old values back.
+Fixed: the task window has a new switch "Apply the name and time to all days from this day on" (on by default, only for routine and school tasks). It changes the routine (or the school schedule) itself from the chosen day forward; earlier days stay as they were. Switch it off for a one-day change. Morning-routine times are converted back for the afternoon shift so the stored time stays correct.
+Tests: new suite "edit" (routine name and time, one-day only, school task, custom task, en and fa).
+Not tested: on a real phone.
