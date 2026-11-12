@@ -56,3 +56,10 @@ Why a fixed key: without it every GitHub build gets a new random signing key, so
 Not done: Firebase and Firestore still need the whole phone to reach Google (a VPN in Iran). Loading the Firebase web SDK from the app's own files instead of gstatic is possible later. Google sign-in needs Google Play services and a Google account on the phone.
 Tested: with a fake Google plugin and a fake Firebase in Chromium: website popup unchanged; app signs in with the ID token and never uses the pop-up; cancel, plugin error and missing-token paths; sign-out on both sides; email login still reachable; all older suites still pass. NOT tested: the GitHub build (esbuild bundle, Gradle with the plugin), the real plugin, a real Google sign-in, a real phone.
 
+
+v37 - Credits popup, copyright notice, release build
+Added: Settings > Credits (popup, English and Persian) showing the creator, Rozhman Ghorbani, and the copyright line. Copyright / creator notice and the safeguard note added as comments to index.html, about.html, privacy.html, sw.js, native-plugins.entry.js, the workflow text, the test files and the docs (package.json has author and license fields; manifest.webmanifest and capacitor.config.json cannot hold comments).
+Added: the creator-attribution safeguard rule in PROMPT_TO_PASTE.txt and HANDOFF_FOR_AI.md.
+Changed: sw.js cache name is now lvlby-v37-credits. Workflow text (PASTE-AS-android.yml.txt) builds a signed RELEASE apk (not debuggable) when the three signing secrets exist, otherwise falls back to the debug build; versionName 37.x.
+Merged: v36 native Google sign-in code with the Credits popup (3-way merge, no conflicts, all test suites pass).
+Not tested: the real GitHub build, the release signing, the install warning on a phone, real Google sign-in. Known and NOT fixed: the repo is flat but manifest.webmanifest, index.html and sw.js refer to icons/...; the icons probably give 404 on the live site.
