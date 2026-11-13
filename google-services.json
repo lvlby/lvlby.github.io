@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "496148554586-5su970k2mg61tlake9io4gets8piljhi.apps.googleusercontent.com",
+          "client_id": "496148554586-epul893vsp56h57deqcms1iigu50t8n5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.lvlby.app",
-            "certificate_hash": "43161da2efc869b154e551f624574bee93fe08cc"
+            "certificate_hash": "5d3999138ef998da362d2cbcdf1d3f7bfb015e6a"
           }
         },
         {
