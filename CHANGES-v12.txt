@@ -65,8 +65,25 @@ Merged: v36 native Google sign-in code with the Credits popup (3-way merge, no c
 Not tested: the real GitHub build, the release signing, the install warning on a phone, real Google sign-in. Known and NOT fixed: the repo is flat but manifest.webmanifest, index.html and sw.js refer to icons/...; the icons probably give 404 on the live site.
 
 
+v38 - Help, contact, download page, what's new, update notice, 404, SEO, privacy review
+Added: Settings > "Help & contact": Help / Q&A (10 questions, in the chosen language, includes Smart Add examples that were checked with the parser), What's new, Contact us (email link), "Get the Android app" (website only).
+Added: What's new popup (shows once after an update to people who already have a profile; new users never see it). Content is the WHATS object in index.html (bump its id for the next release).
+Added: update notice inside the Android app. The workflow writes its build number into the app (APP_BUILD) and publishes version.json to the repo; the app reads https://lvlby.github.io/version.json and shows a card in Settings plus one toast when a newer build exists. Silent when offline or blocked. The website never checks.
+Added: download.html (bilingual, button to releases/latest/download/LvLBY.apk, install steps, why the warning appears, signing fingerprint), 404.html, robots.txt, sitemap.xml, version.json (build 0 placeholder; the workflow overwrites it).
+Changed: privacy.html rewritten and the in-app privacy summary extended (sign-in data, Firebase, IPs seen by Google/jsDelivr servers, no analytics, Android app, deletion, contact). About page footer links to the download page. sw.js cache lvlby-v38-help. Workflow versionName 38.x.
+Tests: new suite v38 in extras/run_tests.py (fake fetch for the update notice).
+Not tested: the real build, the version.json push from the workflow, mailto and external links opening from inside the Android WebView, the real download from GitHub in Iran.
+
+
 v38.1 - routine and school tasks can be edited for all days
-Problem: changing the name or time of a routine or school task in the daily plan only changed that one day, and the next rebuild brought the old values back.
-Fixed: the task window has a new switch "Apply the name and time to all days from this day on" (on by default, only for routine and school tasks). It changes the routine (or the school schedule) itself from the chosen day forward; earlier days stay as they were. Switch it off for a one-day change. Morning-routine times are converted back for the afternoon shift so the stored time stays correct.
-Tests: new suite "edit" (routine name and time, one-day only, school task, custom task, en and fa).
-Not tested: on a real phone.
+Fixed: changing the name or time of a routine or school task in the daily plan only changed that one day. The task window now has a switch "Apply the name and time to all days from this day on" (on by default, only for routine and school tasks). Earlier days stay as they were. Morning-routine times are converted back for the afternoon shift.
+
+v39 - Smart Add ranges and Persian dates, focus timer, countdown, weekly review, phone-free streak
+Added: Smart Add understands time ranges: "2:00-5:00", "2:00 - 5:00", "2:00 till 5:00", "from 2 to 5 pm", "10 am until 2 pm", Persian "ساعت ۲ تا ۵ عصر", "از ساعت ۹ تا ۱۱ صبح". Without am/pm the app asks AM or PM once, as always. The end time is saved on the task (field end), shown in the list as 2:00-5:00, editable in the task window ("Until") and used as the end of calendar events (.ics).
+Added: Smart Add understands Persian-calendar dates written in English letters or Persian: all 12 months with common spellings (aban, abaan, Aban, Azar, Dey, Khordad, Esfand ...), and the day as 27, 27th, twenty seventh, twenty-seventh, "the 27th of aban", "aban 27", ۲۷, ۲۷م, بیست و هفتم, بیست‌وهفتم. Gregorian ordinals also work ("twenty seventh November"). A question like "Did you buy your PC on 27 aban" keeps the question as the title.
+Added: Focus timer window (15, 25 or 45 minutes, notification in the Android app, +10 XP per finished session), countdown cards for the next exams (students), weekly review lines (most missed habit, hardest day, phone-free days), phone-free streak (choose 2 or more apps to stay away from, confirm each day; nothing is blocked and the app list stays on the device).
+Added: Settings (website only) has a "Download the Android app" button that downloads the newest APK from GitHub in one tap, with the install steps right under it and a link to download.html. It replaces the separate "Get the Android app" button. Hidden inside the app.
+Fixed (Persian): time ranges without the word "ساعت" ("۲ تا ۵ عصر") and ranges that end with "شب" or "ظهر" ("ساعت ۷ تا ۸ شب") are understood without asking AM or PM. All 12 Persian months in every form were re-tested (digits, ordinals, with and without a year) with no failures; Persian screens, Help, What's new, focus timer and the task window were checked for leftover English text and sideways scrolling.
+Changed: What's new, Help text and privacy page mention the new things. sw.js cache lvlby-v39-tools. Workflow versionName 39.x.
+Tests: new suites edit, sa2 (about 55 checks for ranges and Jalali dates, en), v39 (focus, countdown, insights, streak, en and fa).
+Not tested: on a real phone; the Android notification for the focus timer; the real build. Smart Add was tested with the fake page environment only.
